@@ -54,6 +54,7 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-body);
+  overflow-x: hidden;
 }
 
 /* Subtle grain texture */
@@ -210,6 +211,8 @@ body::before {
   margin: 2rem 0;
   width: 100%;
   height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
 }
 
 /* Arabic font — applied when html has .font-arabic class */

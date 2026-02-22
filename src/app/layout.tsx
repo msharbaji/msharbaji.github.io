@@ -79,6 +79,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Inline locale detection — runs before paint to prevent LTR→RTL layout shift */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var l=localStorage.getItem("locale");if(!l){var n=navigator.language||"";l=n.startsWith("ar")?"ar":"en"}if(l==="ar"){var d=document.documentElement;d.lang="ar";d.dir="rtl";d.classList.add("font-arabic")}}catch(e){}})()`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

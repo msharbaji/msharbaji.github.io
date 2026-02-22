@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from "react";
 import { type Locale, type Translations, getTranslations } from "@/lib/i18n";
@@ -35,21 +34,13 @@ function getStoredLocale(): Locale {
  * then syncs from localStorage in useEffect.
  */
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
-  const hasHydrated = useRef(false);
-
-  // Sync from localStorage on mount (after hydration) to avoid server/client mismatch.
-  // Deferred to next tick to satisfy react-hooks/set-state-in-effect (avoids sync setState in effect).
-  useEffect(() => {
-    if (!hasHydrated.current) {
-      hasHydrated.current = true;
-      const stored = getStoredLocale();
-      if (stored !== "en") {
-        const id = setTimeout(() => setLocaleState(stored), 0);
-        return () => clearTimeout(id);
-      }
-    }
-  }, []);
+  // Read locale synchronously on first render — the inline <script> in layout.tsx
+  // has already set dir/lang/font-arabic on <html> before paint, so React state
+  // matches the DOM from the start (no CLS from deferred useEffect).
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === "undefined") return "en";
+    return getStoredLocale();
+  });
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
