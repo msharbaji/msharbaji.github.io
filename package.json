@@ -1,33 +1,33 @@
 {
-  "name": "malsharbaji.com",
-  "version": "1.0.0",
-  "description": "My personal website",
-  "main": "index.js",
+  "name": "msharbaji.github.io",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "docs:clean-dev": "vuepress dev docs --clean-cache",
-    "docs:update-package": "npx vp-update"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/msharbaji/malsharbaji.com.git"
+  "dependencies": {
+    "@types/sanitize-html": "^2.16.0",
+    "clsx": "^2.1.1",
+    "gray-matter": "^4.0.3",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "sanitize-html": "^2.17.1",
+    "tailwind-merge": "^3.4.0"
   },
-  "keywords": [
-    "CV",
-    "resume",
-    "blogs"
-  ],
-  "author": "Mohamad Abdalbaqi Alsharbaji",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/msharbaji/malsharbaji.com/issues"
-  },
-  "homepage": "https://github.com/msharbaji/malsharbaji.com#readme",
   "devDependencies": {
-    "@vuepress/client": "2.0.0-beta.63",
-    "vue": "^3.2.47",
-    "vuepress": "2.0.0-beta.63",
-    "vuepress-theme-hope": "2.0.0-beta.228"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
