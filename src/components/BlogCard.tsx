@@ -9,7 +9,7 @@ export default function BlogCard({
 }: {
   post: Omit<BlogPost, "content">;
 }) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
 
   return (
     <Link
@@ -22,10 +22,10 @@ export default function BlogCard({
         <span>{post.readingTime} {t.blog.minRead}</span>
       </div>
       <h3 className="mt-3 font-display text-lg font-600 leading-snug text-foreground transition-colors group-hover:text-accent">
-        {post.title}
+        {post.title[locale]}
       </h3>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">
-        {post.description}
+        {post.description[locale]}
       </p>
       <div className="mt-4 flex flex-wrap gap-1.5">
         {post.tags.map((tag) => (

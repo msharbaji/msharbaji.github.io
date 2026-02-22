@@ -39,10 +39,10 @@ export interface Project {
 
 export interface BlogPost {
   slug: string;
-  title: string;
+  title: Bilingual;
   date: string;
-  description: string;
+  description: Bilingual;
   tags: string[];
-  content: string;
+  content: Bilingual;
   readingTime: number;
 }

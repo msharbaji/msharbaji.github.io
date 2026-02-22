@@ -19,9 +19,9 @@ export async function GET() {
   const items = posts
     .map(
       (post) => `    <item>
-      <title>${escapeXml(post.title)}</title>
+      <title>${escapeXml(post.title.en)}</title>
       <link>${siteUrl}/blog/${post.slug}</link>
-      <description>${escapeXml(post.description)}</description>
+      <description>${escapeXml(post.description.en)}</description>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       <guid>${siteUrl}/blog/${post.slug}</guid>
     </item>`
