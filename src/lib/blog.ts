@@ -8,6 +8,36 @@ import { sanitize } from "./sanitize";
 import type { Locale } from "./i18n";
 
 const postsDirectory = path.join(process.cwd(), "src/content/blog");
+const publicDirectory = path.join(process.cwd(), "public");
+
+/** Read PNG dimensions from file header (bytes 16-23 of IHDR chunk). */
+function getPngDimensions(filePath: string): { width: number; height: number } | null {
+  try {
+    const fd = fs.openSync(filePath, "r");
+    const buf = Buffer.alloc(24);
+    fs.readSync(fd, buf, 0, 24, 0);
+    fs.closeSync(fd);
+    // Verify PNG signature
+    if (buf[0] !== 0x89 || buf[1] !== 0x50) return null;
+    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  } catch {
+    return null;
+  }
+}
+
+/** Inject width/height attributes into local <img> tags to prevent CLS. */
+function addImageDimensions(htmlContent: string): string {
+  return htmlContent.replace(
+    /<img\s+([^>]*?)src="(\/[^"]+\.png)"([^>]*?)\/?>/gi,
+    (match, before, src, after) => {
+      if (match.includes("width=")) return match;
+      const filePath = path.join(publicDirectory, src);
+      const dims = getPngDimensions(filePath);
+      if (!dims) return match;
+      return `<img ${before}src="${src}" width="${dims.width}" height="${dims.height}" loading="lazy"${after}>`;
+    }
+  );
+}
 
 function getReadingTime(text: string): number {
   const words = text.trim().split(/\s+/).length;
@@ -133,8 +163,8 @@ export async function getPostBySlug(
     },
     tags: (en.data.tags as string[]) || [],
     content: {
-      en: sanitize(enProcessed.toString()),
-      ar: arProcessed ? sanitize(arProcessed.toString()) : sanitize(enProcessed.toString()),
+      en: addImageDimensions(sanitize(enProcessed.toString())),
+      ar: addImageDimensions(arProcessed ? sanitize(arProcessed.toString()) : sanitize(enProcessed.toString())),
     },
     readingTime: getReadingTime(en.rawContent),
   };

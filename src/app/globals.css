@@ -209,10 +209,8 @@ body::before {
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
   margin: 2rem 0;
-  width: 100%;
+  max-width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
 }
 
 /* Arabic font — applied when html has .font-arabic class */

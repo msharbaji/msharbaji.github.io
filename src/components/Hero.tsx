@@ -11,8 +11,8 @@ export default function Hero() {
     <section className="relative py-14 sm:py-20 lg:py-24">
       {/* Gradient orbs — contained to prevent viewport overflow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-40 end-0 h-[500px] w-[500px] rounded-full bg-accent/[0.06] blur-[120px]" />
-        <div className="absolute top-20 start-0 h-72 w-72 rounded-full bg-accent/[0.04] blur-[100px]" />
+        <div className="absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-accent/[0.06] blur-[120px]" />
+        <div className="absolute top-20 left-0 h-72 w-72 rounded-full bg-accent/[0.04] blur-[100px]" />
       </div>
 
       <div className="relative grid items-center gap-10 sm:gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
