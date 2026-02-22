@@ -54,6 +54,7 @@ jobs:
 
       - uses: cloudflare/wrangler-action@v3
         with:
+          wranglerVersion: "3.90.0"
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy out --project-name malsharbaji --branch main --commit-hash=${{ github.sha }} --commit-dirty=true
