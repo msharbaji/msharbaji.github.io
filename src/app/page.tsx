@@ -5,6 +5,7 @@ import ExperienceSection from "@/components/ExperienceSection";
 import EducationSection from "@/components/EducationSection";
 import SkillsSection from "@/components/SkillsSection";
 import ProjectCard from "@/components/ProjectCard";
+import ArrowIcon from "@/components/ArrowIcon";
 import AnimateIn from "@/components/AnimateIn";
 import Link from "next/link";
 import { summary } from "@/lib/resume-data";
@@ -20,7 +21,6 @@ export default function Home() {
     <>
       <Hero />
 
-      {/* Summary */}
       <section className="py-10 sm:py-16">
         <AnimateIn>
           <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
@@ -43,7 +43,6 @@ export default function Home() {
       <div className="section-divider" />
       <SkillsSection />
 
-      {/* Featured Course */}
       <div className="section-divider" />
       <section className="py-10 sm:py-16">
         <AnimateIn>
@@ -56,15 +55,7 @@ export default function Home() {
               className="group flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background focus:rounded-md"
             >
               {t.home.viewAll}
-              <svg
-                className="size-3 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
+              <ArrowIcon className="size-3 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
             </Link>
           </div>
         </AnimateIn>
@@ -92,7 +83,6 @@ export default function Home() {
         </AnimateIn>
       </section>
 
-      {/* Featured Projects */}
       <div className="section-divider" />
       <section className="py-10 sm:py-16">
         <AnimateIn>
@@ -105,15 +95,7 @@ export default function Home() {
               className="group flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background focus:rounded-md"
             >
               {t.home.viewAll}
-              <svg
-                className="size-3 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
+              <ArrowIcon className="size-3 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
             </Link>
           </div>
         </AnimateIn>
@@ -126,7 +108,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact CTA */}
       <div className="section-divider" />
       <AnimateIn>
         <section className="relative rounded-2xl border border-accent-warm/10 bg-accent-warm/[0.03] py-16 text-center sm:py-24">

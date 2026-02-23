@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { SITE_URL } from "@/lib/constants";
+import { breadcrumbJsonLd, JsonLd } from "@/lib/schema";
 import BlogPostDetail from "./BlogPostDetail";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://malsharbaji.com";
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
@@ -29,10 +29,10 @@ export async function generateMetadata({
       description: post.description.en,
       type: "article",
       publishedTime: post.date,
-      url: `${siteUrl}/blog/${slug}`,
+      url: `${SITE_URL}/blog/${slug}`,
     },
     alternates: {
-      canonical: `${siteUrl}/blog/${slug}`,
+      canonical: `${SITE_URL}/blog/${slug}`,
     },
   };
 }
@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const post = await getPostBySlug(slug);
   if (!post) notFound();
 
-  const jsonLd = {
+  const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title.en,
@@ -52,46 +52,15 @@ export default async function BlogPostPage({ params }: PageProps) {
     author: {
       "@type": "Person",
       name: "Mohamad Alsharbaji",
-      url: siteUrl,
+      url: SITE_URL,
     },
-    url: `${siteUrl}/blog/${slug}`,
-  };
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: siteUrl,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Blog",
-        item: `${siteUrl}/blog`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: post.title.en,
-        item: `${siteUrl}/blog/${slug}`,
-      },
-    ],
+    url: `${SITE_URL}/blog/${slug}`,
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd data={articleJsonLd} />
+      <JsonLd data={breadcrumbJsonLd("Blog", "blog", post.title.en, slug)} />
       <BlogPostDetail post={post} />
     </>
   );

@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import { courses, getCourseBySlug } from "@/lib/courses-data";
 import { notFound } from "next/navigation";
+import { SITE_URL } from "@/lib/constants";
+import { breadcrumbJsonLd, JsonLd } from "@/lib/schema";
 import CourseDetail from "./CourseDetail";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://malsharbaji.com";
 
 export function generateStaticParams() {
   return courses.map((c) => ({ slug: c.slug }));
@@ -24,7 +24,7 @@ export async function generateMetadata({
     title: course.title.en,
     description: course.description.en,
     alternates: {
-      canonical: `${siteUrl}/courses/${slug}`,
+      canonical: `${SITE_URL}/courses/${slug}`,
     },
   };
 }
@@ -39,11 +39,11 @@ export default async function CoursePage({ params }: PageProps) {
     "@type": "Course",
     name: course.title.en,
     description: course.description.en,
-    url: `${siteUrl}/courses/${slug}`,
+    url: `${SITE_URL}/courses/${slug}`,
     provider: {
       "@type": "Person",
       name: "Mohamad Alsharbaji",
-      url: siteUrl,
+      url: SITE_URL,
     },
     numberOfLessons: course.topics.length,
     hasCourseInstance: {
@@ -53,41 +53,10 @@ export default async function CoursePage({ params }: PageProps) {
     },
   };
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: siteUrl,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Courses",
-        item: `${siteUrl}/courses`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: course.title.en,
-        item: `${siteUrl}/courses/${slug}`,
-      },
-    ],
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd data={courseJsonLd} />
+      <JsonLd data={breadcrumbJsonLd("Courses", "courses", course.title.en, slug)} />
       <CourseDetail course={course} />
     </>
   );

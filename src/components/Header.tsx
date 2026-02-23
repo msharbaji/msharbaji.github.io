@@ -9,21 +9,23 @@ import LanguageToggle from "@/components/LanguageToggle";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const navKeys = ["home", "projects", "courses", "blog", "contact"] as const;
-const navHrefs = ["/", "/projects", "/courses", "/blog", "/contact"];
+const navItems = [
+  { key: "home" as const, href: "/" },
+  { key: "projects" as const, href: "/projects" },
+  { key: "courses" as const, href: "/courses" },
+  { key: "blog" as const, href: "/blog" },
+  { key: "contact" as const, href: "/contact" },
+];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useLanguage();
 
-  const navLinks = navKeys.map((key, i) => ({
-    href: navHrefs[i],
+  const navLinks = navItems.map(({ key, href }) => ({
+    href,
     label: t.nav[key],
-    isActive:
-      navHrefs[i] === "/"
-        ? pathname === "/"
-        : pathname.startsWith(navHrefs[i]),
+    isActive: href === "/" ? pathname === "/" : pathname.startsWith(href),
   }));
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -49,7 +51,6 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden items-center gap-1 md:flex">
           <ul className="flex gap-1">
             {navLinks.map((link) => (
@@ -75,7 +76,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile: toggle + menu button */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <LanguageToggle />
@@ -111,7 +111,6 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile nav */}
       <div
         id="mobile-menu"
         className={cn(

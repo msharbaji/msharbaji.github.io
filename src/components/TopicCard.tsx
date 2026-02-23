@@ -2,6 +2,7 @@
 
 import { CourseTopic } from "@/lib/types";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ArrowIcon from "@/components/ArrowIcon";
 
 const tagStyles: Record<string, string> = {
   theory:
@@ -53,19 +54,7 @@ export default function TopicCard({
       >
         {tagLabels[topic.tag]}
       </span>
-      <svg
-        className="size-4 shrink-0 text-muted transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent rtl:-scale-x-100 rtl:group-hover:-translate-x-1"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-        />
-      </svg>
+      <ArrowIcon className="size-4 shrink-0 text-muted transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
     </a>
   );
 }

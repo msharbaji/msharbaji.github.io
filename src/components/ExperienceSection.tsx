@@ -16,18 +16,15 @@ export default function ExperienceSection() {
       </AnimateIn>
 
       <div className="relative mt-10">
-        {/* Timeline line */}
         <div className="absolute start-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-accent/40 via-border to-transparent sm:start-[9px]" />
 
         <div className="space-y-10">
           {experience.map((job, i) => (
             <AnimateIn key={i} delay={i * 0.05}>
               <div className="relative ps-8 sm:ps-10">
-                {/* Timeline dot */}
                 <div className="absolute start-0 top-1.5 size-[15px] rounded-full border-2 border-accent/50 bg-background sm:size-[19px] sm:top-1" />
                 <div className="absolute start-[5px] top-[11px] size-[5px] rounded-full bg-accent sm:start-[6.5px] sm:top-[10px] sm:size-[6px]" />
 
-                {/* Content */}
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                   <div>
                     <h3 className="font-display text-base font-600 text-foreground sm:text-lg">

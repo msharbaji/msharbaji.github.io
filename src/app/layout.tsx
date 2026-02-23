@@ -4,6 +4,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SITE_URL } from "@/lib/constants";
 import "./globals.css";
 
 const syne = Syne({
@@ -29,11 +30,9 @@ const notoKufiArabic = Noto_Kufi_Arabic({
   weight: ["400", "500", "600", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://malsharbaji.com";
-
 export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Mohamad Alsharbaji — Platform Engineer",
     template: "%s | Mohamad Alsharbaji",
@@ -44,7 +43,7 @@ export const metadata: Metadata = {
     title: "Mohamad Alsharbaji — Platform Engineer",
     description:
       "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
-    url: siteUrl,
+    url: SITE_URL,
     siteName: "Mohamad Alsharbaji",
     locale: "en_US",
     type: "website",
@@ -56,7 +55,7 @@ export const metadata: Metadata = {
       "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
   },
   alternates: {
-    canonical: siteUrl,
+    canonical: SITE_URL,
   },
 };
 
@@ -65,7 +64,7 @@ const jsonLd = {
   "@type": "Person",
   name: "Mohamad Alsharbaji",
   jobTitle: "Platform Engineer",
-  url: siteUrl,
+  url: SITE_URL,
   sameAs: [
     "https://github.com/msharbaji",
     "https://linkedin.com/in/msharbaji93",

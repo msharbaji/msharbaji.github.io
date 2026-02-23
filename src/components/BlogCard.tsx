@@ -14,7 +14,7 @@ export default function BlogCard({
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex h-full flex-col rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_0_40px_-12px] hover:shadow-accent/15"
+      className="card-hover group flex h-full flex-col"
     >
       <div className="flex items-center gap-3 font-mono text-[10px] tracking-wider text-muted">
         <time>{post.date}</time>

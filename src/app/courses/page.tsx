@@ -1,6 +1,7 @@
 "use client";
 
 import AnimateIn from "@/components/AnimateIn";
+import ArrowIcon from "@/components/ArrowIcon";
 import Link from "next/link";
 import { courses } from "@/lib/courses-data";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -35,19 +36,7 @@ export default function CoursesPage() {
                     {course.description[locale]}
                   </p>
                 </div>
-                <svg
-                  className="hidden size-5 shrink-0 text-muted transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent rtl:-scale-x-100 rtl:group-hover:-translate-x-1 sm:block"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                  />
-                </svg>
+                <ArrowIcon className="hidden size-5 shrink-0 text-muted transition-all duration-200 group-hover:translate-x-1 group-hover:text-accent rtl:-scale-x-100 rtl:group-hover:-translate-x-1 sm:block" />
               </div>
               <div className="mt-5 flex gap-6 border-t border-border/60 pt-5">
                 <div>

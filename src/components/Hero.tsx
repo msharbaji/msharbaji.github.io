@@ -9,16 +9,13 @@ export default function Hero() {
 
   return (
     <section className="relative py-14 sm:py-20 lg:py-24">
-      {/* Gradient orbs — contained to prevent viewport overflow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-40 right-0 h-[500px] w-[500px] rounded-full bg-accent/[0.06] blur-[120px]" />
         <div className="absolute top-20 left-0 h-72 w-72 rounded-full bg-accent/[0.04] blur-[100px]" />
       </div>
 
       <div className="relative grid items-center gap-10 sm:gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
-        {/* Text content */}
         <div>
-          {/* Name — Primary */}
           <h1 className="animate-slide-up stagger-1 font-display text-4xl font-800 leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
             {locale === "en" ? (
               <>
@@ -37,7 +34,6 @@ export default function Hero() {
             )}
           </h1>
 
-          {/* Name — Secondary language */}
           <p
             className="animate-slide-up stagger-1 mt-2 text-xl font-600 text-foreground/40 sm:text-2xl"
             dir={locale === "en" ? "rtl" : "ltr"}
@@ -47,7 +43,6 @@ export default function Hero() {
             {t.hero.arabicName}
           </p>
 
-          {/* Role with decorative line */}
           <div className="animate-slide-up stagger-2 mt-6 flex items-center gap-4">
             <div className="h-px w-10 bg-gradient-to-r from-accent/60 to-transparent sm:w-12" />
             <p className="font-display text-base font-500 text-foreground/80 sm:text-lg lg:text-xl">
@@ -55,12 +50,10 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* Description */}
           <p className="animate-slide-up stagger-3 mt-5 max-w-lg text-sm leading-relaxed text-muted sm:mt-6 sm:text-base">
             {t.hero.description}
           </p>
 
-          {/* Social links */}
           <div className="animate-slide-up stagger-4 mt-8 flex flex-wrap gap-2.5 sm:mt-10 sm:gap-3">
             <a
               href={socials.github}
@@ -106,7 +99,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Profile photo */}
         <div className="animate-scale-in stagger-3 flex justify-center lg:justify-end">
           <div className="relative">
             <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-accent/20 via-accent/10 to-transparent blur-2xl" />
