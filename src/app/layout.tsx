@@ -47,12 +47,21 @@ export const metadata: Metadata = {
     siteName: "Mohamad Alsharbaji",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: `${SITE_URL}/images/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Mohamad Alsharbaji — Platform Engineer",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Mohamad Alsharbaji — Platform Engineer",
     description:
       "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
+    images: [`${SITE_URL}/images/og-image.png`],
   },
   alternates: {
     canonical: SITE_URL,
