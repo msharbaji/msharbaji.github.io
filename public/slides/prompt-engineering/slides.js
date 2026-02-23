@@ -68,6 +68,7 @@
 })();
 
 /* ── Quiz ── */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- called via onclick in HTML
 function checkAnswer(btn, isCorrect) {
   var question = btn.parentElement;
   var buttons = question.querySelectorAll(".quiz-option");
@@ -107,6 +108,7 @@ function checkAnswer(btn, isCorrect) {
 }
 
 /* ── Copy Code ── */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- called via onclick in HTML
 function copyCode(btn) {
   var pre = btn.closest(".code-block").querySelector("pre");
   var copiedText = btn.getAttribute("data-copied-text") || "Copied!";

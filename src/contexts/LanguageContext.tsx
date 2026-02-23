@@ -3,7 +3,7 @@
 import {
   createContext,
   useContext,
-  useState,
+  useSyncExternalStore,
   useEffect,
   useCallback,
   type ReactNode,
@@ -28,23 +28,37 @@ function getStoredLocale(): Locale {
   return browserLang.startsWith("ar") ? "ar" : "en";
 }
 
+// External store for locale — avoids setState-in-effect lint issue
+let localeListeners: Array<() => void> = [];
+
+function subscribeLocale(cb: () => void) {
+  localeListeners.push(cb);
+  return () => {
+    localeListeners = localeListeners.filter((l) => l !== cb);
+  };
+}
+
+function notifyLocaleListeners() {
+  localeListeners.forEach((l) => l());
+}
+
 /**
  * Provides language/locale context for the app with RTL support.
- * Always starts with "en" to match server-rendered HTML and avoid hydration mismatch.
+ * Uses useSyncExternalStore to read locale from localStorage without
+ * triggering cascading renders via setState-in-effect.
  * The inline <script> in layout.tsx sets dir/lang/font-arabic on <html> before paint
- * to prevent CLS, while useEffect syncs React state from localStorage after hydration.
+ * to prevent CLS.
  */
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const locale = useSyncExternalStore(
+    subscribeLocale,
+    getStoredLocale,
+    () => "en" as Locale
+  );
 
   const setLocale = useCallback((newLocale: Locale) => {
-    setLocaleState(newLocale);
     localStorage.setItem("locale", newLocale);
-  }, []);
-
-  // Sync from localStorage after hydration
-  useEffect(() => {
-    setLocaleState(getStoredLocale());
+    notifyLocaleListeners();
   }, []);
 
   // Update <html> attributes whenever locale changes
