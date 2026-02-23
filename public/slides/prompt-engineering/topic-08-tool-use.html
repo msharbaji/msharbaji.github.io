@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 8 — Tool Use & Function Calling | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 39%"></div></div>
+    <span class="progress-label">9 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔧</div>
+    <h1>Tool Use & Function Calling</h1>
+    <p>Let your LLM take actions in the real world — calling APIs, running code, and accessing live data.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What Is Tool Use?</h2>
+    </div>
+    <p>
+      By default, LLMs can only generate text. Tool use (also called function calling) lets the model do something
+      <strong>you want it to decide to do</strong> — not something you tell it to do. The model chooses when and how
+      to use tools based on the user's request.
+    </p>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Key Insight: The Model Decides</h4>
+        <p>
+          The critical difference from RAG: with RAG, you retrieve documents and pass them. With tool use,
+          the model analyzes the user's request and decides whether a tool is needed, and which one to call with what arguments.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🤔</div>
+        <h4>Decision-Making</h4>
+        <p>Model analyzes the request and decides if a tool call is needed. It can decline to use tools even if available.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>Argument Selection</h4>
+        <p>Model chooses parameters for the tool. "Search for X" and the model fills in the X based on context.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>Multi-Step Reasoning</h4>
+        <p>Model can call multiple tools in sequence, using output from one tool as input to the next.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🌍</div>
+        <h4>Real-World Impact</h4>
+        <p>Tool calls can have side effects: make purchases, send emails, update databases. Requires safety considerations.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: A Smart Assistant</h4>
+        <p>
+          Without tool use: you ask a question and get an answer from memory. With tool use: you ask an assistant
+          who can pick up the phone (call API), check the filing cabinet (database query), or run a calculation
+          (execute code) to give you an accurate answer. The assistant decides what tools to use.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>How Function Calling Works</h2>
+    </div>
+    <p>
+      Tool use follows a structured loop. Understanding each step is essential for building reliable systems.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">1. Define Tools</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">2. Model Selects</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">3. You Execute</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">4. Model Responds</div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Step 1: Define Tools</p>
+    <p>
+      You describe available tools in JSON schema format. Tell the model what each tool does, what parameters it accepts,
+      and what it returns. The model reads these definitions and uses them to decide when to call.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 2: Model Selects</p>
+    <p>
+      When you send a user message, Claude analyzes it against the tool definitions. If it thinks a tool would help,
+      it returns a tool-use response instead of text. It specifies: which tool, with what arguments.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 3: You Execute</p>
+    <p>
+      Your code receives the tool call, validates the arguments, executes it (calls API, queries database, runs function),
+      and gets a result. You're responsible for the actual action.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 4: Model Responds</p>
+    <p>
+      You pass the tool result back to Claude in the conversation. Claude now has real data and can generate an informed response.
+      This may trigger additional tool calls, or Claude can directly answer the user.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Critical: The Model Doesn't Execute Tools</h4>
+        <p>
+          The model <strong>never actually</strong> calls your tools. It only <strong>requests</strong> that you call them.
+          You must handle execution, error checking, and security validation. This is a feature, not a bug — it keeps
+          the model safe and you in control.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Defining Tools (Anthropic)</h2>
+    </div>
+    <p>
+      Anthropic tools use a clear JSON schema. Here's how to define them.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON — Tool Definition</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">{
+  "name": "get_weather",
+  "description": "Get current weather for a city",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string",
+        "description": "City name (e.g., 'San Francisco')"
+      },
+      "unit": {
+        "type": "string",
+        "enum": ["celsius", "fahrenheit"],
+        "description": "Temperature unit"
+      }
+    },
+    "required": ["city"]
+  }
+}</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Complete Example: Multiple Tools</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Define and Use Tools</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># Define available tools</span>
+tools = [
+    {
+        <span class="string">"name"</span>: <span class="string">"get_weather"</span>,
+        <span class="string">"description"</span>: <span class="string">"Get current weather for a location"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"city"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                            <span class="string">"description"</span>: <span class="string">"City name"</span>},
+                <span class="string">"unit"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                          <span class="string">"enum"</span>: [<span class="string">"celsius"</span>, <span class="string">"fahrenheit"</span>]}
+            },
+            <span class="string">"required"</span>: [<span class="string">"city"</span>]
+        }
+    },
+    {
+        <span class="string">"name"</span>: <span class="string">"calculate"</span>,
+        <span class="string">"description"</span>: <span class="string">"Perform a calculation"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"expression"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                                  <span class="string">"description"</span>: <span class="string">"Math expression (e.g., '2+2*3')"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"expression"</span>]
+        }
+    }
+]
+
+<span class="comment"># Make API call with tools</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">tools</span>=tools,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What's the weather in Paris and what is 15 * 3?"</span>}
+    ]
+)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Defining Tools (OpenAI Format)</h2>
+    </div>
+    <p>
+      OpenAI's function calling uses a similar but slightly different format. Here's the comparison.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ Anthropic Format</div>
+<pre>{
+  "name": "get_weather",
+  "description": "...",
+  "input_schema": {
+    "type": "object",
+    "properties": { ... },
+    "required": [ ... ]
+  }
+}</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ OpenAI Format</div>
+<pre>{
+  "type": "function",
+  "function": {
+    "name": "get_weather",
+    "description": "...",
+    "parameters": {
+      "type": "object",
+      "properties": { ... },
+      "required": [ ... ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">When to Use Each</p>
+    <p>
+      <strong>Anthropic tools:</strong> Clean, minimal format. Excellent documentation support.
+      <strong>OpenAI format:</strong> More widely supported. Use if you're using OpenAI models or need broader compatibility.
+      For new projects, Anthropic's format is simpler and less error-prone.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The Tool Use Loop</h2>
+    </div>
+    <p>
+      Handling tool responses requires a loop. The model might call tools, get results, and call more tools.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Tool Loop</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">process_tool_call</span>(tool_name, tool_input):
+    <span class="string">"""Execute a tool and return result"""</span>
+    <span class="keyword">if</span> tool_name == <span class="string">"get_weather"</span>:
+        <span class="keyword">return</span> f<span class="string">"Weather in {tool_input['city']}: Sunny, 72°F"</span>
+    <span class="keyword">elif</span> tool_name == <span class="string">"calculate"</span>:
+        <span class="keyword">return</span> f<span class="string">"Result: {eval(tool_input['expression'])}"</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="string">"Unknown tool"</span>
+
+<span class="comment"># Main loop</span>
+messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What's weather in NYC and compute 10+5?"</span>}]
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    <span class="comment"># Call Claude with tools</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1024</span>,
+        <span class="param">tools</span>=tools,
+        <span class="param">messages</span>=messages
+    )
+
+    <span class="comment"># Check if we need to handle tool calls</span>
+    <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+        <span class="comment"># Process each tool call</span>
+        tool_calls = [block <span class="keyword">for</span> block <span class="keyword">in</span> response.content
+                      <span class="keyword">if</span> block.type == <span class="string">"tool_use"</span>]
+
+        <span class="comment"># Add assistant response to messages</span>
+        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response.content})
+
+        <span class="comment"># Execute tools and collect results</span>
+        <span class="keyword">for</span> tool_call <span class="keyword">in</span> tool_calls:
+            result = <span class="func">process_tool_call</span>(tool_call.name, tool_call.input)
+
+            <span class="comment"># Add tool result to messages</span>
+            messages.<span class="func">append</span>({
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: [{
+                    <span class="string">"type"</span>: <span class="string">"tool_result"</span>,
+                    <span class="string">"tool_use_id"</span>: tool_call.id,
+                    <span class="string">"content"</span>: result
+                }]
+            })
+    <span class="keyword">else</span>:
+        <span class="comment"># Model generated final response (no more tool calls)</span>
+        final_response = response.content[<span class="number">0</span>].text
+        <span class="keyword">print</span>(final_response)
+        <span class="keyword">break</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Loop Pattern</h4>
+        <p>
+          1. Call Claude with tools in the message list. 2. If response is "tool_use", process the tool calls.
+          3. Add assistant response and tool results back to messages. 4. Loop back to step 1.
+          5. When response is "end_turn" (or no tool calls), you have the final answer.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Real-World Tool Examples</h2>
+    </div>
+    <p>
+      Tool use enables countless real-world applications. Here are the most common patterns:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Web Search</h4>
+        <p>Query a search engine API (Google, Tavily, Serper) to find current information. Perfect for breaking knowledge cutoffs.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧮</div>
+        <h4>Calculator</h4>
+        <p>Send complex math expressions to Python or WolframAlpha. Prevents mathematical hallucinations.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗄️</div>
+        <h4>Database Query</h4>
+        <p>Model generates SQL, you execute safely with parameterized queries. Enables data-driven responses.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📡</div>
+        <h4>API Calls</h4>
+        <p>Call any REST API. Weather, stock prices, transportation, payment systems — anything accessible via HTTP.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📁</div>
+        <h4>File Operations</h4>
+        <p>Read, write, process files. Model decides what analysis to perform based on file contents.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Code Execution</h4>
+        <p>Run Python code in a sandbox. Model analyzes data, creates visualizations, trains models.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Error Handling & Safety</h2>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">What Happens When Tools Fail?</p>
+    <p>
+      Tools will fail. Network timeouts, invalid inputs, API rate limits, permission errors. You must:
+    </p>
+    <ul>
+      <li><strong>Catch errors gracefully:</strong> Don't crash. Return an error message to Claude.</li>
+      <li><strong>Validate inputs:</strong> Check tool arguments before execution. Tell Claude if an argument is invalid.</li>
+      <li><strong>Set timeouts:</strong> Tools should timeout after a reasonable period, not hang forever.</li>
+      <li><strong>Log everything:</strong> For debugging, log what the model requested and what happened.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Error Handling</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">process_tool_call</span>(tool_name, tool_input):
+    <span class="keyword">try</span>:
+        <span class="keyword">if</span> tool_name == <span class="string">"web_search"</span>:
+            <span class="comment"># Validate input</span>
+            query = tool_input.<span class="func">get</span>(<span class="string">"query"</span>, <span class="string">""</span>)
+            <span class="keyword">if</span> <span class="keyword">not</span> query <span class="keyword">or</span> <span class="func">len</span>(query) > <span class="number">500</span>:
+                <span class="keyword">return</span> <span class="string">"Error: query required, max 500 chars"</span>
+
+            <span class="comment"># Execute with timeout</span>
+            result = search_api.<span class="func">search</span>(query, timeout=<span class="number">5</span>)
+            <span class="keyword">return</span> result
+
+    <span class="keyword">except</span> TimeoutError:
+        <span class="keyword">return</span> <span class="string">"Error: search timed out. Try a simpler query."</span>
+    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+        <span class="keyword">return</span> f<span class="string">"Error: {str(e)}"</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Safety & Guardrails</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Tools Can Have Real Impact</h4>
+        <p>
+          A tool that deletes files, transfers money, or sends emails can cause real harm if misused.
+          Always implement guardrails: approval flows for sensitive actions, rate limiting, audit logs,
+          and permission checks based on user identity.
+        </p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Approval Flows</h4>
+        <p>
+          For sensitive actions (payments, deletions, API calls with side effects), consider requiring human approval.
+          The model can request an action, but your code asks the user for confirmation before executing.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What is the critical difference between tool use and RAG?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">RAG uses APIs while tool use uses databases</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">With RAG you retrieve documents; with tool use the model decides which tools to call</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Tool use is faster but less accurate than RAG</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They're the same thing with different names</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Who executes the actual tool (API call, database query, etc.)?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The model executes tools directly</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Your code executes tools; the model only requests them</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The tool execution service in the cloud handles it</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Both the model and your code execute in parallel</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What is the second step in the function calling pipeline?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">You execute the tool</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">The model selects which tool to call and with what arguments</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">You define the tools in JSON schema</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The model generates the final response</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. When the model requests a tool call, what should your code do first?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Immediately execute the tool without any checks</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Validate the input arguments before execution</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Ask the model if the tool call is correct</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Log the request and ignore the tool call</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 8 Summary</h2>
+    </div>
+    <p>
+      <strong>Tool use (function calling)</strong> lets models take action in the real world by calling APIs, running code, and accessing live data.
+      The model <strong>decides when and how</strong> to use tools based on user requests.
+      The pipeline is: Define Tools → Model Selects → You Execute → Model Responds.
+      You must implement the loop: call Claude, check for tool requests, execute tools, return results, repeat until done.
+      Tools can integrate web search, calculators, databases, APIs, file operations, and code execution.
+      <strong>Critical:</strong> You execute tools, not the model. You're responsible for validation, error handling, and safety.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 9: Prompt Templates & Chaining</strong><br>
+      <span style="color: var(--text-dim);">Build reusable prompt components and orchestrate them into multi-step workflows.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-07-rag-concepts.html">← Topic 7</a>
+  <span class="nav-info">Topic 9 of 23</span>
+  <a class="nav-btn primary" href="topic-09-prompt-chains.html">Next: Prompt Templates & Chaining →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

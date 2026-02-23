@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 17 — الذاكرة وإدارة السياق | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 74%"></div></div>
+    <span class="progress-label">17 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🧩</div>
+    <h1>الذاكرة وإدارة السياق</h1>
+    <p>امنح وكلاء الذكاء الاصطناعي ذاكرة دائمة — من مخازن المحادثات إلى قواعد البيانات المتجهية وأنظمة الذاكرة الهرمية.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>مشكلة الذاكرة</h2>
+    </div>
+    <p>
+      في كل مرة تستدعي نموذجاً لغوياً كبيراً، يبدأ من الصفر تماماً. ليس لديه <strong>أي ذاكرة</strong> لما حدث من قبل.
+      هذا قيد معماري جوهري — والتحدي الأكبر عند بناء وكلاء يحتاجون إلى الحفاظ على الاستمرارية.
+    </p>
+    <p>
+      المشكلات الأساسية واضحة:
+    </p>
+    <ul style="margin-bottom: 14px; padding-right: 20px;">
+      <li><strong>النماذج اللغوية عديمة الحالة</strong> — كل استدعاء API يبدأ من الصفر</li>
+      <li><strong>نوافذ السياق محدودة</strong> — لا يمكنك إرسال التاريخ بالكامل للأبد</li>
+      <li><strong>المستخدمون يتوقعون الاستمرارية</strong> — "تذكّر ما أخبرتك به بالأمس"</li>
+      <li><strong>الوكلاء يحتاجون السياق السابق</strong> — القرارات تعتمد على التفاعلات السابقة</li>
+    </ul>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>الذاكرة قصيرة المدى</h4>
+        <p>المحادثة الحالية — الرسائل في نافذة السياق النشطة. تُفقد عند انتهاء الجلسة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💾</div>
+        <h4>الذاكرة طويلة المدى</h4>
+        <p>تُحفظ عبر الجلسات — تُخزَّن في قواعد بيانات أو ملفات أو مخازن متجهية. تنجو من إعادة التشغيل.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📸</div>
+        <h4>الذاكرة العرضية</h4>
+        <p>أحداث وتجارب محددة — "أبلغ المستخدم عن خطأ يوم الثلاثاء" أو "نشرنا الإصدار 2.1 الأسبوع الماضي."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>الذاكرة الدلالية</h4>
+        <p>معارف وحقائق عامة — "المستخدم يفضل بايثون" أو "المشروع يستخدم PostgreSQL."</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: فقدان الذاكرة اللحظي</h4>
+        <p>
+          تخيّل نموذجاً لغوياً بدون ذاكرة كشخص مصاب بفقدان الذاكرة — بارع في اللحظة، لكنه لا يتذكر
+          محادثة الأمس. في كل تفاعل، عليك أن تعيد تقديم نفسك وتشرح السياق من جديد.
+          أنظمة الذاكرة هي الطريقة التي نعالج بها فقدان الذاكرة هذا.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>أنواع الذاكرة</h2>
+    </div>
+    <p>
+      هناك أربعة أنماط أساسية للذاكرة (استناداً إلى إطار عمل Lilian Weng). كل نمط يقدم مقايضة مختلفة
+      بين <strong>الاكتمال</strong> و<strong>كفاءة التوكنات</strong> و<strong>الصلة</strong>.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>ذاكرة المخزن المؤقت</h4>
+        <p>تخزين تاريخ المحادثة بالكامل. بسيطة ومكتملة، لكنها تنمو بلا حدود وتتجاوز نافذة السياق في النهاية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🪟</div>
+        <h4>ذاكرة النافذة</h4>
+        <p>الاحتفاظ فقط بآخر N من الأدوار. تحدّ استخدام التوكنات لكنها تفقد السياق الأقدم — ينسى الوكيل الأجزاء الأولى من المحادثة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>ذاكرة الملخص</h4>
+        <p>استخدام النموذج اللغوي نفسه لتلخيص الرسائل القديمة. تحافظ على المعلومات الأساسية بتوكنات أقل، لكنها تفقد التفاصيل بطبيعتها.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>الذاكرة المتجهية</h4>
+        <p>تحويل الرسائل إلى متجهات واسترجاع الرسائل ذات الصلة فقط عبر البحث بالتشابه. تتوسع لتاريخات ضخمة.</p>
+      </div>
+    </div>
+
+    <p><strong>ذاكرة المخزن المؤقت</strong> — الأسلوب الأبسط. خزّن كل شيء:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">BufferMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        self.messages = []
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.messages.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>) -> list[dict]:
+        <span class="keyword">return</span> self.messages.copy()</pre>
+    </div>
+
+    <p><strong>ذاكرة الملخص</strong> — ضغط الرسائل القديمة باستخدام النموذج اللغوي:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">SummaryMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, <span class="param">client</span>):
+        self.client = client
+        self.summary = <span class="string">""</span>
+        self.recent = []  <span class="comment"># Last 3 turns</span>
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.recent.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+        <span class="keyword">if</span> <span class="func">len</span>(self.recent) > <span class="number">6</span>:  <span class="comment"># 3 turns = 6 messages</span>
+            self._compress()
+
+    <span class="keyword">def</span> <span class="func">_compress</span>(<span class="param">self</span>):
+        old = self.recent[:<span class="number">4</span>]
+        self.recent = self.recent[<span class="number">4</span>:]
+        <span class="comment"># Ask LLM to update summary</span>
+        resp = self.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-haiku-4-5-20251001"</span>,
+            <span class="param">max_tokens</span>=<span class="number">300</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"Current summary:\n{self.summary}\n\n"</span>
+                           <span class="string">f"New messages:\n{old}\n\n"</span>
+                           <span class="string">"Update the summary concisely."</span>
+            }]
+        )
+        self.summary = resp.content[<span class="number">0</span>].text</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>استراتيجيات نافذة السياق</h2>
+    </div>
+    <p>
+      الاستفادة القصوى من نافذة سياق محدودة أمر بالغ الأهمية. إليك الاستراتيجيات الرئيسية، من الأبسط إلى الأكثر تعقيداً:
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>الاستراتيجية</th><th>كيف تعمل</th><th>المقايضة</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>الاقتطاع</strong></td>
+          <td>حذف الرسائل الأقدم عند امتلاء النافذة</td>
+          <td>بسيط لكنه يفقد السياق المبكر بالكامل</td>
+        </tr>
+        <tr>
+          <td><strong>النافذة المنزلقة</strong></td>
+          <td>الاحتفاظ فقط بآخر N توكن من المحادثة</td>
+          <td>تكلفة متوقعة، لكن بدون استرجاع طويل المدى</td>
+        </tr>
+        <tr>
+          <td><strong>التلخيص</strong></td>
+          <td>ضغط التاريخ في ملخص متجدد</td>
+          <td>يحتفظ بالمعلومات الأساسية، لكنه يفقد التفاصيل</td>
+        </tr>
+        <tr>
+          <td><strong>RAG</strong></td>
+          <td>استرجاع السياق ذي الصلة فقط من مخزن متجهي</td>
+          <td>يتوسع جيداً، لكن جودة الاسترجاع حاسمة</td>
+        </tr>
+        <tr>
+          <td><strong>الهرمي</strong></td>
+          <td>دمج الملخص + الرسائل الأخيرة + السياق المسترجع</td>
+          <td>أفضل جودة، لكنه الأكثر تعقيداً في التنفيذ</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>
+      نافذة السياق المصممة جيداً تخصص مساحة لكل مكون. إليك تخطيطاً نموذجياً:
+    </p>
+
+    <div class="diagram" style="text-align: center; padding: 24px; overflow-x: auto;">
+      <div class="context-bar-wrapper" style="display: flex; align-items: stretch; gap: 0; min-height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 16px; direction: ltr;">
+        <div style="background: var(--accent); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">System Prompt</div>
+        <div style="background: var(--blue); flex: 1.2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Summary</div>
+        <div style="background: #a78bfa; flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Retrieved Context</div>
+        <div style="background: var(--green); flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Recent Messages</div>
+        <div style="background: var(--orange); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Current Input</div>
+        <div style="background: var(--surface); flex: 1.8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-dim); border: 1px dashed var(--border); padding: 8px 4px; text-align: center;">Response Space</div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-dim); text-align: center; direction: ltr;">
+        ← Total Context Window →
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>لا تملأ النافذة بالكامل</h4>
+        <p>
+          لا تملأ نافذة السياق بالكامل أبداً — اترك دائماً مساحة لرد النموذج.
+          قاعدة جيدة: استخدم 75% كحد أقصى للإدخال. إذا ملأت النافذة بالكامل، فإن النموذج إما
+          يقتطع رده أو ينتج مخرجات متدنية الجودة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>الذاكرة المتجهية</h2>
+    </div>
+    <p>
+      الذاكرة المتجهية تستخدم <strong>التضمينات (Embeddings)</strong> لتحويل النص إلى متجهات رقمية، ثم تسترجع
+      الذكريات ذات الصلة عبر البحث بالتشابه. التدفق هو: <em>نص → نموذج تضمين → متجه → تخزين في قاعدة بيانات → استعلام بالتشابه</em>.
+    </p>
+    <p>
+      هذا النهج يحاكي طريقة عمل الذاكرة البشرية — أنت لا تتذكر كل محادثة أجريتها في حياتك.
+      بدلاً من ذلك، السياق الحالي يحفز استرجاع الذكريات <strong>ذات الصلة</strong>.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> chromadb
+
+client = chromadb.<span class="func">Client</span>()
+collection = client.<span class="func">create_collection</span>(<span class="string">"memories"</span>)
+
+<span class="comment"># Store a memory</span>
+collection.<span class="func">add</span>(
+    <span class="param">documents</span>=[<span class="string">"User prefers Python over JavaScript"</span>],
+    <span class="param">ids</span>=[<span class="string">"mem_001"</span>],
+    <span class="param">metadatas</span>=[{<span class="string">"type"</span>: <span class="string">"preference"</span>, <span class="string">"date"</span>: <span class="string">"2025-01-15"</span>}]
+)
+
+<span class="comment"># Retrieve relevant memories</span>
+results = collection.<span class="func">query</span>(
+    <span class="param">query_texts</span>=[<span class="string">"What programming language should I recommend?"</span>],
+    <span class="param">n_results</span>=<span class="number">3</span>
+)
+
+<span class="comment"># Inject into prompt</span>
+memories = <span class="string">"\n"</span>.join(results[<span class="string">"documents"</span>][<span class="number">0</span>])
+system = <span class="string">f"User context:\n{memories}\n\nBe helpful."</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>لماذا الذاكرة المتجهية مهمة</h4>
+        <p>
+          الذاكرة المتجهية هي أقرب شيء لطريقة تذكر البشر — أنت لا تتذكر كل شيء، فقط ما يتصل
+          بالموقف الحالي. مخزن متجهي مضبوط جيداً يمكنه البحث عبر آلاف التفاعلات السابقة
+          واستخراج السياق الذي يحتاجه الوكيل بالضبط.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>الأنماط المتقدمة</h2>
+    </div>
+    <p>
+      أنظمة الذاكرة في بيئات الإنتاج تجمع عادة بين أنواع متعددة من الذاكرة في <strong>بنية هرمية</strong>.
+      هذا يمنحك أفضل ما في كل العوالم — السياق الأخير مكتمل، والسياق الأقدم ملخص، وكل
+      شيء آخر يمكن استرجاعه عبر البحث الدلالي.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">HierarchicalMemory</span>:
+    <span class="string">"""Combines buffer + summary + vector memory."""</span>
+
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, <span class="param">client</span>, <span class="param">vector_store</span>):
+        self.client = client
+        self.vector_store = vector_store
+        self.recent = []          <span class="comment"># Last 5 turns (buffer)</span>
+        self.summary = <span class="string">""</span>         <span class="comment"># Rolling summary</span>
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.recent.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+        <span class="comment"># Also store in vector DB for long-term retrieval</span>
+        self.vector_store.<span class="func">add</span>(
+            <span class="param">documents</span>=[content],
+            <span class="param">ids</span>=[<span class="string">f"msg_{</span><span class="func">len</span>(self.recent)<span class="string">}"</span>],
+            <span class="param">metadatas</span>=[{<span class="string">"role"</span>: role, <span class="string">"type"</span>: <span class="string">"conversation"</span>}]
+        )
+        <span class="keyword">if</span> <span class="func">len</span>(self.recent) > <span class="number">10</span>:
+            self.<span class="func">_compress</span>()
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>, <span class="param">current_query</span>: <span class="param">str</span>) -> <span class="param">str</span>:
+        <span class="comment"># 1. Retrieve relevant past memories</span>
+        retrieved = self.vector_store.<span class="func">query</span>(
+            <span class="param">query_texts</span>=[current_query], <span class="param">n_results</span>=<span class="number">5</span>
+        )
+        relevant = <span class="string">"\n"</span>.join(retrieved[<span class="string">"documents"</span>][<span class="number">0</span>])
+
+        <span class="comment"># 2. Assemble hierarchical context</span>
+        <span class="keyword">return</span> (
+            <span class="string">f"## Conversation Summary\n{self.summary}\n\n"</span>
+            <span class="string">f"## Relevant Past Context\n{relevant}\n\n"</span>
+            <span class="string">f"## Recent Messages\n{self.recent}"</span>
+        )
+
+    <span class="keyword">def</span> <span class="func">_compress</span>(<span class="param">self</span>):
+        old = self.recent[:<span class="number">6</span>]
+        self.recent = self.recent[<span class="number">6</span>:]
+        resp = self.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-haiku-4-5-20251001"</span>,
+            <span class="param">max_tokens</span>=<span class="number">300</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"Current summary:\n{self.summary}\n\n"</span>
+                           <span class="string">f"New messages:\n{old}\n\n"</span>
+                           <span class="string">"Update the summary concisely."</span>
+            }]
+        )
+        self.summary = resp.content[<span class="number">0</span>].text</pre>
+    </div>
+
+    <div class="concept-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+      <div class="concept-card">
+        <div class="icon">🏷️</div>
+        <h4>ذاكرة الكيانات</h4>
+        <p>تتبع الحقائق حول كيانات محددة — المستخدمين، المشاريع، الملفات. تحديث سجلات منظمة بمرور الوقت.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🪞</div>
+        <h4>التأمل</h4>
+        <p>يتأمل الوكيل دورياً في ذكرياته، ويستخلص رؤى عالية المستوى من التجارب الخام.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🕳️</div>
+        <h4>النسيان</h4>
+        <p>تلاشي الذكريات القديمة أو منخفضة الأهمية. ليس كل شيء يستحق التذكر — النسيان المنضبط يمنع الضوضاء.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>أفضل ممارسات التنفيذ</h2>
+    </div>
+    <p>
+      بناء أنظمة الذاكرة هو المكان الذي تلتقي فيه النظرية بالإنتاج. هذه هي الدروس الأكثر أهمية:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📈</div>
+        <h4>ابدأ بالمخزن المؤقت، توسّع للمتجهات</h4>
+        <p>ذاكرة المخزن المؤقت البسيطة تعمل للمحادثات القصيرة. لا تبالغ في الهندسة — أضف الذاكرة المتجهية فقط عندما تحتاج فعلاً للتعامل مع تواريخ طويلة أو الاسترجاع عبر الجلسات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧱</div>
+        <h4>افصل بين أنواع الذاكرة</h4>
+        <p>اجعل الذاكرة قصيرة المدى وطويلة المدى والعاملة أنظمة مستقلة. خلطها ينتج كوداً معقداً يصعب تنقيحه وضبطه.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>حدد ميزانيات التوكنات دائماً</h4>
+        <p>خصص ميزانيات توكنات ثابتة لكل مكون ذاكرة — مثلاً 500 توكن للملخص، 1000 للسياق المسترجع، 2000 للرسائل الأخيرة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧪</div>
+        <h4>اختبر جودة الاسترجاع</h4>
+        <p>الاسترجاع السيء أسوأ من عدم وجود ذاكرة — السياق غير ذي الصلة يربك النموذج. تحقق من أن البحث المتجهي يعيد نتائج مفيدة فعلاً.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 3 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. لماذا لا تستطيع النماذج اللغوية تذكر المحادثات السابقة بشكل افتراضي؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لديها نظام ذاكرة سيء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">كل استدعاء API عديم الحالة — النموذج ليس لديه آلية حفظ مدمجة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تختار عدم التذكر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">نافذة السياق صغيرة جداً</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. متى تختار ذاكرة الملخص بدلاً من ذاكرة المخزن المؤقت؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تحتاج استرجاعاً دقيقاً لكل الرسائل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عندما تكون المحادثات طويلة وتحتاج البقاء ضمن نافذة السياق</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تكون المحادثة قصيرة جداً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما لا تهتم بالسياق مطلقاً</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما الميزة الرئيسية للذاكرة المتجهية؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هي الأسرع من بين الأنواع</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تسترجع فقط الذكريات ذات الصلة الدلالية بدلاً من كل شيء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تخزن أكبر كمية من البيانات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هي الأسهل في التنفيذ</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 17</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      النماذج اللغوية <strong>عديمة الحالة</strong> — يجب إدارة الذاكرة بشكل صريح. أنواع الذاكرة الأربعة الأساسية هي
+      <strong>المخزن المؤقت</strong> (التاريخ الكامل)، و<strong>النافذة</strong> (آخر N من الأدوار)، و<strong>الملخص</strong>
+      (التاريخ المضغوط)، و<strong>المتجهات</strong> (الاسترجاع القائم على التضمينات). أنظمة الإنتاج تستخدم
+      <strong>ذاكرة هرمية</strong> تجمع بين الثلاثة. حدد دائماً <strong>ميزانيات توكنات</strong>
+      لكل مكون ذاكرة واترك 25% على الأقل من نافذة السياق لرد النموذج.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 18: أطر عمل الوكلاء</strong><br>
+      <span style="color: var(--text-dim);">ستتعلم عن LangChain وLangGraph وCrewAI وأطر العمل الأخرى التي توفر الذاكرة واستخدام الأدوات والتنسيق بشكل جاهز.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-13-agent-architecture.html">السابق →</a>
+  <span class="nav-info">الموضوع 17 من 23</span>
+  <a class="nav-btn primary" href="topic-14-agent-frameworks.html">← التالي: أطر عمل الوكلاء</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

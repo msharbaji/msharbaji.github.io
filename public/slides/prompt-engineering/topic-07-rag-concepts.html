@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 7 — RAG: Retrieval-Augmented Generation | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 35%"></div></div>
+    <span class="progress-label">8 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📚</div>
+    <h1>RAG: Retrieval-Augmented Generation</h1>
+    <p>Give your LLM access to external knowledge — the most important pattern in production AI.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Problem RAG Solves</h2>
+    </div>
+    <p>
+      Large language models have three critical limitations that RAG addresses:
+    </p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🕐</div>
+        <h4>Stale Knowledge</h4>
+        <p>Model training data has a cutoff date. Claude Opus's knowledge ends in early 2025. It can't answer questions about events that happened after that.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤥</div>
+        <h4>Hallucinations</h4>
+        <p>When models don't know something, they confidently make up plausible-sounding answers. Give them real facts, and hallucinations drop dramatically.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>No Private Data Access</h4>
+        <p>Models can't read your company's internal docs, codebase, or customer data. They only work with what you give them in the prompt.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💰</div>
+        <h4>Token Efficiency</h4>
+        <p>You can't fit your entire knowledge base in the system prompt. RAG lets you dynamically retrieve only relevant documents, saving tokens and cost.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>RAG = Retrieval + LLM Generation</h4>
+        <p>
+          Instead of hoping the model knows something, you retrieve relevant documents, inject them into the prompt, then ask the model to answer based on those facts.
+          This is the most important pattern in production AI systems.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>How RAG Works — The Full Pipeline</h2>
+    </div>
+    <p>
+      RAG follows a clear four-step pipeline. Understanding each step is key to building reliable systems.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">1. Query</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">2. Retrieve</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">3. Augment</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">4. Generate</div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Step 1: Query</p>
+    <p>
+      The user asks a question. This query is passed to a retrieval system. The query itself isn't sent to Claude yet —
+      it's used to find relevant documents.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 2: Retrieve</p>
+    <p>
+      The retrieval system (typically a vector database like Pinecone, Weaviate, or Chroma) finds documents similar to the query.
+      Most commonly, this uses <strong>semantic search</strong> — converting the query to numbers (embeddings) and finding nearby documents.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 3: Augment</p>
+    <p>
+      The retrieved documents are injected into the prompt. A typical augmentation looks like:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Augmented Prompt</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">You are a helpful customer support agent.
+
+&lt;context&gt;
+The following documents are relevant to the customer's question:
+
+---
+From our Knowledge Base (Product FAQ):
+Q: How do I reset my password?
+A: Click "Forgot Password" on the login page, enter your email,
+   and follow the verification link.
+---
+
+From our Support Docs:
+Resetting passwords typically takes 5-10 minutes. If you don't receive
+the email within 15 minutes, check your spam folder.
+&lt;/context&gt;
+
+Based on the documents above, answer the customer's question.
+If the documents don't contain the answer, say so.
+
+User: I forgot my password. How do I reset it?</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Step 4: Generate</p>
+    <p>
+      Claude reads the augmented prompt (with context) and generates a response grounded in the retrieved facts.
+      Because the model has the facts in front of it, it can't hallucinate — it either uses the docs or declines to answer.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Research Assistant</h4>
+        <p>
+          Without RAG, asking Claude a question is like asking someone to answer from memory alone. With RAG,
+          it's like asking them a question while they're reading the relevant documents. They can cite sources
+          and be confident their answer is accurate.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Embeddings & Vector Search</h2>
+    </div>
+    <p>
+      The magic of RAG happens in the retrieval step. How does the system know which documents are relevant?
+      The answer: <strong>embeddings</strong>.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">What Are Embeddings?</p>
+    <p>
+      An embedding is a numerical representation of text. A model (like OpenAI's text-embedding-3-small)
+      converts text into a vector — a list of numbers.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Embedding Example</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">"How do I reset my password?"</span>
+  ↓ (embedding model)
+[0.123, -0.456, 0.789, -0.321, ..., 0.654]  ← 384 or 1536 dimensions</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Semantic Similarity</p>
+    <p>
+      The key insight: similar texts produce similar embeddings. You can measure similarity by computing
+      the distance between vectors. The closer two vectors, the more similar the texts.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>How Vector Search Works</h4>
+        <p>1. Convert query to embedding. 2. Find nearest neighbor documents in vector space. 3. Return top K results.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>Vector Databases</h4>
+        <p>Specialized databases (Pinecone, Weaviate, Chroma, Milvus) store embeddings and enable fast nearest-neighbor search over millions of documents.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Library Index Cards</h4>
+        <p>
+          Think of a library card catalog from the pre-digital era. Each book had an index card with subject tags.
+          To find books on "machine learning," you'd look up that subject tag and get a list of relevant books.
+          Embeddings work the same way — they're a numerical "subject tag" that lets you find similar documents instantly.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Embedding Model Quality Matters</h4>
+        <p>
+          Not all embedding models are equally good. Using a weak embedding model means poor retrieval,
+          which means you'll pass irrelevant documents to Claude. Always benchmark your retrieval quality.
+          OpenAI's text-embedding-3 and Anthropic's embeddings are solid choices.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Chunking Strategies</h2>
+    </div>
+    <p>
+      Raw documents are too long to embed efficiently. You need to break them into chunks.
+      Chunking strategy dramatically affects retrieval quality.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Fixed-Size Chunking</h4>
+        <p><strong>How:</strong> Split every N tokens/words. <strong>Pros:</strong> Simple, predictable. <strong>Cons:</strong> Ignores semantic boundaries, may split sentences.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>Semantic Chunking</h4>
+        <p><strong>How:</strong> Split based on topic changes, paragraph breaks. <strong>Pros:</strong> Preserves meaning. <strong>Cons:</strong> More complex, variable chunk sizes.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>Recursive Chunking</h4>
+        <p><strong>How:</strong> Try semantic boundaries first, fall back to fixed-size if needed. <strong>Pros:</strong> Best of both worlds. <strong>Cons:</strong> Slower to implement.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>Domain-Specific</h4>
+        <p><strong>How:</strong> Respect structure (chapters, sections, code functions). <strong>Pros:</strong> Optimal for domain. <strong>Cons:</strong> Requires domain knowledge.</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Best Practices</p>
+    <ul>
+      <li><strong>Start with 512-1024 token chunks:</strong> This is a good default. Larger chunks are less precise; smaller chunks may lack context.</li>
+      <li><strong>Use overlap:</strong> Include 20-50 tokens of overlap between chunks to preserve context across boundaries.</li>
+      <li><strong>Benchmark:</strong> Test different chunk sizes on real queries and measure retrieval precision.</li>
+      <li><strong>Preserve metadata:</strong> Keep track of source document, section, and position in original document.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Simple Chunking</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">chunk_text</span>(text, chunk_size=512, overlap=50):
+    <span class="comment"># Simple fixed-size chunking with overlap</span>
+    tokens = text.split()
+    chunks = []
+
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="number">0</span>, <span class="func">len</span>(tokens), chunk_size - overlap):
+        chunk = <span class="string">' '</span>.<span class="func">join</span>(tokens[i:i + chunk_size])
+        chunks.<span class="func">append</span>(chunk)
+
+    <span class="keyword">return</span> chunks
+
+<span class="comment"># Usage:</span>
+doc = <span class="string">"Your long document here..."</span>
+chunks = <span class="func">chunk_text</span>(doc, chunk_size=512, overlap=50)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The RAG Prompt Pattern</h2>
+    </div>
+    <p>
+      How do you inject retrieved context into a prompt? There's a proven pattern that works well.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — RAG Prompt Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># 1. Retrieve relevant documents (from vector DB)</span>
+query = <span class="string">"How do I configure API authentication?"</span>
+retrieved_docs = retrieve_from_vector_db(query)  <span class="comment"># Returns top K docs</span>
+
+<span class="comment"># 2. Format context</span>
+context = <span class="string">"\n\n---\n\n"</span>.<span class="func">join</span>(retrieved_docs)
+
+<span class="comment"># 3. Build augmented prompt</span>
+SYSTEM_PROMPT = <span class="string">"""You are a technical support assistant.
+Use the provided documentation to answer questions.
+If the docs don't contain the answer, say so clearly.
+Never make up information."""</span>
+
+user_message = f<span class="string">"""&lt;context&gt;
+{context}
+&lt;/context&gt;
+
+User Question: {query}"""</span>
+
+<span class="comment"># 4. Call Claude with augmented prompt</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=SYSTEM_PROMPT,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_message}]
+)
+
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Use XML Tags for Clarity</h4>
+        <p>
+          Using <code>&lt;context&gt;</code> tags makes it clear to the model where the retrieved docs are.
+          Claude (and other models) parses XML structure especially well. Consider also tagging individual documents:
+          <code>&lt;document source="FAQ.md"&gt;...&lt;/document&gt;</code>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Common RAG Pitfalls & Fixes</h2>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">1. Irrelevant Retrieval</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Problem</h4>
+        <p>
+          You retrieve documents that don't actually answer the question. The vector database finds topically related
+          documents but not the specific answer.
+        </p>
+      </div>
+    </div>
+    <p><strong>Fixes:</strong> Better embedding model, better chunking, increase top-K results, hybrid search (vector + keyword).</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">2. Lost in the Middle</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Problem</h4>
+        <p>
+          When you retrieve many documents (10+), Claude sometimes misses important information in the middle
+          and focuses on the beginning and end.
+        </p>
+      </div>
+    </div>
+    <p><strong>Fixes:</strong> Rerank documents by relevance before injecting, keep top-3 to 5, or use a more recent model (they handle long context better).</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">3. Context Overflow</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Problem</h4>
+        <p>
+          You retrieve so much context that you exceed the model's context window or make the request very expensive.
+        </p>
+      </div>
+    </div>
+    <p><strong>Fixes:</strong> Tighter chunk sizes, lower top-K, estimate context size before API call, use smaller models for validation.</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">4. Conflicting Information</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Problem</h4>
+        <p>
+          You retrieve documents with conflicting information. Claude has to choose which to trust,
+          and it might not choose the right one.
+        </p>
+      </div>
+    </div>
+    <p>
+      <strong>Fixes:</strong> Include source metadata (document date, version), tell Claude which sources are authoritative,
+      validate inconsistencies in your knowledge base.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Hands-On: Simple RAG with Python</h2>
+    </div>
+    <p>
+      Let's build a complete RAG system using Chroma (an open-source vector database) and the Anthropic API.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete RAG System</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment">#!/usr/bin/env python3</span>
+<span class="keyword">import</span> anthropic
+<span class="keyword">import</span> chromadb
+<span class="keyword">from</span> chromadb.<span class="func">config</span> <span class="keyword">import</span> Settings
+
+<span class="comment"># Initialize clients</span>
+client = anthropic.<span class="func">Anthropic</span>()
+chroma_client = chromadb.<span class="func">Client</span>()
+
+<span class="comment"># Create a collection (like a table)</span>
+collection = chroma_client.<span class="func">create_collection</span>(name=<span class="string">"company_docs"</span>)
+
+<span class="comment"># Add documents to the vector store</span>
+documents = [
+    <span class="string">"Our API uses OAuth 2.0 for authentication. "
+    "Request an access token with your client ID and secret."</span>,
+
+    <span class="string">"Rate limits: 100 requests per minute for free tier, "
+    "1000 per minute for premium."</span>,
+
+    <span class="string">"To set up webhooks, go to Settings > Integrations. "
+    "All webhook payloads include a signature for verification."</span>,
+]
+
+<span class="comment"># Chroma automatically embeds documents</span>
+collection.<span class="func">add</span>(
+    documents=documents,
+    ids=[<span class="string">"doc1"</span>, <span class="string">"doc2"</span>, <span class="string">"doc3"</span>]
+)
+
+<span class="comment"># User query</span>
+query = <span class="string">"How do I authenticate with your API?"</span>
+
+<span class="comment"># Retrieve relevant documents</span>
+results = collection.<span class="func">query</span>(
+    query_texts=[query],
+    n_results=2  <span class="comment"># Top 2 results</span>
+)
+
+<span class="comment"># Format retrieved docs</span>
+context = <span class="string">"\n"</span>.<span class="func">join</span>(results[<span class="string">"documents"</span>][<span class="number">0</span>])
+
+<span class="comment"># Build augmented prompt</span>
+system_prompt = <span class="string">"""You are a helpful API documentation assistant.
+Answer questions using the provided documentation.
+If the docs don't address the question, say so."""</span>
+
+user_message = f<span class="string">"""&lt;context&gt;
+{context}
+&lt;/context&gt;
+
+Question: {query}"""</span>
+
+<span class="comment"># Call Claude</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">system</span>=system_prompt,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_message}]
+)
+
+<span class="keyword">print</span>(<span class="string">"Answer:"</span>, response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Try It Yourself</h4>
+        <p>
+          Install dependencies: <code>pip install anthropic chromadb</code>
+          Set your API key: <code>export ANTHROPIC_API_KEY="..."</code>
+          Run the script. It will retrieve relevant docs and generate an answer grounded in your knowledge base.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Next Steps</h4>
+        <p>
+          In production, replace Chroma with Pinecone or Weaviate for scalability. Add document metadata (source, date).
+          Implement reranking to filter low-relevance results. Monitor retrieval quality with a test set.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What are the three main limitations of LLMs that RAG addresses?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Hallucinations, bias, and slow inference speed</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Stale knowledge, hallucinations, and lack of access to private data</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Limited context window, poor reasoning, and inability to code</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Expensive API calls, language barriers, and lack of domain knowledge</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. What is the second step in the RAG pipeline?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Augment documents with metadata</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Retrieve relevant documents from a vector database</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Generate embeddings for the user query</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Format the prompt for Claude</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What is an embedding?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">A reference to a source document</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">A numerical representation (vector) of text used to measure semantic similarity</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">A chunk of text that has been labeled with metadata</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">A technique for breaking large documents into smaller pieces</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. What is "lost in the middle"?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When retrieved documents are ranked incorrectly</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">When a model focuses on the beginning and end of context and misses important info in the middle</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When the embedding vector space doesn't contain the query</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When documents are chunked without proper overlap</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 7 Summary</h2>
+    </div>
+    <p>
+      <strong>RAG (Retrieval-Augmented Generation)</strong> is the most important pattern in production AI.
+      It solves three critical LLM limitations: stale knowledge, hallucinations, and lack of private data access.
+      The pipeline is simple: <strong>Query → Retrieve → Augment → Generate</strong>.
+      Retrieval uses <strong>embeddings</strong> and vector search to find relevant documents.
+      <strong>Chunking strategy</strong> affects retrieval quality significantly.
+      Common pitfalls include irrelevant retrieval, lost-in-the-middle effects, context overflow, and conflicting information —
+      all have concrete fixes.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 8: Tool Use & Function Calling</strong><br>
+      <span style="color: var(--text-dim);">Extend your LLM beyond text — let it call APIs, run code, and take action in the real world.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-06-api-hands-on.html">← Topic 6</a>
+  <span class="nav-info">Topic 8 of 23</span>
+  <a class="nav-btn primary" href="topic-08-tool-use.html">Next: Tool Use & Function Calling →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

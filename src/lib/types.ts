@@ -37,6 +37,23 @@ export interface Project {
   live?: string;
 }
 
+export interface CourseTopic {
+  number: number;
+  file: string;
+  title: Bilingual;
+  description: Bilingual;
+  icon: string;
+  tag: "theory" | "hands-on" | "project" | "career";
+  phase: number;
+}
+
+export interface Course {
+  slug: string;
+  title: Bilingual;
+  description: Bilingual;
+  topics: CourseTopic[];
+}
+
 export interface BlogPost {
   slug: string;
   title: Bilingual;

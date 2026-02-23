@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 5 — Prompt Iteration & Debugging | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 26%"></div></div>
+    <span class="progress-label">6 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔄</div>
+    <h1>Prompt Iteration & Debugging</h1>
+    <p>Learn the systematic process of improving prompts — from first draft to production-ready.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Iteration Loop</h2>
+    </div>
+    <p>
+      Prompt engineering is <strong>not a one-shot process</strong>. Great prompts are built through iteration:
+      Write → Test → Analyze → Refine → Repeat. This cycle improves output quality exponentially.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">The Iteration Loop (Detail):</p>
+    <ol style="margin-left: 20px;">
+      <li><strong>Write:</strong> Draft your initial prompt based on the requirements</li>
+      <li><strong>Test:</strong> Run the prompt on representative test cases (10-20 examples minimum)</li>
+      <li><strong>Analyze:</strong> Examine failures and patterns. Ask "Why did it fail?"</li>
+      <li><strong>Refine:</strong> Make targeted changes to address root causes</li>
+      <li><strong>Repeat:</strong> Continue until results are acceptable</li>
+    </ol>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Software Development</h4>
+        <p>
+          Prompt engineering is like writing code. Your first draft won't be perfect.
+          You test, debug, refactor, and iterate. The difference: with prompts,
+          your "tests" are small API calls, not full test suites.
+        </p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">The Loop in Practice:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Iteration Loop</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># Test cases</span>
+test_cases = [
+    (<span class="string">"I love this!"</span>, <span class="string">"positive"</span>),
+    (<span class="string">"Terrible product."</span>, <span class="string">"negative"</span>),
+    (<span class="string">"It's okay."</span>, <span class="string">"neutral"</span>),
+]
+
+<span class="keyword">def</span> <span class="func">test_prompt</span>(prompt, test_data):
+    <span class="string">"""Run prompt on test cases and check accuracy."""</span>
+    correct = <span class="number">0</span>
+    <span class="keyword">for</span> text, expected in test_data:
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">100</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"{prompt}\n\nText: {text}"</span>
+            }]
+        )
+        result = response.content[<span class="number">0</span>].text.<span class="func">strip</span>().<span class="func">lower</span>()
+        <span class="keyword">if</span> expected <span class="keyword">in</span> result:
+            correct += <span class="number">1</span>
+    accuracy = (correct / <span class="func">len</span>(test_data)) * <span class="number">100</span>
+    <span class="keyword">return</span> accuracy
+
+<span class="comment"># Iteration cycle</span>
+prompt_v1 = <span class="string">"Classify sentiment: positive, negative, or neutral."</span>
+acc_v1 = <span class="func">test_prompt</span>(prompt_v1, test_cases)
+<span class="func">print</span>(<span class="string">f"V1: {acc_v1}%"</span>)
+
+<span class="comment"># Analyze and improve</span>
+prompt_v2 = <span class="string">"""Classify sentiment.
+Examples: "love" → positive, "bad" → negative.
+Return ONE word: positive, negative, or neutral."""</span>
+acc_v2 = <span class="func">test_prompt</span>(prompt_v2, test_cases)
+<span class="func">print</span>(<span class="string">f"V2: {acc_v2}%"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Measure Everything</h4>
+        <p>
+          Define success metrics upfront (accuracy, latency, cost).
+          Without metrics, you're iterating blindly. Measure before and after each change.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Common Failure Modes</h2>
+    </div>
+    <p>
+      Most prompt failures fall into predictable patterns. Learn to recognize them, and you'll debug faster.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Failure Mode 1: Too Verbose Prompts</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Problem</div>
+<pre>Your job is to carefully read the
+text and think deeply about whether
+the sentiment is positive or negative.
+Please consider all nuances...</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Fix</div>
+<pre>Classify sentiment: positive or
+negative. Be concise. One word
+answer only.</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>Why it fails:</strong> Long prompts confuse the model and waste tokens.
+      <strong>How to fix:</strong> Remove filler words. Be specific, not verbose.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Failure Mode 2: Hallucinations</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Problem</div>
+<pre>What is the annual revenue of
+company X?</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Fix</div>
+<pre>Based ONLY on this text, extract
+the annual revenue. If not mentioned,
+say "Not found".</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>Why it fails:</strong> Model makes up information when uncertain.
+      <strong>How to fix:</strong> Tell it what to do when info is unavailable.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Failure Mode 3: Wrong Format Output</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Problem</div>
+<pre>Return the data as JSON.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Fix</div>
+<pre>Return valid JSON (no markdown).
+{
+  "name": "...",
+  "score": 0-100
+}</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>Why it fails:</strong> "JSON" is ambiguous. Model might return markdown-wrapped JSON.
+      <strong>How to fix:</strong> Show exact expected format with an example.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Failure Mode 4: Ignoring Instructions</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Problem</div>
+<pre>Don't be too creative. Just summarize
+the text factually.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Fix</div>
+<pre>Summarize ONLY facts from the text.
+Do NOT add interpretations or
+creative additions.</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>Why it fails:</strong> Weak negatives ("don't") are less effective.
+      <strong>How to fix:</strong> Use system prompt for hard rules. Be explicit.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Failure Mode 5: Lazy Responses</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Problem</div>
+<pre>Summarize the meeting.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Fix</div>
+<pre>Summarize the meeting covering:
+1. Key decisions (at least 3)
+2. Action items with owners
+3. Next meeting date
+Format: markdown with headers</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>Why it fails:</strong> Vague instructions allow low-effort responses.
+      <strong>How to fix:</strong> Specify exactly what you want. Set expectations.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Test Against Failure Modes</h4>
+        <p>
+          When you notice a failure, check which mode it is. Then apply the targeted fix.
+          Don't just say "the prompt is bad" — diagnose the specific problem.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Debugging Techniques</h2>
+    </div>
+    <p>
+      When a prompt fails, you need to isolate the cause. Is it the system prompt? The input data?
+      The output format spec? Debugging is detective work.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Systematic Debugging Process:</p>
+    <ol style="margin-left: 20px;">
+      <li><strong>Isolate:</strong> Test each component separately (system prompt, examples, format specs)</li>
+      <li><strong>Simplify:</strong> Create minimal test cases that reproduce the failure</li>
+      <li><strong>Hypothesis:</strong> Form a theory about what's wrong</li>
+      <li><strong>Test:</strong> Make ONE change and measure the effect</li>
+      <li><strong>Iterate:</strong> If the hypothesis was right, apply to all cases</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Debugging Example: "Model is returning markdown when I want JSON"</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Systematic Debugging</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Debug: Is it the format spec or the system prompt?</span>
+
+<span class="comment"># Test 1: Just format spec (no system prompt)</span>
+response_1 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 1 (no system):"</span>, response_1.content[<span class="number">0</span>].text)
+
+<span class="comment"># Test 2: With system prompt that says to be helpful</span>
+response_2 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">system</span>=<span class="string">"Be helpful"</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 2 (vague system):"</span>, response_2.content[<span class="number">0</span>].text)
+
+<span class="comment"># Test 3: Strong system prompt about JSON only</span>
+response_3 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">system</span>=<span class="string">"Return ONLY valid JSON. No markdown. No explanation."</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 3 (strong system):"</span>, response_3.content[<span class="number">0</span>].text)
+
+<span class="comment"># Conclusion: Hypothesis was right! System prompt was too weak.</span></pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>One Change at a Time</h4>
+        <p>
+          Never change multiple things at once. Change one variable, measure, then move to the next.
+          Otherwise, you won't know which change caused the improvement.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>A/B Testing Prompts</h2>
+    </div>
+    <p>
+      When you have two competing prompt versions, <strong>A/B test them</strong> on your dataset.
+      Don't rely on gut feeling. Let data decide.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">A/B Testing Process:</p>
+    <ol style="margin-left: 20px;">
+      <li>Create a test dataset (50-200 examples with known correct answers)</li>
+      <li>Run Prompt A on all examples, measure accuracy/quality</li>
+      <li>Run Prompt B on all examples, measure the same metrics</li>
+      <li>Compare: Which performed better? By how much?</li>
+      <li>If B is better, adopt B. If tie or marginal, stick with A (simpler).</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Python: A/B Testing Code</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — A/B Testing Framework</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">from</span> anthropic <span class="keyword">import</span> Anthropic
+
+client = Anthropic()
+
+<span class="comment"># Test dataset</span>
+test_data = [
+    {<span class="string">"text"</span>: <span class="string">"I love this!"</span>, <span class="string">"expected"</span>: <span class="string">"positive"</span>},
+    {<span class="string">"text"</span>: <span class="string">"Awful experience."</span>, <span class="string">"expected"</span>: <span class="string">"negative"</span>},
+    {<span class="string">"text"</span>: <span class="string">"It's okay."</span>, <span class="string">"expected"</span>: <span class="string">"neutral"</span>},
+]
+
+<span class="keyword">def</span> <span class="func">test_prompt_version</span>(prompt, dataset):
+    <span class="string">"""Test a prompt and return accuracy."""</span>
+    results = []
+    <span class="keyword">for</span> item <span class="keyword">in</span> dataset:
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">100</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"{prompt}\n\nText: {item['text']}"</span>
+            }]
+        )
+        result = response.content[<span class="number">0</span>].text.<span class="func">strip</span>().<span class="func">lower</span>()
+        correct = item[<span class="string">"expected"</span>] <span class="keyword">in</span> result
+        results.<span class="func">append</span>({
+            <span class="string">"input"</span>: item[<span class="string">"text"</span>],
+            <span class="string">"expected"</span>: item[<span class="string">"expected"</span>],
+            <span class="string">"output"</span>: result,
+            <span class="string">"correct"</span>: correct
+        })
+    accuracy = (<span class="func">sum</span>(<span class="number">1</span> <span class="keyword">for</span> r <span class="keyword">in</span> results <span class="keyword">if</span> r[<span class="string">"correct"</span>])) / <span class="func">len</span>(results) * <span class="number">100</span>
+    <span class="keyword">return</span> accuracy, results
+
+<span class="comment"># Prompt A (basic)</span>
+prompt_a = <span class="string">"Classify sentiment: positive, negative, or neutral."</span>
+
+<span class="comment"># Prompt B (improved with examples)</span>
+prompt_b = <span class="string">"""Classify sentiment: positive, negative, neutral.
+Examples:
+- "love" → positive
+- "hate" → negative
+- "ok" → neutral
+
+Return ONE word only."""</span>
+
+<span class="comment"># Run A/B test</span>
+acc_a, results_a = <span class="func">test_prompt_version</span>(prompt_a, test_data)
+acc_b, results_b = <span class="func">test_prompt_version</span>(prompt_b, test_data)
+
+<span class="func">print</span>(<span class="string">f"Prompt A accuracy: {acc_a}%"</span>)
+<span class="func">print</span>(<span class="string">f"Prompt B accuracy: {acc_b}%"</span>)
+<span class="func">print</span>(<span class="string">f"Winner: {'B' if acc_b > acc_a else 'A'}"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Statistical Significance</h4>
+        <p>
+          Small improvements (1-2%) might be noise. Look for bigger gaps (5%+) before declaring a winner.
+          On larger datasets (1000+ examples), smaller improvements become meaningful.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Prompt Versioning</h2>
+    </div>
+    <p>
+      Track your prompt versions like you track code. Versioning lets you compare, rollback, and understand
+      what changed and why. This is essential in production.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Prompt Changelog Example:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Prompt Changelog</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">## Sentiment Classifier Prompt Changelog
+
+### v1.0 (2025-01-15)
+- Initial: "Classify sentiment: positive, negative, neutral"
+- Accuracy: 72%
+- Issue: Too vague, model guesses
+
+### v1.1 (2025-01-16)
+- Added few-shot examples
+- Added "Return ONE word only" constraint
+- Accuracy: 85%
+- Improvement: +13%
+
+### v1.2 (2025-01-17)
+- Moved examples to system prompt
+- Added "If unsure, say 'unclear'"
+- Accuracy: 87%
+- Improvement: +2%
+
+### v2.0 (2025-01-18)
+- Full XML structure with tags
+- Explicit JSON output format
+- Accuracy: 89%
+- Improvement: +2%, better production-grade</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Best Practices for Versioning:</p>
+    <ul style="margin-left: 20px;">
+      <li><strong>Semantic versioning:</strong> v1.0, v1.1, v2.0 (major.minor.patch)</li>
+      <li><strong>Date stamps:</strong> Include date for tracking when changes happened</li>
+      <li><strong>Metrics:</strong> Always record accuracy/quality metrics</li>
+      <li><strong>Rationale:</strong> Explain why you made each change</li>
+      <li><strong>Comparison:</strong> Show before/after metrics to prove improvement</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Store Prompts in Version Control</h4>
+        <p>
+          Keep prompts in Git (or equivalent) alongside your code. Tag releases.
+          This lets you roll back to a previous version if a new prompt performs worse.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Real-World Case Study: Code Review Prompt</h2>
+    </div>
+    <p>
+      Let's walk through a real example of iterating on a code review prompt from terrible (v1) to excellent (v5).
+      Notice the pattern of progressive improvements.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V1 (Terrible) — Initial Attempt</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V1: Too Vague</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">Review this code.</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>Problem:</strong> No specificity. Model gives generic feedback.
+      <strong>Accuracy:</strong> 30% (misses bugs, gives irrelevant comments)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V2 (Okay) — Add Some Context</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V2: Basic Structure</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">You are a code reviewer.
+Review this Python code for bugs and improvements.
+List issues and suggestions.
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>Improvement:</strong> More specific, but still loose.
+      <strong>Accuracy:</strong> 60% (catches some issues, but output is rambling)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V3 (Better) — Add Format & Examples</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V3: Structured Format</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">You are a senior Python engineer.
+Review code focusing on:
+1. Security issues (highest priority)
+2. Performance problems
+3. Code quality improvements
+
+Output format:
+## Security Issues
+[list with severity]
+
+## Performance
+[specific suggestions]
+
+## Code Quality
+[improvements with examples]
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>Improvement:</strong> Clear format, prioritization.
+      <strong>Accuracy:</strong> 75% (catches most issues, better organized)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V4 (Excellent) — Add XML Tags & Guardrails</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V4: Production-Grade</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python engineer at a Fortune 500
+company with 15 years of experience. Your code
+reviews are known for catching subtle bugs and
+suggesting high-impact improvements.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Review this Python code. Flag issues in priority order.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;priorities&gt;</span>
+1. Security vulnerabilities (SQL injection, etc.)
+2. Race conditions or concurrency issues
+3. Memory leaks or performance problems
+4. Code quality and style issues
+<span class="tag">&lt;/priorities&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+## 🔴 Critical Issues
+- Issue 1 (line X): description
+- Issue 2 (line Y): description
+
+## 🟡 Warnings
+- Warning 1: description
+
+## 💡 Improvements
+- Suggestion 1: description
+
+## ✅ Positive Notes
+- What's good about the code
+<span class="tag">&lt;/output_format&gt;</span>
+
+<span class="tag">&lt;rules&gt;</span>
+- Cite specific line numbers
+- Provide code examples for fixes
+- Be constructive, not dismissive
+- Don't comment on style preferences
+- If you're unsure, say "needs clarification"
+<span class="tag">&lt;/rules&gt;</span>
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>Improvement:</strong> Strong role, clear rules, structured format.
+      <strong>Accuracy:</strong> 88% (catches nearly all issues, highly useful)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V5 (Optimal) — Add Few-Shot & Error Handling</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V5: Fully Optimized</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python engineer at a Fortune 500
+company with 15 years of experience. Your code
+reviews are known for catching subtle bugs and
+suggesting high-impact improvements.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;examples&gt;</span>
+Example 1: SQL injection vulnerability
+```python
+result = db.execute(f"SELECT * FROM users WHERE id = {user_id}")
+```
+Review: "🔴 Critical security issue on line 2. This is vulnerable to
+SQL injection. Fix: Use parameterized queries."
+
+Example 2: Good code
+```python
+def calculate_total(items: list[float]) -> float:
+    """Calculate sum of items with validation."""
+    return sum(item for item in items if isinstance(item, (int, float)))
+```
+Review: "✅ Good: Type hints, docstring, and defensive code."
+<span class="tag">&lt;/examples&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Review this Python code. Flag issues in priority order.
+<span class="tag">&lt;/instructions&gt;</span>
+
+... [rest of v4 structure] ...
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>Improvement:</strong> Few-shot examples teach desired behavior.
+      <strong>Accuracy:</strong> 92% (production-ready, consistent, actionable)
+    </p>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>The Progression</h4>
+        <p>
+          Notice each version builds on the previous: v1 → v2 (add context) → v3 (structure) →
+          v4 (XML tags, guardrails) → v5 (examples). This is the path most prompts follow to production.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What are the steps of the prompt iteration loop?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Write → Test → Analyze → Refine → Repeat</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Plan → Design → Code → Deploy → Maintain</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Read → Understand → Generate → Review → Ship</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Ask → Wait → Check → Fix → Deploy</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Which failure mode is fixed by adding "Return ONLY JSON. No markdown"?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Hallucinations</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Lazy responses</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Wrong format output</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Too verbose prompts</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. When debugging a prompt, what should you do?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Change multiple things at once to fix faster</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Change one variable at a time and measure each change</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Rewrite the entire prompt from scratch</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Ask the model to fix itself</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. Why should you version control your prompts?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">To track changes, compare versions, rollback if needed, and understand what worked</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To make them shorter</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To share with users</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's optional and not important</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 5 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      <strong>Iteration is everything.</strong> Start simple, test, and refine.
+      <strong>Failure modes are predictable.</strong> Learn to recognize and fix them.
+      <strong>Debugging is systematic.</strong> Isolate, hypothesize, test one change at a time.
+      <strong>A/B testing eliminates guessing.</strong> Let data decide between versions.
+      <strong>Versioning prevents chaos.</strong> Track changes like code.
+      <strong>Case studies show the path.</strong> Most prompts follow a v1 → v5 progression to production.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 6: Hands-On — Building with LLM APIs</strong><br>
+      <span style="color: var(--text-dim);">Write real Python code to call Claude and OpenAI APIs with streaming, error handling, and practical patterns.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-04-advanced-prompting.html">← Topic 4</a>
+  <span class="nav-info">Topic 6 of 23</span>
+  <a class="nav-btn primary" href="topic-06-api-hands-on.html">Next: Hands-On APIs →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 11 — المخرجات المنظمة وتحليلها | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 48%"></div></div>
+    <span class="progress-label">11 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📋</div>
+    <h1>المخرجات المنظمة وتحليلها</h1>
+    <p>احصل على JSON موثوق، وجداول، وبيانات منظمة من النماذج اللغوية — باستخدام المخططات، والتحقق، واستراتيجيات التحليل.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>لماذا المخرجات المنظمة مهمة</h2>
+    </div>
+    <p>
+      النماذج اللغوية الكبيرة تنتج بطبيعتها <strong>نصوصاً حرة</strong> — كلاماً متدفقاً وحوارياً. لكن التطبيقات الحقيقية تحتاج
+      <strong>بيانات منظمة</strong>: JSON لواجهات البرمجة، وصفوف لقواعد البيانات، وكائنات محددة الأنواع لمنطق التطبيق.
+      الفجوة بين النص الحر والبيانات القابلة للقراءة آلياً هي المجال الذي تتدخل فيه تقنيات المخرجات المنظمة.
+    </p>
+    <p>
+      بدون المخرجات المنظمة، ستضطر لكتابة كود هش لتحليل النصوص يتعطل كلما غيّر النموذج صياغته.
+      مع المقاربة الصحيحة، تحصل على بيانات متوقعة ومُتحقق منها في كل مرة.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>استجابات JSON</h4>
+        <p>إرجاع البيانات ككائنات JSON صالحة يمكن لتطبيقك تحليلها واستخدامها مباشرة دون معالجة نصية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>استخراج البيانات</h4>
+        <p>سحب حقول منظمة (أسماء، تواريخ، مبالغ) من نصوص غير منظمة كالرسائل الإلكترونية والمستندات والتقارير.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>التكامل مع واجهات البرمجة</h4>
+        <p>توليد مخرجات تطابق مخططات واجهات البرمجة الخاصة بك حتى تتدفق استجابات النموذج مباشرة إلى نظامك.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗄️</div>
+        <h4>تعبئة قواعد البيانات</h4>
+        <p>تحويل اللغة الطبيعية إلى سجلات منظمة جاهزة للإدراج في قاعدة البيانات مع أنواع وقيود صحيحة.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: نموذج مقابل صفحة فارغة</h4>
+        <p>
+          فكر في المخرجات المنظمة كإعطاء النموذج اللغوي نموذجاً (فورم) لملئه بدلاً من صفحة فارغة.
+          الصفحة الفارغة تدعو للإسهاب. أما النموذج ذو الحقول المسمّاة والقوائم المنسدلة وخانات الاختيار
+          فيحصل لك على البيانات التي تحتاجها بالضبط، بالتنسيق الذي تتوقعه.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>وضع JSON وتنسيق الاستجابة</h2>
+    </div>
+    <p>
+      مزودو النماذج اللغوية المختلفون يوفرون آليات مختلفة لطلب المخرجات المنظمة.
+      بعضها لديه أوضاع JSON أصلية مدمجة في واجهات البرمجة، بينما يعتمد البعض الآخر على صياغة دقيقة للبرومبت.
+      إليك كيف يتعامل المزودون الرئيسيون مع الأمر:
+    </p>
+
+    <p><strong>OpenAI</strong> — وضع JSON أصلي عبر <code style="font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12.5px;color:var(--accent-light);direction:ltr;display:inline-block;">response_format</code>:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_format</span>={<span class="string">"type"</span>: <span class="string">"json_object"</span>},
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"Return JSON with keys: title, summary, rating"</span>},
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># response.choices[0].message.content is guaranteed valid JSON</span>
+<span class="keyword">import</span> json
+data = json.<span class="func">loads</span>(response.choices[<span class="number">0</span>].message.content)
+<span class="func">print</span>(data[<span class="string">"title"</span>])  <span class="comment"># "Inception"</span></pre>
+    </div>
+
+    <p><strong>Anthropic</strong> — مخرجات منظمة عبر برومبت النظام + وسوم XML أو استخدام الأدوات:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+message = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=<span class="string">"""Return your response as a JSON object inside &lt;json&gt; tags.
+The JSON must have these exact keys: title, summary, rating.
+Example: &lt;json&gt;{"title": "...", "summary": "...", "rating": 8.5}&lt;/json&gt;"""</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># Extract JSON from XML tags</span>
+<span class="keyword">import</span> re
+match = re.<span class="func">search</span>(<span class="string">r'&lt;json&gt;([\s\S]*?)&lt;/json&gt;'</span>, message.content[<span class="number">0</span>].text)
+data = json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">1</span>))</pre>
+    </div>
+
+    <p><strong>Google Gemini</strong> — توليد مبني على المخطط مع نوع MIME للاستجابة:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> google.generativeai <span class="keyword">as</span> genai
+
+model = genai.<span class="func">GenerativeModel</span>(<span class="string">"gemini-1.5-pro"</span>)
+
+response = model.<span class="func">generate_content</span>(
+    <span class="string">"Review the movie Inception"</span>,
+    <span class="param">generation_config</span>=genai.types.<span class="func">GenerationConfig</span>(
+        <span class="param">response_mime_type</span>=<span class="string">"application/json"</span>,
+        <span class="param">response_schema</span>={
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"title"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"summary"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"rating"</span>: {<span class="string">"type"</span>: <span class="string">"number"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"title"</span>, <span class="string">"summary"</span>, <span class="string">"rating"</span>]
+        }
+    )
+)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>فكرة جوهرية</h4>
+        <p>
+          ليست كل النماذج لديها وضع JSON أصلي — لكن يمكنك الحصول على JSON موثوق من أي نموذج بالصياغة الصحيحة.
+          المفتاح هو أن تكون صريحاً بشأن البنية المتوقعة، وأن تقدم مثالاً، وأن تستخدم محددات
+          (مثل وسوم XML) حتى تتمكن من استخراج الـ JSON برمجياً.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>التوليد المبني على المخططات</h2>
+    </div>
+    <p>
+      أكثر المقاربات موثوقية للمخرجات المنظمة هي <strong>التوليد المبني على المخططات</strong> — تعريف
+      الشكل الدقيق لبياناتك بالأنواع والقيود والأوصاف، ثم ترك مكتبة
+      تفرض ذلك المخطط على مخرجات النموذج. هنا تتألق أدوات مثل <strong>Pydantic</strong>
+      و<strong>Instructor</strong>.
+    </p>
+
+    <p>أولاً، عرّف نموذج البيانات باستخدام Pydantic:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field
+
+<span class="keyword">class</span> <span class="func">MovieReview</span>(BaseModel):
+    title: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"Movie title"</span>)
+    rating: <span class="param">float</span> = <span class="func">Field</span>(<span class="param">ge</span>=<span class="number">1</span>, <span class="param">le</span>=<span class="number">10</span>, <span class="param">description</span>=<span class="string">"Rating from 1-10"</span>)
+    sentiment: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"positive, negative, or neutral"</span>)
+    key_themes: <span class="param">list</span>[<span class="param">str</span>] = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"Main themes"</span>)
+    summary: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">max_length</span>=<span class="number">200</span>)</pre>
+    </div>
+
+    <p>ثم استخدم مكتبة <strong>Instructor</strong> للحصول على استجابات محددة الأنواع ومُتحقق منها تلقائياً:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># Install: pip install instructor openai</span>
+<span class="keyword">import</span> instructor
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+<span class="comment"># Patch the OpenAI client with Instructor</span>
+client = instructor.<span class="func">from_openai</span>(OpenAI())
+
+<span class="comment"># Get a typed, validated response — no manual parsing!</span>
+review = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_model</span>=MovieReview,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># review is a fully typed MovieReview object</span>
+<span class="func">print</span>(review.title)       <span class="comment"># "Inception"</span>
+<span class="func">print</span>(review.rating)      <span class="comment"># 9.2</span>
+<span class="func">print</span>(review.sentiment)   <span class="comment"># "positive"</span>
+<span class="func">print</span>(review.key_themes)  <span class="comment"># ["dreams", "reality", "loss"]</span>
+
+<span class="comment"># Validation is automatic — rating must be 1-10, summary ≤ 200 chars</span>
+<span class="comment"># If the LLM returns invalid data, Instructor retries automatically</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>لماذا المقاربة المبنية على المخططات هي الأفضل</h4>
+        <p>
+          نموذج Pydantic يخدم ثلاثة أغراض في آن واحد: يوثّق التنسيق المتوقع، ويقيّد مخرجات النموذج،
+          ويتحقق من النتيجة. إذا أرجع النموذج تقييماً قدره 15، يكتشف Pydantic المخالفة
+          ويعيد Instructor المحاولة تلقائياً مع تغذية راجعة تصحيحية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>استراتيجيات التحليل</h2>
+    </div>
+    <p>
+      في بيئة الإنتاج، استجابات النماذج اللغوية ليست دائماً منسقة بشكل مثالي. قد يغلف النموذج JSON في
+      كتل كود markdown، أو يضيف نصاً توضيحياً قبل JSON، أو ينتج مخرجات مشوهة قليلاً.
+      استراتيجية التحليل القوية تتعامل مع كل هذه الحالات بسلاسة.
+    </p>
+
+    <p>إليك دالة تحليل مجرّبة ميدانياً تتعامل مع أكثر الحالات الحدية شيوعاً:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">import</span> re
+
+<span class="keyword">def</span> <span class="func">extract_json</span>(text: <span class="param">str</span>) -> <span class="param">dict</span>:
+    <span class="string">"""Extract JSON from LLM response, handling markdown code blocks."""</span>
+    <span class="comment"># Try direct parse first</span>
+    <span class="keyword">try</span>:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(text)
+    <span class="keyword">except</span> json.JSONDecodeError:
+        <span class="keyword">pass</span>
+
+    <span class="comment"># Try extracting from markdown code block</span>
+    match = re.<span class="func">search</span>(<span class="string">r'```(?:json)?\s*([\s\S]*?)```'</span>, text)
+    <span class="keyword">if</span> match:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">1</span>).<span class="func">strip</span>())
+
+    <span class="comment"># Try finding JSON-like substring</span>
+    match = re.<span class="func">search</span>(<span class="string">r'\{[\s\S]*\}'</span>, text)
+    <span class="keyword">if</span> match:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">0</span>))
+
+    <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">"No valid JSON found in response"</span>)</pre>
+    </div>
+
+    <p>لمزيد من المتانة، أضف حلقة <strong>إعادة المحاولة مع التغذية الراجعة</strong> التي ترسل أخطاء التحليل مرة أخرى للنموذج:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">get_json_with_retry</span>(client, messages, <span class="param">max_retries</span>=<span class="number">3</span>):
+    <span class="string">"""Get valid JSON from LLM with automatic retry on parse failure."""</span>
+    <span class="keyword">for</span> attempt <span class="keyword">in</span> <span class="func">range</span>(max_retries):
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">1024</span>,
+            <span class="param">messages</span>=messages
+        )
+        text = response.content[<span class="number">0</span>].text
+
+        <span class="keyword">try</span>:
+            <span class="keyword">return</span> <span class="func">extract_json</span>(text)
+        <span class="keyword">except</span> (json.JSONDecodeError, <span class="func">ValueError</span>) <span class="keyword">as</span> e:
+            <span class="comment"># Send the error back to the model for correction</span>
+            messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: text})
+            messages.<span class="func">append</span>({
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"That response failed to parse: {e}\n"</span>
+                           <span class="string">f"Please return ONLY valid JSON, no other text."</span>
+            })
+
+    <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">f"Failed to get valid JSON after {max_retries} attempts"</span>)</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>تحقق دائماً من المخطط</h4>
+        <p>
+          تحقق دائماً من المخرجات المُحللة مقابل المخطط المتوقع — النماذج اللغوية قد تنتج JSON صالحاً لا يطابق
+          بنيتك. استجابة مثل <code style="font-family:'JetBrains Mono',monospace;font-size:12px;direction:ltr;display:inline-block;">{"result": "success"}</code> هي JSON صالح لكنه عديم الفائدة
+          إذا كنت تتوقع <code style="font-family:'JetBrains Mono',monospace;font-size:12px;direction:ltr;display:inline-block;">{"title": "...", "rating": 9}</code>. استخدم Pydantic أو JSON Schema للتحقق
+          من التطابق البنيوي، وليس فقط أخطاء الصياغة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>بث المخرجات المنظمة</h2>
+    </div>
+    <p>
+      بث استجابات النماذج اللغوية رائع لتجربة المستخدم — يرى المستخدمون النص يظهر في الوقت الحقيقي. لكن بث
+      <strong>البيانات المنظمة</strong> يطرح تحدياً: لا يمكنك تحليل JSON غير مكتمل.
+      استجابة جزئية مثل <code style="font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12.5px;color:var(--accent-light);direction:ltr;display:inline-block;">{"title": "Incep</code> ستسبب خطأ في التحليل.
+    </p>
+
+    <p>هناك استراتيجيتان رئيسيتان لبث المخرجات المنظمة:</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>JSON مفصول بالأسطر (NDJSON)</h4>
+        <p>كل سطر هو كائن JSON كامل. حلّل سطراً بسطر فور وصولها. مثالي لقوائم العناصر أو المخرجات بنمط السجلات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧩</div>
+        <h4>تحليل الكائنات الجزئية</h4>
+        <p>استخدم مكتبات يمكنها استخراج الحقول المكتملة من JSON غير مكتمل، مع تحديث واجهة المستخدم كلما أصبح حقل متاحاً.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> instructor
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+<span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel
+
+<span class="keyword">class</span> <span class="func">MovieReview</span>(BaseModel):
+    title: <span class="param">str</span>
+    rating: <span class="param">float</span>
+    summary: <span class="param">str</span>
+
+client = instructor.<span class="func">from_openai</span>(OpenAI())
+
+<span class="comment"># Stream partial objects — fields populate as they're generated</span>
+review_stream = client.chat.completions.<span class="func">create_partial</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_model</span>=MovieReview,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="keyword">for</span> partial_review <span class="keyword">in</span> review_stream:
+    <span class="comment"># partial_review has fields filled in as they stream</span>
+    <span class="func">print</span>(<span class="string">f"Title: </span>{partial_review.title or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">f"Rating: </span>{partial_review.rating or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">f"Summary: </span>{partial_review.summary or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">"---"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>متى يكون البث مهماً</h4>
+        <p>
+          بث المخرجات المنظمة أكثر قيمة لواجهات المستخدم الحية حيث يشاهد المستخدمون النتائج تظهر
+          (لوحات المعلومات، نتائج البحث، جداول البيانات) وللمخرجات الكبيرة حيث الانتظار للاستجابة الكاملة
+          سيسبب تأخيراً غير مقبول. لخطوط الأنابيب الخلفية، التحليل الدفعي بعد الاكتمال أبسط ومفضّل.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>أفضل الممارسات</h2>
+    </div>
+    <p>اتبع هذه المبادئ لبناء خطوط أنابيب مخرجات منظمة موثوقة تعمل في بيئة الإنتاج.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📐</div>
+        <h4>عرّف مخططاً دائماً</h4>
+        <p>المخططات الصريحة تعطي نتائج أفضل من الأمل في التنسيق الصحيح. استخدم نماذج Pydantic أو JSON Schema أو على الأقل مثالاً واضحاً في برومبتك.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🛡️</div>
+        <h4>تحقق ولا تثق</h4>
+        <p>تحقق دائماً من المخرجات مقابل مخططك قبل استخدامها. JSON صالح لا يعني بنية صحيحة. تحقق من الأنواع والحقول المطلوبة وقيود القيم.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>أعد المحاولة مع التغذية الراجعة</h4>
+        <p>إذا فشل التحليل، أرسل الخطأ مرة أخرى للنموذج للتصحيح. معظم النماذج تصحح نفسها بشكل موثوق عند إظهار خطئها والتنسيق المتوقع.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>ابدأ ببساطة</h4>
+        <p>ابدأ ببنى مسطحة؛ أضف التعشيش فقط عند الحاجة. المخططات المتداخلة بعمق أصعب على النماذج وأصعب عليك للتحقق منها.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 3 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما أكثر طريقة موثوقة للحصول على مخرجات JSON من نموذج لغوي؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اطلب بلطف في البرومبت</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">استخدم وضع JSON أو التوليد المبني على المخططات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اضبط الحرارة على 0</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">حلّل الاستجابة بالتعبيرات النمطية (regex)</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. لماذا يجب التحقق من مخرجات النموذج حتى عند استخدام وضع JSON؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">وضع JSON أحياناً يرجع XML</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">بنية JSON قد لا تتطابق مع المخطط المتوقع</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يكون أبطأ بدون التحقق</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يجب دائماً التحقق من JSON</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ماذا يجب أن تفعل عند فشل تحليل JSON من استجابة نموذج لغوي؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">ارفع خطأ فوراً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أعد المحاولة بحرارة أعلى</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">أرسل الخطأ مرة أخرى للنموذج مع البرومبت الأصلي للتصحيح</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">انتقل إلى نموذج مختلف</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 11</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      <strong>المخرجات المنظمة</strong> تسد الفجوة بين النص الحر للنماذج اللغوية والبيانات القابلة للقراءة آلياً.
+      استخدم <strong>وضع JSON</strong> أو <strong>التوليد المبني على المخططات</strong> (Pydantic + Instructor) للحصول على أكثر النتائج موثوقية.
+      ابنِ <strong>محللات قوية</strong> تتعامل مع كتل كود markdown والمخرجات المشوهة.
+      تحقق دائماً <strong>من المخطط</strong> — JSON صالح لا يعني بنية صحيحة.
+      عند فشل التحليل، <strong>أعد المحاولة مع التغذية الراجعة</strong> بدلاً من الاستسلام فوراً.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 12: تقييم جودة البرومبت</strong><br>
+      <span style="color: var(--text-dim);">ستتعلم كيف تقيس وتسجل وتحسّن برومبتاتك بشكل منهجي باستخدام أطر التقييم والمقاييس.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-09-prompt-chains.html">السابق →</a>
+  <span class="nav-info">الموضوع 11 من 23</span>
+  <a class="nav-btn primary" href="topic-10-evaluation.html">← التالي: تقييم جودة البرومبت</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

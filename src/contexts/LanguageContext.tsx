@@ -30,21 +30,21 @@ function getStoredLocale(): Locale {
 
 /**
  * Provides language/locale context for the app with RTL support.
- * Uses "en" for initial render to avoid server/client hydration mismatch,
- * then syncs from localStorage in useEffect.
+ * Always starts with "en" to match server-rendered HTML and avoid hydration mismatch.
+ * The inline <script> in layout.tsx sets dir/lang/font-arabic on <html> before paint
+ * to prevent CLS, while useEffect syncs React state from localStorage after hydration.
  */
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Read locale synchronously on first render — the inline <script> in layout.tsx
-  // has already set dir/lang/font-arabic on <html> before paint, so React state
-  // matches the DOM from the start (no CLS from deferred useEffect).
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    if (typeof window === "undefined") return "en";
-    return getStoredLocale();
-  });
+  const [locale, setLocaleState] = useState<Locale>("en");
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
     localStorage.setItem("locale", newLocale);
+  }, []);
+
+  // Sync from localStorage after hydration
+  useEffect(() => {
+    setLocaleState(getStoredLocale());
   }, []);
 
   // Update <html> attributes whenever locale changes

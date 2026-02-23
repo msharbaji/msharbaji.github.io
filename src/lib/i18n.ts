@@ -7,6 +7,7 @@ const translations = {
     nav: {
       home: "Home",
       projects: "Projects",
+      courses: "Courses",
       blog: "Blog",
       contact: "Contact",
     },
@@ -45,6 +46,22 @@ const translations = {
       backToProjects: "Back to projects",
       techStack: "Tech Stack",
       readMore: "Read more",
+    },
+    courses: {
+      title: "Courses",
+      description:
+        "Interactive courses on AI, prompt engineering, and building intelligent systems.",
+      backToCourses: "Back to courses",
+      openLesson: "Open lesson",
+      topics: "Topics",
+      phase1: "Foundations",
+      phase2: "Applied Prompt Engineering",
+      phase3: "AI Agents",
+      bonus: "Bonus",
+      phase1Desc: "Core concepts & first API calls",
+      phase2Desc: "RAG, tools, evaluation & projects",
+      phase3Desc: "Architecture, frameworks & building agents",
+      bonusDesc: "Career growth & staying current",
     },
     blog: {
       title: "Blog",
@@ -86,6 +103,7 @@ const translations = {
     nav: {
       home: "الرئيسية",
       projects: "المشاريع",
+      courses: "الدورات",
       blog: "المدونة",
       contact: "تواصل",
     },
@@ -124,6 +142,22 @@ const translations = {
       backToProjects: "العودة للمشاريع",
       techStack: "التقنيات المستخدمة",
       readMore: "اقرأ المزيد",
+    },
+    courses: {
+      title: "الدورات",
+      description:
+        "دورات تفاعلية عن AI وهندسة البرومبت وبناء أنظمة ذكية.",
+      backToCourses: "العودة للدورات",
+      openLesson: "افتح الدرس",
+      topics: "المواضيع",
+      phase1: "الأساسيات",
+      phase2: "هندسة البرومبت التطبيقية",
+      phase3: "وكلاء الذكاء الاصطناعي",
+      bonus: "إضافي",
+      phase1Desc: "المفاهيم الأساسية وأول تجربة مع الـ API",
+      phase2Desc: "RAG والأدوات والتقييم ومشاريع عملية",
+      phase3Desc: "بنية الـ agents وأطر العمل وبناء agents من الصفر",
+      bonusDesc: "المسار المهني ومواكبة آخر التطورات",
     },
     blog: {
       title: "المدونة",

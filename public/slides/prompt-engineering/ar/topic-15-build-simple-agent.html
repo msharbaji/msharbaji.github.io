@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 15 — بناء وكيل بسيط من الصفر | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 83%"></div></div>
+    <span class="progress-label">19 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔨</div>
+    <h1>بناء وكيل بسيط من الصفر</h1>
+    <p>بدون أطر عمل — ابنِ وكيلاً كاملاً وجاهزاً للإنتاج بلغة بايثون الخالصة لتفهم حقاً كيف تعمل الوكلاء من الأساس.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>ما الذي سنبنيه</h2>
+    </div>
+    <p>
+      <strong>وكيل بحث</strong> يمكنه بشكل مستقل:
+    </p>
+    <ul style="margin-right: 24px;">
+      <li>البحث في الويب عن معلومات حديثة</li>
+      <li>قراءة واستخراج البيانات الرئيسية من الصفحات</li>
+      <li>تجميع النتائج في تقرير متماسك</li>
+      <li>كتابة المخرجات النهائية في ملف</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Agent Architecture Overview</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>┌────────────────────────────────────────────┐
+│  INPUT: "Research quantum computing 2025"  │
+└────────────────────┬───────────────────────┘
+                     │
+        ┌────────────▼────────────┐
+        │  LLM DECIDES NEXT STEP  │
+        │  (ReAct: Thought/Action)│
+        └────────────┬────────────┘
+                     │
+    ┌────────────────┼────────────────┐
+    │                │                │
+    ▼                ▼                ▼
+  SEARCH          READ_PAGE        WRITE_FILE
+  web search      read URL           save output
+    │                │                │
+    └────────────────┼────────────────┘
+                     │
+         ┌───────────▼───────────┐
+         │  FEEDBACK TO LLM      │
+         │  (Add to messages)    │
+         └───────────┬───────────┘
+                     │
+            Has goal been reached?
+            ├─ Yes → Return answer
+            └─ No → Loop back to LLM decision</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>حلقة الوكيل — البنية الأساسية</h2>
+    </div>
+    <p>
+      الأساس بسيط: حلقة while تقرأ مخرجات النموذج، وتحلل استدعاءات الأدوات، وتنفذها،
+      وتغذي النتائج مرة أخرى إلى النموذج. كل شيء آخر هو تفاصيل تنفيذية.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Minimal Agent Loop</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+TOOLS = {}  <span class="comment"># Will populate this</span>
+
+<span class="keyword">def</span> <span class="func">run_agent</span>(user_goal: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Run the agent loop until goal is reached."""</span>
+    messages = [
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_goal}
+    ]
+
+    iteration = <span class="number">0</span>
+    <span class="keyword">while</span> iteration &lt; <span class="number">10</span>:
+        iteration += <span class="number">1</span>
+
+        <span class="comment"># 1. Ask the model what to do next</span>
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">tools</span>=list(TOOLS.values()),
+            <span class="param">messages</span>=messages
+        )
+
+        <span class="comment"># 2. Parse response</span>
+        <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+            <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+                <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                    <span class="comment"># 3. Execute the tool</span>
+                    result = <span class="func">execute_tool</span>(block.name, block.input)
+
+                    <span class="comment"># 4. Add result back to messages</span>
+                    messages.<span class="func">append</span>({
+                        <span class="string">"role"</span>: <span class="string">"assistant"</span>,
+                        <span class="string">"content"</span>: response.content
+                    })
+                    messages.<span class="func">append</span>({
+                        <span class="string">"role"</span>: <span class="string">"user"</span>,
+                        <span class="string">"content"</span>: [
+                            {
+                                <span class="string">"type"</span>: <span class="string">"tool_result"</span>,
+                                <span class="string">"tool_use_id"</span>: block.id,
+                                <span class="string">"content"</span>: result
+                            }
+                        ]
+                    })
+        <span class="keyword">else</span>:
+            <span class="comment"># Model finished, return final answer</span>
+            <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> <span class="string">"Max iterations reached"</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>النمط الأساسي: بروتوكول استخدام الأدوات</h4>
+        <p>
+          الوكيل لا يستدعي الأدوات مباشرة. بل يفكر بنص مكتوب، وميزة tool_use في Claude تحدد
+          أي أداة يجب استدعاؤها، ونحن نحلل النتيجة وننفذها. تعود النتيجة كـ tool_result block.
+          هذا يبقي تفكير النموذج اللغوي قابلاً للقراءة والتدقيق.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>تعريف الأدوات — مخططات JSON والتنفيذات</h2>
+    </div>
+    <p>
+      كل أداة لها جزءان: مخطط JSON (يخبر النموذج بما تفعله الأداة) وتنفيذ (يقوم بالعمل الفعلي).
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Definitions</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>TOOLS = {
+    <span class="string">"web_search"</span>: {
+        <span class="string">"name"</span>: <span class="string">"web_search"</span>,
+        <span class="string">"description"</span>: <span class="string">"Search the internet for current information"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"query"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"Search query (e.g., 'AI agents 2025')"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"query"</span>]
+        }
+    },
+    <span class="string">"read_page"</span>: {
+        <span class="string">"name"</span>: <span class="string">"read_page"</span>,
+        <span class="string">"description"</span>: <span class="string">"Read the text content of a web page"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"url"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"URL to read (must start with http)"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"url"</span>]
+        }
+    },
+    <span class="string">"write_file"</span>: {
+        <span class="string">"name"</span>: <span class="string">"write_file"</span>,
+        <span class="string">"description"</span>: <span class="string">"Save text content to a file"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"filename"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"content"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"filename"</span>, <span class="string">"content"</span>]
+        }
+    }
+}</pre>
+    </div>
+
+    <h3>التنفيذات</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Implementations</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> requests
+<span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup
+
+<span class="keyword">def</span> <span class="func">web_search</span>(query: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Search Google and return top results."""</span>
+    <span class="keyword">try</span>:
+        headers = {<span class="string">"User-Agent"</span>: <span class="string">"Research Agent"</span>}
+        <span class="comment"># Use a free search API or implement custom</span>
+        url = <span class="func">f</span><span class="string">"https://api.duckduckgo.com/?q={query}&format=json"</span>
+        resp = requests.<span class="func">get</span>(url, headers=headers, timeout=<span class="number">5</span>)
+        results = resp.<span class="func">json</span>()
+
+        formatted = <span class="string">"Top results:\n"</span>
+        <span class="keyword">for</span> i, r <span class="keyword">in</span> <span class="func">enumerate</span>(results.<span class="func">get</span>(<span class="string">"Results"</span>, [])[:<span class="number">3</span>]):
+            formatted += <span class="func">f</span><span class="string">"{i+1}. {r.get('Title', 'N/A')}\n"</span>
+            formatted += <span class="func">f</span><span class="string">"   URL: {r.get('FirstURL', 'N/A')}\n"</span>
+        <span class="keyword">return</span> formatted
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Search failed: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">read_page</span>(url: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Read and extract text from a web page."""</span>
+    <span class="keyword">try</span>:
+        resp = requests.<span class="func">get</span>(url, timeout=<span class="number">10</span>)
+        soup = BeautifulSoup(resp.content, <span class="string">"html.parser"</span>)
+
+        <span class="comment"># Remove script and style tags</span>
+        <span class="keyword">for</span> tag <span class="keyword">in</span> soup([<span class="string">"script"</span>, <span class="string">"style"</span>]):
+            tag.<span class="func">decompose</span>()
+
+        text = soup.<span class="func">get_text</span>(separator=<span class="string">"\n"</span>)
+        <span class="keyword">return</span> text[:<span class="number">2000</span>]  <span class="comment"># Limit to 2000 chars</span>
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Failed to read page: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">write_file</span>(filename: <span class="string">str</span>, content: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Write content to a file."""</span>
+    <span class="keyword">try</span>:
+        <span class="keyword">with</span> <span class="func">open</span>(filename, <span class="string">"w"</span>) <span class="keyword">as</span> f:
+            f.<span class="func">write</span>(content)
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Successfully wrote {len(content)} chars to {filename}"</span>
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Write failed: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">execute_tool</span>(name: <span class="string">str</span>, args: <span class="keyword">dict</span>) -> <span class="string">str</span>:
+    <span class="string">"""Execute a tool by name."""</span>
+    <span class="keyword">if</span> name == <span class="string">"web_search"</span>:
+        <span class="keyword">return</span> <span class="func">web_search</span>(args[<span class="string">"query"</span>])
+    <span class="keyword">elif</span> name == <span class="string">"read_page"</span>:
+        <span class="keyword">return</span> <span class="func">read_page</span>(args[<span class="string">"url"</span>])
+    <span class="keyword">elif</span> name == <span class="string">"write_file"</span>:
+        <span class="keyword">return</span> <span class="func">write_file</span>(args[<span class="string">"filename"</span>], args[<span class="string">"content"</span>])
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="string">"Unknown tool"</span></pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>برومبت النظام — سلوك الوكيل</h2>
+    </div>
+    <p>
+      برومبت النظام يشكّل طريقة تفكير الوكيل وتصرفه. أضف تعليمات للسلوك الموجه نحو الهدف،
+      وإرشادات استخدام الأدوات، ومعالجة الأخطاء.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Agent System Prompt</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>You are a Research Agent. Your goal is to gather current
+information and synthesize it into a comprehensive report.
+
+INSTRUCTIONS:
+1. For any research topic, systematically search for
+   current information using web_search
+2. Read the most promising pages using read_page
+3. Synthesize findings into a structured report
+4. Save the final report using write_file
+
+GUIDELINES:
+- Search multiple sources to get diverse perspectives
+- Prioritize recent information (2025 is current)
+- When you have enough information, synthesize
+  and write the report. Do not over-research.
+- Be concise but thorough. Reports should be 800-1200 words.
+- If a page fails to read, try another source
+
+SUCCESS CRITERIA:
+Your task is complete when you have:
+1. Searched for relevant information
+2. Read at least 2-3 quality sources
+3. Written a comprehensive report and saved it
+
+Always work towards completing the task efficiently.</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>أفضل الممارسات لبرومبت النظام للوكلاء</h4>
+        <p>
+          كن صريحاً بشأن الهدف، وإرشادات استخدام الأدوات، ومعايير النجاح.
+          أخبر الوكيل متى يتوقف (لتجنب الحلقات اللانهائية).
+          قدم قيوداً (مثل "3 عمليات بحث كحد أقصى لكل موضوع").
+          وجّه الجودة (مثل "أعطِ الأولوية للمعلومات الحديثة").
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>إضافة حواجز الأمان — ضمانات للإنتاج</h2>
+    </div>
+    <p>
+      وكيل الإنتاج يحتاج إلى ضمانات: حدود التكرار، وميزانيات التوكنات، والموافقة على الأدوات، واستعادة الأخطاء.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Agent with Guardrails</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">GuardedAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.max_iterations = <span class="number">10</span>
+        <span class="param">self</span>.token_budget = <span class="number">10000</span>
+        <span class="param">self</span>.tokens_used = <span class="number">0</span>
+        <span class="param">self</span>.failed_tools = []
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, goal: <span class="string">str</span>) -> <span class="string">str</span>:
+        messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: goal}]
+
+        <span class="keyword">for</span> iteration <span class="keyword">in</span> <span class="func">range</span>(<span class="param">self</span>.max_iterations):
+            <span class="comment"># Check token budget</span>
+            <span class="keyword">if</span> <span class="param">self</span>.tokens_used &gt; <span class="param">self</span>.token_budget:
+                <span class="keyword">return</span> <span class="string">"Token budget exceeded"</span>
+
+            <span class="comment"># Call model</span>
+            response = client.messages.<span class="func">create</span>(..., messages=messages)
+
+            <span class="comment"># Track token usage</span>
+            <span class="param">self</span>.tokens_used += response.usage.input_tokens
+            <span class="param">self</span>.tokens_used += response.usage.output_tokens
+
+            <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+                <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+                    <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                        <span class="comment"># Check if tool is disabled</span>
+                        <span class="keyword">if</span> block.name <span class="keyword">in</span> <span class="param">self</span>.failed_tools:
+                            result = <span class="string">"Tool disabled due to repeated failures"</span>
+                        <span class="keyword">else</span>:
+                            <span class="keyword">try</span>:
+                                result = <span class="func">execute_tool</span>(block.name, block.input)
+                            <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+                                result = <span class="func">f</span><span class="string">"Tool error: {str(e)}"</span>
+                                <span class="param">self</span>.failed_tools.<span class="func">append</span>(block.name)
+
+                        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: ...})
+                        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: ...})
+            <span class="keyword">else</span>:
+                <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+        <span class="keyword">return</span> <span class="string">"Max iterations reached"</span></pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المشاكل الشائعة</h4>
+        <p>
+          <strong>الحلقات اللانهائية:</strong> اضبط دائماً max_iterations. <strong>انفجار التكاليف:</strong> تتبع استهلاك التوكنات.
+          <strong>تسلسل فشل الأدوات:</strong> فشل أداة واحدة يسبب سلسلة من الإخفاقات. أضف قواطع دوائر.
+          <strong>الإخفاقات الصامتة:</strong> سجّل كل شيء. ستقوم بالتصحيح من خلال السجلات، وليس التخمينات.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>تشغيل الوكيل الكامل</h2>
+    </div>
+    <p>
+      إليك كيفية تشغيل الوكيل على مهمة حقيقية:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Running the Agent</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    agent = GuardedAgent()
+
+    goal = <span class="string">"""Research AI agents in 2025.
+Search for:
+1. Latest agent frameworks and libraries
+2. New agent applications in production
+3. Recent breakthroughs or challenges
+
+Synthesize findings into a comprehensive report
+and save to 'ai_agents_report_2025.md'."""</span>
+
+    result = agent.<span class="func">run</span>(goal)
+    <span class="func">print</span>(<span class="string">f"Agent completed. Tokens used: {agent.tokens_used}"</span>)
+    <span class="func">print</span>(<span class="string">f"\nFinal output:\n{result}"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>المخرجات المتوقعة</h4>
+        <p>
+          سيبحث الوكيل عن "AI agents 2025"، ويقرأ الصفحات، ويجمّع النتائج،
+          ويحفظ تقريراً بصيغة markdown. في التكرارات اللاحقة، يضيف عمقاً بالبحث
+          عن أطر عمل محددة، وحالات استخدام إنتاجية، وأوراق بحثية حديثة. يتوقف عندما
+          يكون واثقاً أنه أجاب على سؤال البحث.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>نصائح الاختبار والتصحيح</h2>
+    </div>
+    <p>
+      الوكلاء صعبة التصحيح بشكل معروف لأن السلوك ينبثق من النموذج اللغوي.
+      إليك استراتيجيات عملية:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>سجّل كل شيء</h4>
+        <p>اطبع كل استدعاء أداة ونتيجة وتبادل رسائل. ستفهم سلوك الوكيل من خلال السجلات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>أداة واحدة أولاً</h4>
+        <p>اختبر كل أداة بشكل مستقل قبل الدمج. تحقق أن web_search يعمل، ثم read_page، ثم write.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>استخدم نماذج أصغر</h4>
+        <p>ابدأ بنماذج أصغر وأسرع (Claude 3.5 Sonnet) للتكرار السريع. انتقل إلى Opus للتشغيل النهائي.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>قِس النجاح</h4>
+        <p>حدد معايير نجاح صريحة. هل بحث؟ هل قرأ الصفحات؟ هل حفظ الملف؟ تحقق من كل خطوة.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Logging Agent Execution</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> logging
+
+logging.<span class="func">basicConfig</span>(<span class="param">level</span>=logging.DEBUG)
+logger = logging.<span class="func">getLogger</span>(__name__)
+
+<span class="keyword">def</span> <span class="func">run_agent_with_logging</span>(goal):
+    messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: goal}]
+    logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Agent goal: {goal}"</span>)
+
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="number">10</span>):
+        logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Iteration {i}: {len(messages)} messages in context"</span>)
+
+        response = client.messages.<span class="func">create</span>(...)
+        logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Response stop_reason: {response.stop_reason}"</span>)
+
+        <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+            <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Tool call: {block.name} with {block.input}"</span>)
+                result = <span class="func">execute_tool</span>(block.name, block.input)
+                logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Tool result: {result[:200]}..."</span>)
+
+            <span class="keyword">elif</span> block.<span class="param">type</span> == <span class="string">"text"</span>:
+                logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Text response: {block.text[:100]}..."</span>)
+
+    logger.<span class="func">info</span>(<span class="string">"Agent completed"</span>)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ماذا تفعل حلقة الوكيل في كل تكرار؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تطلب من المستخدم إدخال بيانات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تسأل النموذج ماذا يفعل، وتنفذ الأداة، وتضيف النتيجة للرسائل، وتكرر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تبحث في الويب وتحفظ النتائج</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تعد التوكنات وتتحقق من الميزانية</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. لماذا تحتاج الأدوات إلى مخطط JSON وتنفيذ معاً؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">المخطط هو نسخة احتياطية إذا فشل التنفيذ</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">المخطط يخبر النموذج بما تفعله الأداة؛ والتنفيذ يقوم بالعمل فعلياً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">للتوثيق فقط</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هما نفس الشيء، مكتوبان بطريقتين مختلفتين</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما الغرض من حاجز أمان max_iterations؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جعل الوكيل أسرع</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">منع الحلقات اللانهائية والتحكم في التكلفة/زمن الاستجابة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تحسين الدقة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تتبع التقدم للتسجيل</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. كيف يعرف الوكيل متى يتوقف؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تنفد الأدوات المتاحة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عند الوصول إلى max_iterations</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عندما يُرجع النموذج نصاً بدلاً من tool_use (أي stop_reason != "tool_use")</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عند فشل إحدى الأدوات</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 15</h2>
+    </div>
+    <p>
+      لقد بنيت الآن وكيلاً بجودة إنتاجية من الصفر. النقاط الرئيسية:
+      <strong>حلقة الوكيل</strong> بسيطة: اسأل النموذج ماذا يفعل ← نفّذ الأداة ← أعد النتيجة ← كرر.
+      <strong>الأدوات تحتاج جزأين:</strong> مخطط JSON (للنموذج) وتنفيذ (للقيام بالعمل).
+      <strong>برومبتات النظام</strong> توجه سلوك الوكيل — كن صريحاً بشأن الأهداف واستخدام الأدوات ومعايير النجاح.
+      <strong>حواجز الأمان ضرورية:</strong> max_iterations، وميزانيات التوكنات، وقواطع الدوائر، وتسجيل الأخطاء.
+      <strong>تصحيح الوكلاء</strong> يتطلب تسجيل كل شيء. تفهم سلوك الوكيل من خلال أثره.
+      هذا الأساس يمكّنك من استخدام أطر عمل مثل LangChain أو CrewAI بفهم عميق.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 16: الأنظمة متعددة الوكلاء</strong><br>
+      <span style="color: var(--text-dim);">الآن ستنسق عدة وكلاء متخصصين يعملون معاً على مشاكل معقدة.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-14-agent-frameworks.html">السابق →</a>
+  <span class="nav-info">الموضوع 19 من 23</span>
+  <a class="nav-btn primary" href="topic-16-multi-agent.html">← التالي: الأنظمة متعددة الوكلاء</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

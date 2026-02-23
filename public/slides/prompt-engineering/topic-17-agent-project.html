@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 17 — Full-Stack AI Agent Project | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 91%"></div></div>
+    <span class="progress-label">21 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🎯</div>
+    <h1>Full-Stack AI Agent Project</h1>
+    <p>Capstone project: Build a complete, production-ready multi-agent research system that researches topics, writes reports, and manages files autonomously.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Project Overview</h2>
+    </div>
+    <p>
+      You will build a <strong>Research & Report Generation Agent</strong> with multiple specialized agents:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🗺️</div>
+        <h4>Planner Agent</h4>
+        <p>Breaks user request into research subtasks. Creates an actionable plan.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Researcher Agent</h4>
+        <p>Searches the web, reads pages, extracts key information, cites sources.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">✍️</div>
+        <h4>Writer Agent</h4>
+        <p>Synthesizes research into a well-structured, compelling report.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔎</div>
+        <h4>Reviewer Agent</h4>
+        <p>Checks quality, suggests improvements, validates facts and citations.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Example Flow</h4>
+        <p>
+          User: "Research quantum computing breakthroughs in 2025."
+          Planner: Creates plan (what to search, how to structure report).
+          Researcher: Searches, reads articles, extracts insights.
+          Writer: Turns research into a polished 1500-word report.
+          Reviewer: Checks for accuracy, quality, and cites all sources.
+          Output: Final markdown report saved to file.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Architecture Diagram</h2>
+    </div>
+    <p>
+      Here's the system architecture:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — System Architecture</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>┌─────────────────────────────────────┐
+│  USER INPUT: Research Topic         │
+└──────────────┬──────────────────────┘
+               │
+        ┌──────▼─────────┐
+        │ PLANNER AGENT  │
+        │ (Orchestrator) │
+        └──────┬─────────┘
+               │
+      ┌────────┴────────┐
+      │                 │
+   TASK 1          TASK 2        TASK N...
+   (Research    (Research     (Research
+    subtopic1)   subtopic2)   subtopicN)
+      │              │            │
+      ▼              ▼            ▼
+  RESEARCHER AGENT (parallel or sequential)
+  ├─ web_search()
+  ├─ read_page()
+  └─ extract_key_info()
+      │
+      ▼
+  ┌─────────────────────────┐
+  │  RESEARCH RESULTS       │
+  │  (facts, citations)     │
+  └────────────┬────────────┘
+               │
+        ┌──────▼──────────┐
+        │  WRITER AGENT   │
+        │ (Synthesizer)   │
+        └──────┬──────────┘
+               │
+        ┌──────▼──────────┐
+        │ REVIEWER AGENT  │
+        │   (Critic)      │
+        └──────┬──────────┘
+               │
+        ┌──────▼──────────────────┐
+        │ FINAL REPORT (markdown) │
+        │ Saved to file           │
+        └─────────────────────────┘</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>The Planner Agent — Breaking Down the Task</h2>
+    </div>
+    <p>
+      The first agent creates a detailed plan for the research.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Planner Agent</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">PlannerAgent</span>:
+    <span class="keyword">def</span> <span class="func">plan</span>(<span class="param">self</span>, research_goal: <span class="string">str</span>) -> <span class="string">list</span>:
+        <span class="string">"""Create a research plan."""</span>
+        prompt = <span class="func">f</span><span class="string">"""Research Goal: {research_goal}
+
+Create a detailed research plan with 4-5 specific subtasks.
+Each subtask should be actionable and specific.
+
+Format your response as:
+RESEARCH PLAN
+==============
+Subtask 1: [specific search/research task]
+Subtask 2: [specific search/research task]
+...
+
+Include:
+- What to search for
+- Types of sources to prioritize
+- Key concepts to explore
+- Expected report length
+
+Be detailed and strategic."""</span>
+
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">system</span>=<span class="string">"You are an expert research strategist. Create detailed research plans."</span>,
+            <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: prompt}]
+        )
+
+        plan_text = response.content[<span class="number">0</span>].text
+        <span class="comment"># Parse subtasks from response</span>
+        subtasks = []
+        <span class="keyword">for</span> line <span class="keyword">in</span> plan_text.<span class="func">split</span>(<span class="string">"\n"</span>):
+            <span class="keyword">if</span> <span class="string">"Subtask"</span> <span class="keyword">in</span> line:
+                subtasks.<span class="func">append</span>(line)
+        <span class="keyword">return</span> subtasks</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>The Researcher Agent — Gathering Information</h2>
+    </div>
+    <p>
+      The researcher searches, reads, and extracts key findings.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Researcher Agent</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">ResearcherAgent</span>:
+    <span class="keyword">def</span> <span class="func">research</span>(<span class="param">self</span>, subtask: <span class="string">str</span>) -> <span class="string">dict</span>:
+        <span class="string">"""Research a subtask and extract findings."""</span>
+
+        <span class="comment"># Step 1: Extract search query from subtask</span>
+        extract_prompt = <span class="func">f</span><span class="string">"Extract the search query from: {subtask}"</span>
+        query_response = client.messages.<span class="func">create</span>(...)
+        search_query = query_response.content[<span class="number">0</span>].text.<span class="func">strip</span>()
+
+        <span class="comment"># Step 2: Search the web</span>
+        search_results = <span class="func">web_search</span>(search_query)
+
+        <span class="comment"># Step 3: Read top pages</span>
+        findings = []
+        <span class="keyword">for</span> result <span class="keyword">in</span> search_results[:<span class="number">3</span>]:
+            page_content = <span class="func">read_page</span>(result[<span class="string">"url"</span>])
+
+            <span class="comment"># Step 4: Extract key info</span>
+            extract_prompt = <span class="func">f</span><span class="string">"""From this article about {search_query}:
+
+{page_content[:1000]}
+
+Extract:
+- 2-3 key facts
+- Important statistics
+- Relevant quotes
+- Source URL
+
+Format as markdown."""</span>
+
+            extraction = client.messages.<span class="func">create</span>(...)
+            findings.<span class="func">append</span>({
+                <span class="string">"url"</span>: result[<span class="string">"url"</span>],
+                <span class="string">"findings"</span>: extraction.content[<span class="number">0</span>].text
+            })
+
+        <span class="keyword">return</span> {
+            <span class="string">"subtask"</span>: subtask,
+            <span class="string">"search_query"</span>: search_query,
+            <span class="string">"findings"</span>: findings
+        }</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The Writer Agent — Creating the Report</h2>
+    </div>
+    <p>
+      The writer synthesizes all research into a polished report.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Writer Agent</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">WriterAgent</span>:
+    <span class="keyword">def</span> <span class="func">write_report</span>(<span class="param">self</span>, topic: <span class="string">str</span>, research_findings: <span class="string">list</span>) -> <span class="string">str</span>:
+        <span class="string">"""Write a comprehensive report."""</span>
+
+        <span class="comment"># Compile all findings into one document</span>
+        compiled_findings = <span class="string">"\n\n"</span>.<span class="func">join</span>(
+            [f.<span class="func">get</span>(<span class="string">"findings"</span>, <span class="string">""</span>) <span class="keyword">for</span> f <span class="keyword">in</span> research_findings]
+        )
+
+        prompt = <span class="func">f</span><span class="string">"""Topic: {topic}
+
+Research Findings:
+{compiled_findings}
+
+Write a comprehensive, well-structured report (1000-1500 words).
+
+Structure:
+1. Executive Summary (150 words)
+2. Background & Context
+3. Key Findings (main sections)
+4. Analysis & Implications
+5. Conclusion
+6. Sources (cite URLs from findings)
+
+Style:
+- Professional but accessible
+- Well-organized with clear headings
+- Data-driven with proper citations
+- Balanced perspective
+
+Output in Markdown format."""</span>
+
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">4096</span>,
+            <span class="param">system</span>=<span class="string">"You are an expert report writer. Create insightful, well-researched reports."</span>,
+            <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: prompt}]
+        )
+
+        <span class="keyword">return</span> response.content[<span class="number">0</span>].text</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>The Reviewer Agent — Quality Assurance</h2>
+    </div>
+    <p>
+      The reviewer checks quality and suggests improvements before delivery.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Reviewer Agent</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">ReviewerAgent</span>:
+    <span class="keyword">def</span> <span class="func">review</span>(<span class="param">self</span>, report: <span class="string">str</span>) -> <span class="keyword">dict</span>:
+        <span class="string">"""Review report quality and suggest improvements."""</span>
+
+        prompt = <span class="func">f</span><span class="string">"""Review this report:
+
+{report[:2000]}...
+
+Evaluate:
+1. Structure and organization
+2. Clarity and readability
+3. Factual accuracy (are claims supported?)
+4. Citation quality
+5. Completeness
+
+Provide:
+- Overall quality score (1-10)
+- Key strengths (2-3)
+- Areas for improvement (2-3)
+- Specific revision suggestions
+
+Format as JSON."""</span>
+
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">system</span>=<span class="string">"You are a critical editor. Provide honest, constructive feedback."</span>,
+            <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: prompt}]
+        )
+
+        <span class="keyword">try</span>:
+            feedback = json.<span class="func">loads</span>(response.content[<span class="number">0</span>].text)
+        <span class="keyword">except</span>:
+            feedback = {<span class="string">"raw_feedback"</span>: response.content[<span class="number">0</span>].text}
+
+        <span class="keyword">return</span> feedback</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Orchestration — Tying It All Together</h2>
+    </div>
+    <p>
+      The main orchestration loop coordinates all agents.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Main Orchestration</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">ResearchPipeline</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.planner = <span class="func">PlannerAgent</span>()
+        <span class="param">self</span>.researcher = <span class="func">ResearcherAgent</span>()
+        <span class="param">self</span>.writer = <span class="func">WriterAgent</span>()
+        <span class="param">self</span>.reviewer = <span class="func">ReviewerAgent</span>()
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, research_goal: <span class="string">str</span>, output_file: <span class="string">str</span>):
+        <span class="string">"""Execute the full pipeline."""</span>
+        <span class="func">print</span>(<span class="func">f</span><span class="string">"Starting research: {research_goal}"</span>)
+
+        <span class="comment"># 1. PLAN</span>
+        <span class="func">print</span>(<span class="string">"[1/5] Planning research..."</span>)
+        subtasks = <span class="param">self</span>.planner.<span class="func">plan</span>(research_goal)
+        <span class="func">print</span>(<span class="func">f</span><span class="string">"Created {len(subtasks)} research subtasks"</span>)
+
+        <span class="comment"># 2. RESEARCH (parallel or sequential)</span>
+        <span class="func">print</span>(<span class="string">"[2/5] Conducting research..."</span>)
+        all_findings = []
+        <span class="keyword">for</span> subtask <span class="keyword">in</span> subtasks:
+            findings = <span class="param">self</span>.researcher.<span class="func">research</span>(subtask)
+            all_findings.<span class="func">append</span>(findings)
+        <span class="func">print</span>(<span class="func">f</span><span class="string">"Completed research from {len(all_findings)} sources"</span>)
+
+        <span class="comment"># 3. WRITE</span>
+        <span class="func">print</span>(<span class="string">"[3/5] Writing report..."</span>)
+        report = <span class="param">self</span>.writer.<span class="func">write_report</span>(research_goal, all_findings)
+
+        <span class="comment"># 4. REVIEW</span>
+        <span class="func">print</span>(<span class="string">"[4/5] Reviewing quality..."</span>)
+        feedback = <span class="param">self</span>.reviewer.<span class="func">review</span>(report)
+        <span class="func">print</span>(<span class="func">f</span><span class="string">"Quality score: {feedback.get('score', 'N/A')}/10"</span>)
+
+        <span class="comment"># 5. SAVE</span>
+        <span class="func">print</span>(<span class="string">"[5/5] Saving report..."</span>)
+        <span class="keyword">with</span> <span class="func">open</span>(output_file, <span class="string">"w"</span>) <span class="keyword">as</span> f:
+            f.<span class="func">write</span>(report)
+        <span class="func">print</span>(<span class="func">f</span><span class="string">"Report saved to {output_file}"</span>)
+
+        <span class="keyword">return</span> {
+            <span class="string">"goal"</span>: research_goal,
+            <span class="string">"subtasks"</span>: len(subtasks),
+            <span class="string">"feedback"</span>: feedback,
+            <span class="string">"output_file"</span>: output_file
+        }
+
+<span class="comment"># USAGE</span>
+pipeline = <span class="func">ResearchPipeline</span>()
+result = pipeline.<span class="func">run</span>(
+    <span class="string">"Research the current state of quantum computing"</span>,
+    <span class="string">"quantum_computing_report.md"</span>
+)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 8 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Running the Project — Example</h2>
+    </div>
+    <p>
+      Here's what happens when you run the agent system:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Example Execution Output</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>Starting research: Research the current state of quantum computing
+
+[1/5] Planning research...
+Created 5 research subtasks:
+  - Subtask 1: Search for recent quantum computing breakthroughs (2024-2025)
+  - Subtask 2: Explore major quantum computing companies and their progress
+  - Subtask 3: Investigate quantum computing challenges and limitations
+  - Subtask 4: Research applications of quantum computing in industry
+  - Subtask 5: Examine the timeline for commercial quantum advantage
+
+[2/5] Conducting research...
+Researching subtask 1: 3 sources found
+Researching subtask 2: 3 sources found
+Researching subtask 3: 3 sources found
+Researching subtask 4: 3 sources found
+Researching subtask 5: 3 sources found
+Completed research from 15 sources
+
+[3/5] Writing report...
+Report ready: 1,247 words
+Structure: Executive Summary, Background, Key Findings, Analysis, Conclusion
+
+[4/5] Reviewing quality...
+Quality score: 9/10
+Strengths: Well-researched, clear structure, good citations
+Suggestions: Add more on near-term applications
+
+[5/5] Saving report...
+Report saved to quantum_computing_report.md
+
+===== FINAL REPORT =====
+
+# The Current State of Quantum Computing: 2025 Analysis
+
+## Executive Summary
+Quantum computing has reached a critical inflection point in 2025...
+[report continues...]
+
+## Sources
+- IBM Quantum Research: https://...
+- Google Quantum AI: https://...
+[more sources...]</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 9 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>Extensions & Next Steps</h2>
+    </div>
+    <p>
+      Once you have the basic system working, here are ways to extend it:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💾</div>
+        <h4>Persistence Layer</h4>
+        <p>Store intermediate results in a database. Enable resumability if agents fail.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔐</div>
+        <h4>Tool Approval</h4>
+        <p>Require human approval before certain actions (publishing, modifying files).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>Monitoring & Logging</h4>
+        <p>Track agent performance, cost, latency. Build a dashboard.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🌐</div>
+        <h4>Web UI</h4>
+        <p>Add a Flask/FastAPI interface so users can trigger research through a web form.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>More Agents</h4>
+        <p>Add a fact-checker agent, translator agent, or presentation-building agent.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💬</div>
+        <h4>Interactive Mode</h4>
+        <p>Let users chat with agents during the process, modify plan, or ask clarifying questions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 3 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. In this project, what does the Planner Agent do?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Breaks down the research goal into specific subtasks</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Searches the web for information</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Writes the final report</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Reviews quality</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. What's the purpose of the Reviewer Agent?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To conduct research</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">To check quality, validate facts, and suggest improvements</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To create the plan</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To save the file</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. How does the pipeline flow work?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Researcher → Planner → Writer → Reviewer</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Planner → Researcher → Writer → Reviewer</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Writer → Planner → Researcher → Reviewer</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">All agents work at the same time with no sequence</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── CELEBRATION ────────────────────────────── -->
+  <div class="celebration">
+    <h2>🎉 Phase 3 Complete! 🎉</h2>
+    <p>
+      You've mastered AI agents! You understand what they are, how they work internally,
+      how to build them from scratch, and how to orchestrate multiple agents to solve complex problems.
+      You're now equipped to build production-ready AI agent systems.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--green); background: linear-gradient(135deg, var(--surface) 0%, rgba(52,211,153,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Phase 3 Complete Summary</h2>
+    </div>
+    <p>
+      <strong>Phase 3: AI Agents</strong> covered everything from theory to practice.
+      You learned that <strong>agents are autonomous systems</strong> that perceive, reason, act, and learn.
+      You explored <strong>agent architecture:</strong> planning, memory, tools, and error recovery.
+      You evaluated <strong>frameworks</strong> (LangChain, CrewAI, Claude SDK) and understood when to use them vs. building custom agents.
+      You <strong>built a complete agent</strong> from scratch in pure Python, understanding every component.
+      You orchestrated <strong>multi-agent systems</strong> with the supervisor, pipeline, and debate patterns.
+      You implemented a <strong>full-stack research pipeline</strong> with four specialized agents working together.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Topics 18-20 (Phase 4)</strong> will cover advanced topics: prompt injection & security, production deployment, and real-world case studies.
+      But you've achieved the core mastery of agents. Congratulations!
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-16-multi-agent.html">← Topic 16</a>
+  <span class="nav-info">Topic 21 of 23</span>
+  <a class="nav-btn primary" href="topic-19-job-landscape.html">Next: AI Job Landscape →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

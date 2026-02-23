@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 11 — Structured Output & Parsing | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 48%"></div></div>
+    <span class="progress-label">11 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📋</div>
+    <h1>Structured Output & Parsing</h1>
+    <p>Get reliable JSON, tables, and typed data from LLMs — using schemas, validation, and parsing strategies.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Why Structured Output Matters</h2>
+    </div>
+    <p>
+      LLMs naturally produce <strong>prose</strong> — flowing, conversational text. But real-world applications need
+      <strong>structured data</strong>: JSON for APIs, rows for databases, typed objects for application logic.
+      The gap between free-text output and machine-readable data is where structured output techniques come in.
+    </p>
+    <p>
+      Without structured output, you're stuck writing fragile string-parsing code that breaks whenever
+      the model changes its phrasing. With the right approach, you get predictable, validated data every time.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>JSON Responses</h4>
+        <p>Return data as valid JSON objects that your application can parse and use directly without string manipulation.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Data Extraction</h4>
+        <p>Pull structured fields (names, dates, amounts) from unstructured text like emails, documents, or reports.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>API Integration</h4>
+        <p>Generate output that matches your API schemas so LLM responses can flow directly into your system.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗄️</div>
+        <h4>Database Population</h4>
+        <p>Transform natural language into structured records ready for database insertion with proper types and constraints.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Form vs. Blank Page</h4>
+        <p>
+          Think of structured output as giving the LLM a form to fill out instead of a blank page.
+          A blank page invites rambling prose. A form with labeled fields, dropdowns, and checkboxes
+          gets you exactly the data you need, in exactly the format you expect.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>JSON Mode & Response Format</h2>
+    </div>
+    <p>
+      Different LLM providers offer different mechanisms for requesting structured output.
+      Some have native JSON modes built into their APIs, while others rely on careful prompting.
+      Here's how the major providers handle it:
+    </p>
+
+    <p><strong>OpenAI</strong> — native JSON mode via <code style="font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12.5px;color:var(--accent-light);">response_format</code>:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_format</span>={<span class="string">"type"</span>: <span class="string">"json_object"</span>},
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"Return JSON with keys: title, summary, rating"</span>},
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># response.choices[0].message.content is guaranteed valid JSON</span>
+<span class="keyword">import</span> json
+data = json.<span class="func">loads</span>(response.choices[<span class="number">0</span>].message.content)
+<span class="func">print</span>(data[<span class="string">"title"</span>])  <span class="comment"># "Inception"</span></pre>
+    </div>
+
+    <p><strong>Anthropic</strong> — structured output via system prompts + XML tags or tool use:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+message = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=<span class="string">"""Return your response as a JSON object inside &lt;json&gt; tags.
+The JSON must have these exact keys: title, summary, rating.
+Example: &lt;json&gt;{"title": "...", "summary": "...", "rating": 8.5}&lt;/json&gt;"""</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># Extract JSON from XML tags</span>
+<span class="keyword">import</span> re
+match = re.<span class="func">search</span>(<span class="string">r'&lt;json&gt;([\s\S]*?)&lt;/json&gt;'</span>, message.content[<span class="number">0</span>].text)
+data = json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">1</span>))</pre>
+    </div>
+
+    <p><strong>Google Gemini</strong> — schema-based generation with response MIME type:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> google.generativeai <span class="keyword">as</span> genai
+
+model = genai.<span class="func">GenerativeModel</span>(<span class="string">"gemini-1.5-pro"</span>)
+
+response = model.<span class="func">generate_content</span>(
+    <span class="string">"Review the movie Inception"</span>,
+    <span class="param">generation_config</span>=genai.types.<span class="func">GenerationConfig</span>(
+        <span class="param">response_mime_type</span>=<span class="string">"application/json"</span>,
+        <span class="param">response_schema</span>={
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"title"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"summary"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"rating"</span>: {<span class="string">"type"</span>: <span class="string">"number"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"title"</span>, <span class="string">"summary"</span>, <span class="string">"rating"</span>]
+        }
+    )
+)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Key Insight</h4>
+        <p>
+          Not all models have native JSON mode — but you can achieve reliable JSON from any model with the right prompting.
+          The key is to be explicit about the expected structure, provide an example, and use delimiters
+          (like XML tags) so you can extract the JSON programmatically.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Schema-Driven Generation</h2>
+    </div>
+    <p>
+      The most reliable approach to structured output is <strong>schema-driven generation</strong> — defining
+      the exact shape of your data with types, constraints, and descriptions, then letting a library
+      enforce that schema against the LLM's output. This is where tools like <strong>Pydantic</strong>
+      and <strong>Instructor</strong> shine.
+    </p>
+
+    <p>First, define your data model with Pydantic:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel, Field
+
+<span class="keyword">class</span> <span class="func">MovieReview</span>(BaseModel):
+    title: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"Movie title"</span>)
+    rating: <span class="param">float</span> = <span class="func">Field</span>(<span class="param">ge</span>=<span class="number">1</span>, <span class="param">le</span>=<span class="number">10</span>, <span class="param">description</span>=<span class="string">"Rating from 1-10"</span>)
+    sentiment: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"positive, negative, or neutral"</span>)
+    key_themes: <span class="param">list</span>[<span class="param">str</span>] = <span class="func">Field</span>(<span class="param">description</span>=<span class="string">"Main themes"</span>)
+    summary: <span class="param">str</span> = <span class="func">Field</span>(<span class="param">max_length</span>=<span class="number">200</span>)</pre>
+    </div>
+
+    <p>Then use the <strong>Instructor</strong> library to get typed, validated responses automatically:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install: pip install instructor openai</span>
+<span class="keyword">import</span> instructor
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+<span class="comment"># Patch the OpenAI client with Instructor</span>
+client = instructor.<span class="func">from_openai</span>(OpenAI())
+
+<span class="comment"># Get a typed, validated response — no manual parsing!</span>
+review = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_model</span>=MovieReview,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="comment"># review is a fully typed MovieReview object</span>
+<span class="func">print</span>(review.title)       <span class="comment"># "Inception"</span>
+<span class="func">print</span>(review.rating)      <span class="comment"># 9.2</span>
+<span class="func">print</span>(review.sentiment)   <span class="comment"># "positive"</span>
+<span class="func">print</span>(review.key_themes)  <span class="comment"># ["dreams", "reality", "loss"]</span>
+
+<span class="comment"># Validation is automatic — rating must be 1-10, summary ≤ 200 chars</span>
+<span class="comment"># If the LLM returns invalid data, Instructor retries automatically</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Why Schema-Driven is Best</h4>
+        <p>
+          The Pydantic model serves triple duty: it documents the expected format, constrains the LLM's output,
+          and validates the result. If the LLM returns a rating of 15, Pydantic catches the violation and
+          Instructor automatically retries with corrective feedback.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Parsing Strategies</h2>
+    </div>
+    <p>
+      In production, LLM responses aren't always perfectly formatted. The model might wrap JSON in markdown
+      code blocks, include explanatory text before the JSON, or produce slightly malformed output.
+      A robust parsing strategy handles all these cases gracefully.
+    </p>
+
+    <p>Here's a battle-tested parsing function that handles the most common edge cases:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">import</span> re
+
+<span class="keyword">def</span> <span class="func">extract_json</span>(text: <span class="param">str</span>) -> <span class="param">dict</span>:
+    <span class="string">"""Extract JSON from LLM response, handling markdown code blocks."""</span>
+    <span class="comment"># Try direct parse first</span>
+    <span class="keyword">try</span>:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(text)
+    <span class="keyword">except</span> json.JSONDecodeError:
+        <span class="keyword">pass</span>
+
+    <span class="comment"># Try extracting from markdown code block</span>
+    match = re.<span class="func">search</span>(<span class="string">r'```(?:json)?\s*([\s\S]*?)```'</span>, text)
+    <span class="keyword">if</span> match:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">1</span>).<span class="func">strip</span>())
+
+    <span class="comment"># Try finding JSON-like substring</span>
+    match = re.<span class="func">search</span>(<span class="string">r'\{[\s\S]*\}'</span>, text)
+    <span class="keyword">if</span> match:
+        <span class="keyword">return</span> json.<span class="func">loads</span>(match.<span class="func">group</span>(<span class="number">0</span>))
+
+    <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">"No valid JSON found in response"</span>)</pre>
+    </div>
+
+    <p>For even more resilience, add a <strong>retry-with-feedback</strong> loop that sends parsing errors back to the model:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">get_json_with_retry</span>(client, messages, <span class="param">max_retries</span>=<span class="number">3</span>):
+    <span class="string">"""Get valid JSON from LLM with automatic retry on parse failure."""</span>
+    <span class="keyword">for</span> attempt <span class="keyword">in</span> <span class="func">range</span>(max_retries):
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">1024</span>,
+            <span class="param">messages</span>=messages
+        )
+        text = response.content[<span class="number">0</span>].text
+
+        <span class="keyword">try</span>:
+            <span class="keyword">return</span> <span class="func">extract_json</span>(text)
+        <span class="keyword">except</span> (json.JSONDecodeError, <span class="func">ValueError</span>) <span class="keyword">as</span> e:
+            <span class="comment"># Send the error back to the model for correction</span>
+            messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: text})
+            messages.<span class="func">append</span>({
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"That response failed to parse: {e}\n"</span>
+                           <span class="string">f"Please return ONLY valid JSON, no other text."</span>
+            })
+
+    <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">f"Failed to get valid JSON after {max_retries} attempts"</span>)</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Always Validate Against Your Schema</h4>
+        <p>
+          Always validate parsed output against your expected schema — LLMs can produce valid JSON that doesn't
+          match your structure. A response like <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">{"result": "success"}</code> is valid JSON but useless
+          if you expected <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">{"title": "...", "rating": 9}</code>. Use Pydantic or JSON Schema validation
+          to catch structural mismatches, not just syntax errors.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Streaming Structured Output</h2>
+    </div>
+    <p>
+      Streaming LLM responses is great for UX — users see text appearing in real time. But streaming
+      <strong>structured data</strong> introduces a challenge: you can't parse incomplete JSON.
+      A partial response like <code style="font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12.5px;color:var(--accent-light);">{"title": "Incep</code> will throw a parse error.
+    </p>
+
+    <p>There are two main strategies for streaming structured output:</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>Line-Delimited JSON (NDJSON)</h4>
+        <p>Each line is a complete JSON object. Parse line-by-line as they arrive. Ideal for lists of items or log-style output.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧩</div>
+        <h4>Partial Object Parsing</h4>
+        <p>Use libraries that can extract completed fields from incomplete JSON, updating the UI as each field becomes available.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> instructor
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+<span class="keyword">from</span> pydantic <span class="keyword">import</span> BaseModel
+
+<span class="keyword">class</span> <span class="func">MovieReview</span>(BaseModel):
+    title: <span class="param">str</span>
+    rating: <span class="param">float</span>
+    summary: <span class="param">str</span>
+
+client = instructor.<span class="func">from_openai</span>(OpenAI())
+
+<span class="comment"># Stream partial objects — fields populate as they're generated</span>
+review_stream = client.chat.completions.<span class="func">create_partial</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">response_model</span>=MovieReview,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Review the movie Inception"</span>}
+    ]
+)
+
+<span class="keyword">for</span> partial_review <span class="keyword">in</span> review_stream:
+    <span class="comment"># partial_review has fields filled in as they stream</span>
+    <span class="func">print</span>(<span class="string">f"Title: </span>{partial_review.title or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">f"Rating: </span>{partial_review.rating or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">f"Summary: </span>{partial_review.summary or <span class="string">'...'</span>}<span class="string">"</span>)
+    <span class="func">print</span>(<span class="string">"---"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>When Streaming Matters</h4>
+        <p>
+          Streaming structured output is most valuable for real-time UIs where users watch results populate
+          (dashboards, search results, data tables) and for large outputs where waiting for the complete
+          response would cause unacceptable delays. For backend pipelines, batch parsing after completion is simpler and preferred.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Best Practices</h2>
+    </div>
+    <p>Follow these principles to build reliable structured output pipelines that work in production.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📐</div>
+        <h4>Always Define a Schema</h4>
+        <p>Explicit schemas get better results than hoping for the right format. Use Pydantic models, JSON Schema, or at minimum a clear example in your prompt.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🛡️</div>
+        <h4>Validate, Don't Trust</h4>
+        <p>Always validate output against your schema before using it. Valid JSON does not mean correct structure. Check types, required fields, and value constraints.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>Retry with Feedback</h4>
+        <p>If parsing fails, send the error back to the model for correction. Most models self-correct reliably when shown their mistake and the expected format.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>Start Simple</h4>
+        <p>Begin with flat structures; add nesting only when needed. Deeply nested schemas are harder for models to get right and harder for you to validate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 3 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What's the most reliable way to get JSON output from an LLM?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Just ask nicely in the prompt</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Use a JSON mode or schema-based generation</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Set temperature to 0</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Parse the response with regex</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Why should you validate LLM output even when using JSON mode?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">JSON mode sometimes returns XML</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">The JSON structure might not match your expected schema</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's slower without validation</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">You always need to validate JSON</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What should you do when JSON parsing fails on an LLM response?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Raise an error immediately</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Retry with a higher temperature</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Send the error back to the model with the original prompt for correction</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Switch to a different model</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 11 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      <strong>Structured output</strong> bridges the gap between LLM prose and machine-readable data.
+      Use <strong>JSON mode</strong> or <strong>schema-based generation</strong> (Pydantic + Instructor) for the most reliable results.
+      Build <strong>robust parsers</strong> that handle markdown code blocks and malformed output.
+      Always <strong>validate against your schema</strong> — valid JSON doesn't mean correct structure.
+      When parsing fails, <strong>retry with feedback</strong> rather than giving up immediately.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 12: Evaluating Prompt Quality</strong><br>
+      <span style="color: var(--text-dim);">You'll learn how to measure, score, and systematically improve your prompts with evaluation frameworks and metrics.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-09-prompt-chains.html">← Previous</a>
+  <span class="nav-info">Topic 11 of 23</span>
+  <a class="nav-btn primary" href="topic-10-evaluation.html">Next: Evaluation →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

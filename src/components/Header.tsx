@@ -6,10 +6,11 @@ import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
 import LanguageToggle from "@/components/LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const navKeys = ["home", "projects", "blog", "contact"] as const;
-const navHrefs = ["/", "/projects", "/blog", "/contact"];
+const navKeys = ["home", "projects", "courses", "blog", "contact"] as const;
+const navHrefs = ["/", "/projects", "/courses", "/blog", "/contact"];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -68,13 +69,15 @@ export default function Header() {
               </li>
             ))}
           </ul>
-          <div className="ms-2">
+          <div className="ms-2 flex items-center gap-2">
+            <ThemeToggle />
             <LanguageToggle />
           </div>
         </div>
 
         {/* Mobile: toggle + menu button */}
         <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
           <LanguageToggle />
           <button
             className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background"

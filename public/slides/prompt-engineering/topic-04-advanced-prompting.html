@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 4 — Advanced Prompting | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 22%"></div></div>
+    <span class="progress-label">5 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⚡</div>
+    <h1>Advanced Prompting</h1>
+    <p>Structured output, XML tags, delimiters, and advanced system prompt patterns for production-grade results.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>XML Tags for Structure</h2>
+    </div>
+    <p>
+      Claude (Anthropic) responds exceptionally well to <strong>XML-tagged prompts</strong>.
+      Wrapping sections in tags like <code>&lt;context&gt;</code>, <code>&lt;instructions&gt;</code>,
+      and <code>&lt;output_format&gt;</code> helps the model parse complex requests with precision.
+      XML tags are a best practice for production prompts.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Why XML Tags Work:</p>
+    <ul style="margin-left: 20px;">
+      <li>Clear semantic structure — the model understands what each section means</li>
+      <li>Nested hierarchy — XML can contain complex nested information</li>
+      <li>Unambiguous boundaries — no confusion about where sections start/end</li>
+      <li>Production-proven — used at scale by teams using Claude in enterprise apps</li>
+    </ul>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Common XML Tags:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>&lt;context&gt;</h4>
+        <p>Background info, data, or situation the model needs to understand</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>&lt;instructions&gt;</h4>
+        <p>What you want the model to do</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>&lt;output_format&gt;</h4>
+        <p>Exact structure of the response (JSON, XML, markdown, etc.)</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">✅</div>
+        <h4>&lt;rules&gt;</h4>
+        <p>Constraints and guardrails ("don't do X", "always do Y")</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💡</div>
+        <h4>&lt;examples&gt;</h4>
+        <p>Few-shot examples showing expected behavior</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎭</div>
+        <h4>&lt;system_role&gt;</h4>
+        <p>Identity and expertise of the model</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — XML Structure</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python architect.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;context&gt;</span>
+The user has a function that processes
+large lists (100k+ items). It's slow.
+<span class="tag">&lt;/context&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Analyze the code and suggest optimizations.
+Focus on algorithm complexity first, then
+memory usage, then parallelization.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;rules&gt;</span>
+- Don't suggest rewrites unless necessary
+- Always explain the performance impact
+- Cite specific lines of code
+- Don't suggest external dependencies
+<span class="tag">&lt;/rules&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+{
+  "summary": "Brief overview",
+  "optimizations": [
+    {
+      "issue": "What's slow",
+      "fix": "How to fix it",
+      "performance_gain": "Expected improvement",
+      "code_location": "Line X-Y"
+    }
+  ]
+}
+<span class="tag">&lt;/output_format&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Pro Tip: Nesting Tags</h4>
+        <p>
+          You can nest tags for hierarchy. Example: <code>&lt;examples&gt;&lt;example id="1"&gt;...&lt;/example&gt;&lt;/examples&gt;</code>.
+          This helps organize complex prompts into logical sections.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Delimiters & Separators</h2>
+    </div>
+    <p>
+      Delimiters (---, ```, ###) visually separate sections and help the model understand boundaries.
+      They're especially useful when your prompt contains user-provided content that might contain text
+      that looks like instructions (prompt injection defense).
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Common Delimiters:</p>
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">--- (Triple Dash)</div>
+<pre>Instruction text here.
+
+---
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">``` (Triple Backticks)</div>
+<pre>Instruction text here.
+
+```
+User-provided content here.
+This could contain anything.
+```</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">### (Markdown Header)</div>
+<pre>Instruction text here.
+
+### User Content
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">== (Double Equal)</div>
+<pre>Instruction text here.
+
+====================
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">When to Use Which:</p>
+    <ul style="margin-left: 20px;">
+      <li><strong>---</strong> Best for separating major sections; clean and readable</li>
+      <li><strong>```</strong> Best for code or technical data; semantically signals "code block"</li>
+      <li><strong>###</strong> Best for markdown-formatted prompts; integrates with markdown structure</li>
+      <li><strong>==</strong> Good for emphasis; stands out visually</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Delimiter + XML = Maximum Clarity</h4>
+        <p>
+          Combine delimiters with XML tags for fortress-level clarity:
+          <code>&lt;instructions&gt;...&lt;/instructions&gt; --- &lt;user_content&gt;...&lt;/user_content&gt;</code>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Structured Output (JSON)</h2>
+    </div>
+    <p>
+      For production apps, you often need <strong>guaranteed JSON output</strong> that you can parse programmatically.
+      This requires both system prompt patterns and clear output_format specifications.
+      Claude is highly reliable at producing valid JSON when asked explicitly.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — JSON Output Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+You are a sentiment analysis system.
+Analyze the text and respond with JSON
+containing sentiment, confidence, and
+supporting evidence.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+{
+  "sentiment": "positive|negative|neutral",
+  "confidence": 0.0 to 1.0,
+  "supporting_quote": "...",
+  "explanation": "..."
+}
+
+IMPORTANT: Return ONLY valid JSON.
+No markdown, no extra text. Just JSON.
+<span class="tag">&lt;/output_format&gt;</span>
+
+Text to analyze: "I love this product!"</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Python Code to Parse JSON Safely:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Safe JSON Parsing</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"..."</span>}]
+)
+
+text = response.content[<span class="number">0</span>].text
+
+<span class="keyword">try</span>:
+    result = json.<span class="func">loads</span>(text)
+    <span class="func">print</span>(<span class="string">f"Sentiment: {result['sentiment']}"</span>)
+<span class="keyword">except</span> json.<span class="func">JSONDecodeError</span> <span class="keyword">as</span> e:
+    <span class="func">print</span>(<span class="string">f"Failed to parse JSON: {e}"</span>)
+    <span class="func">print</span>(<span class="string">f"Raw response: {text}"</span>)</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Always Validate JSON</h4>
+        <p>
+          Even with explicit instructions, always wrap JSON parsing in try/except blocks.
+          Models are reliable but not perfect. Graceful error handling is essential in production.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Output Templates</h2>
+    </div>
+    <p>
+      <strong>Output templates</strong> pre-define the exact shape of the response.
+      Instead of just saying "give me a summary," you provide the exact structure you want filled in.
+      This ensures consistency across multiple requests.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example: Meeting Summary Template</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Template-Driven Output</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+Summarize the meeting transcript using
+this exact template. Fill in each section.
+<span class="tag">&lt;/instructions&gt;</span>
+
+Meeting Summary Template:
+──────────────────────────
+<span class="string">Title: [Meeting name]
+Date: [Date]
+Duration: [Length in minutes]
+
+Attendees: [List names]
+
+Key Decisions:
+1. [Decision 1]
+2. [Decision 2]
+3. [Decision 3]
+
+Action Items:
+- [ ] [Action 1] - Owner: [Name]
+- [ ] [Action 2] - Owner: [Name]
+- [ ] [Action 3] - Owner: [Name]
+
+Next Steps: [What happens next]
+
+Follow-up Meeting: [Date/Time if scheduled]</span>
+──────────────────────────
+
+Now summarize this transcript: ...</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Benefits of Templates:</p>
+    <ul style="margin-left: 20px;">
+      <li><strong>Consistency:</strong> Every output follows the same structure</li>
+      <li><strong>Parsing:</strong> Easy to extract fields from templated output</li>
+      <li><strong>Completeness:</strong> Ensures no sections are missed</li>
+      <li><strong>Quality:</strong> Explicit structure often improves reasoning</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Template + JSON = Power Combo</h4>
+        <p>
+          Combine templates with JSON for maximum structure:
+          Have the template define the field names, then ask for JSON output.
+          This gives you both human-readable structure and machine-parseable format.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Negative Prompting</h2>
+    </div>
+    <p>
+      <strong>Negative prompting</strong> tells the model what NOT to do.
+      While it's not as powerful as positive instructions, it's useful for guardrails.
+      Be specific: "Don't apologize" works better than "Be confident."
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Good vs. Bad Negative Prompting:</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Vague Negative</div>
+<pre>Don't make mistakes.
+Don't be rude.
+Don't be boring.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Specific Negative</div>
+<pre>Don't include disclaimers or apologies.
+Don't use corporate jargon.
+Don't make up facts you're unsure about.
+Don't exceed 200 words.</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Negative Prompting Patterns:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>Format Restrictions</h4>
+        <p>"Never use markdown. Always return plain text."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>Content Restrictions</h4>
+        <p>"Don't mention competitors. Don't reveal internal details."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>Behavior Restrictions</h4>
+        <p>"Don't ask follow-up questions. Don't hedge your answer."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>Tone Restrictions</h4>
+        <p>"Don't apologize. Don't be overly formal. Don't use sarcasm."</p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Prefer Positive Instructions</h4>
+        <p>
+          Negative instructions are helpful but less effective than positive ones.
+          Instead of "Don't be rude," say "Be friendly and respectful."
+          Negative constraints should reinforce positive behavior, not replace it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Prompt Chaining</h2>
+    </div>
+    <p>
+      <strong>Prompt chaining</strong> breaks complex tasks into sequential prompts.
+      Instead of asking one model to do everything, you pipeline outputs: Task A → Task B → Task C.
+      This improves accuracy and allows error handling between steps.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example Chain: Analyze → Extract → Summarize</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Prompt Chaining</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">chain_analysis</span>(document):
+    <span class="comment"># Step 1: Extract key entities</span>
+    step1 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Extract names, dates, and amounts from this document:\n{document}\n\nReturn JSON."</span>
+        }]
+    )
+    entities = json.<span class="func">loads</span>(step1.content[<span class="number">0</span>].text)
+
+    <span class="comment"># Step 2: Analyze sentiment of entities</span>
+    step2 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Analyze sentiment of these names in context:\n{json.dumps(entities)}\n\nReturn JSON."</span>
+        }]
+    )
+    analysis = json.<span class="func">loads</span>(step2.content[<span class="number">0</span>].text)
+
+    <span class="comment"># Step 3: Generate summary</span>
+    step3 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">300</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Summarize this analysis:\n{json.dumps(analysis)}\n\nKeep it under 100 words."</span>
+        }]
+    )
+    summary = step3.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"entities"</span>: entities,
+        <span class="string">"analysis"</span>: analysis,
+        <span class="string">"summary"</span>: summary
+    }
+
+result = <span class="func">chain_analysis</span>(<span class="string">"Alice sold 100 shares..."</span>)
+<span class="func">print</span>(json.<span class="func">dumps</span>(result, indent=<span class="number">2</span>))</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">When to Use Prompt Chaining:</p>
+    <ul style="margin-left: 20px;">
+      <li>Complex tasks that naturally decompose into steps</li>
+      <li>When you need to validate intermediate results</li>
+      <li>When different steps benefit from different system prompts or temperatures</li>
+      <li>When you want to apply different rules to different steps</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Error Handling in Chains</h4>
+        <p>
+          Always check step outputs for validity before passing to the next step.
+          If Step 2 fails to produce valid JSON, you might retry, use a fallback, or abort the chain gracefully.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Meta-Prompting</h2>
+    </div>
+    <p>
+      <strong>Meta-prompting</strong> means using an LLM to generate or improve prompts.
+      You can ask Claude to write prompts for itself or other models.
+      This is useful for prototyping, scaling prompt development, and exploring variations.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example: Ask Claude to Write a Prompt</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Meta-Prompting</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+Write a prompt that will make Claude classify
+customer support tickets as urgent, normal,
+or low-priority. The prompt should:
+- Use XML tags for clarity
+- Include 3 few-shot examples
+- Define output format as JSON
+- Include guardrails against bias
+<span class="tag">&lt;/instructions&gt;</span>
+
+Return the complete prompt as a markdown code
+block with proper formatting.</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Python Code: Generate Prompts Dynamically</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Dynamic Prompt Generation</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">generate_prompt</span>(task_description):
+    <span class="string">"""Use Claude to write a prompt."""</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1000</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"""Write a production-grade prompt for this task:
+
+{task_description}
+
+The prompt should use XML tags, include
+few-shot examples, define output format,
+and include guardrails. Return just the
+prompt text, ready to use."""</span>
+        }]
+    )
+    <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+<span class="comment"># Generate a prompt for data extraction</span>
+task = <span class="string">"Extract invoice data (vendor, amount, date) from unstructured text"</span>
+prompt = <span class="func">generate_prompt</span>(task)
+<span class="func">print</span>(prompt)
+
+<span class="comment"># Now use the generated prompt</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: prompt
+    }]
+)
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Meta-Prompting Use Cases</h4>
+        <p>
+          Use meta-prompting to: generate variations of a prompt, convert one prompt to another format,
+          expand a simple prompt into a production-grade version, or explore alternative phrasings.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Why does Claude respond well to XML tags in prompts?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">XML provides clear semantic structure that helps the model parse complex requests with precision</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Claude only understands XML format</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">XML tags reduce token count</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They make responses faster</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. What is prompt chaining primarily used for?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Making prompts run in parallel</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Breaking complex tasks into sequential steps to improve accuracy and allow error handling between steps</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Connecting multiple models together</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Reducing token usage</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. When using structured JSON output, what should you always do?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Trust the model output without validation</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Wrap JSON parsing in try/except blocks for graceful error handling</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Use JSON only for small outputs</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Never use JSON in production</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. What is the main advantage of output templates?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They make responses shorter</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">They ensure consistency, completeness, and easy parsing of responses across multiple requests</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They require less API tokens</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They are only for simple tasks</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 4 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      <strong>XML tags</strong> structure prompts for clarity.
+      <strong>Delimiters</strong> separate sections and defend against injection.
+      <strong>JSON output</strong> makes responses machine-parseable.
+      <strong>Templates</strong> enforce consistency.
+      <strong>Negative prompting</strong> adds guardrails.
+      <strong>Prompt chaining</strong> breaks complexity into steps.
+      <strong>Meta-prompting</strong> uses LLMs to generate prompts.
+      These techniques stack together for production-grade reliability.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 5: Prompt Iteration & Debugging</strong><br>
+      <span style="color: var(--text-dim);">Learn to systematically improve prompts from first draft to production-ready.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-03-prompting-techniques.html">← Topic 3</a>
+  <span class="nav-info">Topic 5 of 23</span>
+  <a class="nav-btn primary" href="topic-05-prompt-iteration.html">Next: Prompt Iteration →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

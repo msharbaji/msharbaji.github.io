@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 13 — هندسة الوكلاء | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 70%"></div></div>
+    <span class="progress-label">16 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🏛️</div>
+    <h1>هندسة الوكلاء</h1>
+    <p>غوص عميق في الأسس التقنية: التخطيط، والذاكرة، واستخدام الأدوات، وحلقة الاستدلال التي تجعل الوكلاء يعملون على نطاق واسع. افهم كيفية بناء أنظمة وكلاء متينة وجاهزة للإنتاج.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>الركائز الأربع لهندسة الوكلاء</h2>
+    </div>
+    <p>
+      كل وكيل فعّال يرتكز على أربعة مكونات أساسية. هذه ليست اختيارية — بدون أي واحدة منها،
+      سيفشل وكيلك أو سيتصرف بشكل غير متوقع. لنبنِ نموذجاً ذهنياً لكيفية تفاعلها معاً.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">🎯</div>
+        <h4>1. التخطيط والاستدلال</h4>
+        <p>
+          قدرة الوكيل على تقسيم هدف معقد إلى مهام فرعية وتحديد الإجراء التالي.
+          هنا تتألق قدرة النموذج اللغوي على الاستدلال. إنها مرحلة "التفكير".
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>الذاكرة</h4>
+        <p>قصيرة المدى (المحادثة)، طويلة المدى (قاعدة بيانات متجهية)، عاملة (مسودة). يحتاج الوكلاء إلى الذاكرة لتجنب الحلقات اللانهائية والحفاظ على السياق.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>الأدوات</h4>
+        <p>وظائف خارجية يمكن للوكيل استدعاؤها: واجهات برمجة التطبيقات، وقواعد البيانات، والآلات الحاسبة، والبحث على الويب. الأدوات تربط الوكيل بالواقع.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>تنفيذ الإجراءات</h4>
+        <p>الإطار الذي يستدعي الأدوات، ويحلل النتائج، ويعيدها إلى الوكيل. إنها مرحلة "التنفيذ".</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>مخطط الهندسة</h4>
+        <p>
+          مدخلات المستخدم ← التخطيط (النموذج يقرر ماذا يفعل) ← اختيار الأداة ← تنفيذ الإجراء ← معالجة النتائج ←
+          تحديث الذاكرة ← العودة إلى التخطيط (إذا لم يتحقق الهدف). هذه الدورة هي الوكيل.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>التخطيط والاستدلال — نمط ReAct</h2>
+    </div>
+    <p>
+      <strong>ReAct</strong> هو اختصار لـ "Reasoning + Acting" (الاستدلال + التنفيذ). إنه نمط مُثبت حيث يُولّد الوكيل
+      خطوة استدلال (ماذا يفعل)، ثم خطوة إجراء (أي أداة يستخدم)، ثم يراقب النتيجة.
+      هذه الدورة فعّالة بشكل ملحوظ.
+    </p>
+
+    <div class="anatomy-block">
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--blue);"></div> Thought</div>
+        <div class="anatomy-content">Agent's internal reasoning: "I need to search for current AI agent frameworks to answer this question accurately."</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--cyan);"></div> Action</div>
+        <div class="anatomy-content">Tool to invoke: web_search("AI agent frameworks 2025")</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--green);"></div> Observation</div>
+        <div class="anatomy-content">Tool result: [search results with links to LangChain, Claude SDK, CrewAI docs]</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — ReAct Pattern Implementation</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">react_loop</span>(user_input: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="comment"># Build the context with tools available</span>
+    available_tools = [<span class="string">"web_search"</span>, <span class="string">"calculator"</span>, <span class="string">"code_executor"</span>]
+
+    <span class="comment"># Keep track of the thought-action-observation history</span>
+    history = []
+
+    <span class="keyword">while</span> <span class="keyword">not</span> goal_reached:
+        <span class="comment"># 1. THOUGHT: What should I do?</span>
+        thought = llm.<span class="func">generate</span>(
+            <span class="string">f"Given {user_input} and my tools {available_tools}, what's my next step?"</span>
+        )
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"thought"</span>, <span class="string">"content"</span>: thought})
+
+        <span class="comment"># 2. ACTION: Execute the tool</span>
+        tool_name, tool_args = <span class="func">parse_action</span>(thought)
+        result = <span class="func">execute_tool</span>(tool_name, tool_args)
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"action"</span>, <span class="string">"tool"</span>: tool_name})
+
+        <span class="comment"># 3. OBSERVATION: What happened?</span>
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"observation"</span>, <span class="string">"content"</span>: result})
+
+        <span class="comment"># Check if we're done</span>
+        goal_reached = <span class="func">check_goal</span>(result)
+
+    <span class="keyword">return</span> <span class="func">synthesize_final_answer</span>(history)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>لماذا ينجح نمط ReAct</h4>
+        <p>
+          بفصل التفكير عن التنفيذ، يصبح النموذج أكثر وضوحاً في استدلاله.
+          هذا يجعل تصحيح الأخطاء أسهل ويساعد النموذج على تجنب الأخطاء. إنه أبطأ من الاستجابات المباشرة
+          لكنه أكثر موثوقية بكثير للمهام المعقدة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>أنظمة الذاكرة — ثلاث طبقات</h2>
+    </div>
+    <p>
+      يحتاج الوكلاء إلى أنواع مختلفة من الذاكرة ليعملوا بفعالية. فكّر فيها كذاكرة الإنسان:
+      قصيرة المدى (ما تفكر فيه الآن)، طويلة المدى (حقائق تعلمتها منذ زمن)، وعاملة (دفتر ملاحظاتك).
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💭</div>
+        <h4>الذاكرة قصيرة المدى</h4>
+        <p>تاريخ المحادثة. الرسائل الأخيرة ونتائج الأدوات. محدودة بنافذة السياق (4 آلاف - 200 ألف توكن). تُمسح في كل جلسة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>الذاكرة طويلة المدى</h4>
+        <p>معرفة دائمة. قواعد بيانات متجهية للبحث الدلالي. حقائق مُتعلَّمة عبر الجلسات. يمكن أن تكون ضخمة (ملايين المستندات).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>الذاكرة العاملة</h4>
+        <p>مسودة للمهمة الحالية. نتائج وسيطة، سلاسل الاستدلال، متغيرات الحالة. تُحفظ في الذاكرة قصيرة المدى لكن منفصلة عن المحادثة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>أمثلة</h4>
+        <p><strong>قصيرة:</strong> آخر 10 رسائل. <strong>طويلة:</strong> تاريخ العميل في قاعدة بيانات متجهية. <strong>عاملة:</strong> قائمة المهام الفرعية الحالية، عدد التكرارات.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Memory Architecture Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">AgentMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="comment"># Short-term: conversation history</span>
+        <span class="param">self</span>.conversation = []
+
+        <span class="comment"># Long-term: vector database</span>
+        <span class="param">self</span>.vector_db = <span class="func">VectorDatabase</span>()
+
+        <span class="comment"># Working: current task state</span>
+        <span class="param">self</span>.scratchpad = {
+            <span class="string">"current_task"</span>: <span class="keyword">None</span>,
+            <span class="string">"subtasks_remaining"</span>: [],
+            <span class="string">"iteration_count"</span>: <span class="number">0</span>,
+            <span class="string">"max_iterations"</span>: <span class="number">10</span>
+        }
+
+    <span class="keyword">def</span> <span class="func">add_observation</span>(<span class="param">self</span>, text: <span class="string">str</span>):
+        <span class="param">self</span>.conversation.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"observation"</span>, <span class="string">"content"</span>: text})
+        <span class="param">self</span>.vector_db.<span class="func">add</span>(text)  <span class="comment"># Also store for long-term retrieval</span>
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>, query: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="comment"># Combine short-term + relevant long-term</span>
+        recent = <span class="param">self</span>.conversation[<span class="param">-10</span>:]  <span class="comment"># Last 10 messages</span>
+        relevant = <span class="param">self</span>.vector_db.<span class="func">search</span>(query, top_k=<span class="number">5</span>)
+        <span class="keyword">return</span> <span class="func">format_context</span>(recent + relevant)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>دمج الأدوات — اختيار الأدوات الديناميكي</h2>
+    </div>
+    <p>
+      يحتاج الوكيل إلى معرفة الأدوات المتاحة ومتى يستخدم كل واحدة.
+      يُحل هذا بنمط سجل الأدوات حيث تُوصف كل أداة بمخطط JSON.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Registry Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>TOOL_REGISTRY = {
+    <span class="string">"web_search"</span>: {
+        <span class="string">"description"</span>: <span class="string">"Search the web for current information"</span>,
+        <span class="string">"parameters"</span>: {
+            <span class="string">"query"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>, <span class="string">"description"</span>: <span class="string">"Search terms"</span>}
+        },
+        <span class="string">"function"</span>: web_search_impl
+    },
+    <span class="string">"execute_code"</span>: {
+        <span class="string">"description"</span>: <span class="string">"Run Python code safely"</span>,
+        <span class="string">"parameters"</span>: {
+            <span class="string">"code"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>, <span class="string">"description"</span>: <span class="string">"Python code to execute"</span>}
+        },
+        <span class="string">"function"</span>: execute_code_impl
+    }
+}
+
+<span class="keyword">def</span> <span class="func">execute_tool</span>(tool_name: <span class="string">str</span>, args: <span class="keyword">dict</span>) -> <span class="string">str</span>:
+    <span class="keyword">if</span> tool_name <span class="keyword">not</span> <span class="keyword">in</span> TOOL_REGISTRY:
+        <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">f"Tool {tool_name} not found"</span>)
+
+    func = TOOL_REGISTRY[tool_name][<span class="string">"function"</span>]
+    <span class="keyword">try</span>:
+        result = <span class="func">func</span>(**args)
+        <span class="keyword">return</span> result
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="string">f"Error: {str(e)}"</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>تعريفات الأدوات التصريحية</h4>
+        <p>
+          بتعريف الأدوات في JSON، يستطيع الوكيل قراءة الأوصاف وتقرير أي أداة يستخدم.
+          هكذا يعمل استخدام الأدوات في Claude — يرى النموذج المخطط ويختار بذكاء.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>إدارة الحالة — تتبع تقدم الوكيل</h2>
+    </div>
+    <p>
+      أثناء عمل الوكيل على مهمة، يحتاج إلى تتبع الحالة: ما تم إنجازه، وما هو معلق، وعدد الأخطاء، وغير ذلك.
+      هذا أمر حاسم لاستئناف العمل وتصحيح الأخطاء.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — State Dictionary Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>agent_state = {
+    <span class="string">"goal"</span>: <span class="string">"Write a report on quantum computing"</span>,
+    <span class="string">"status"</span>: <span class="string">"in_progress"</span>,  <span class="comment"># pending, in_progress, completed, failed</span>
+    <span class="string">"iteration"</span>: <span class="number">3</span>,
+    <span class="string">"max_iterations"</span>: <span class="number">10</span>,
+    <span class="string">"current_step"</span>: <span class="string">"searching_for_recent_papers"</span>,
+    <span class="string">"completed_steps"</span>: [<span class="string">"plan_outline"</span>, <span class="string">"search_quantum_basics"</span>],
+    <span class="string">"pending_steps"</span>: [<span class="string">"synthesize_findings"</span>, <span class="string">"write_draft"</span>, <span class="string">"review"</span>],
+    <span class="string">"errors"</span>: {
+        <span class="string">"search_failed"</span>: <span class="number">1</span>,
+        <span class="string">"rate_limited"</span>: <span class="number">0</span>
+    },
+    <span class="string">"results"</span>: [],
+    <span class="string">"memory_tokens_used"</span>: <span class="number">3456</span>,
+    <span class="string">"started_at"</span>: <span class="string">"2025-02-17T10:30:00Z"</span>,
+    <span class="string">"updated_at"</span>: <span class="string">"2025-02-17T10:35:22Z"</span>
+}</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>استمرارية الحالة</h4>
+        <p>
+          يجب على الوكلاء طويلي التشغيل حفظ الحالة على القرص أو في قاعدة البيانات. إذا تعطل الوكيل، يمكنه الاستئناف
+          من حيث توقف. هذا أمر حاسم لأنظمة الإنتاج التي تتعامل مع عمليات مكلفة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>التعافي من الأخطاء — عندما تسوء الأمور</h2>
+    </div>
+    <p>
+      وكلاء الإنتاج سيفشلون. الأدوات تفشل، والشبكات غير موثوقة، والنماذج ترتكب أخطاء.
+      الوكلاء الممتازون لديهم استراتيجيات للتعافي بأناقة.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">استراتيجية إعادة المحاولة ✅</div>
+        <pre>Tool fails → Wait (exponential backoff)
+→ Retry up to 3 times → Fallback
+to different tool or human</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">استراتيجية إعادة التخطيط ✅</div>
+        <pre>Tool returns unexpected result
+→ Agent re-reasons → Chooses
+different tool or approach</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">التصعيد ✅</div>
+        <pre>Tool fails 3+ times → Mark
+as failed → Skip step → Try
+next step or ask human</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">قاطع الدائرة ✅</div>
+        <pre>Tool fails repeatedly → Disable
+it temporarily → Use fallback
+tools → Monitor for recovery</pre>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Error Recovery Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">execute_with_recovery</span>(tool_name: <span class="string">str</span>, args, max_retries=<span class="number">3</span>):
+    retry_count = <span class="number">0</span>
+    wait_time = <span class="number">1</span>  <span class="comment"># seconds, exponential backoff</span>
+
+    <span class="keyword">while</span> retry_count &lt; max_retries:
+        <span class="keyword">try</span>:
+            result = <span class="func">execute_tool</span>(tool_name, args)
+            <span class="keyword">return</span> {<span class="string">"success"</span>: <span class="keyword">True</span>, <span class="string">"result"</span>: result}
+
+        <span class="keyword">except</span> <span class="func">ToolError</span> <span class="keyword">as</span> e:
+            retry_count += <span class="number">1</span>
+            <span class="keyword">if</span> retry_count &lt; max_retries:
+                <span class="func">time</span>.<span class="func">sleep</span>(wait_time)
+                wait_time *= <span class="number">2</span>  <span class="comment"># exponential backoff</span>
+                <span class="keyword">continue</span>
+            <span class="keyword">else</span>:
+                <span class="keyword">return</span> {
+                    <span class="string">"success"</span>: <span class="keyword">False</span>,
+                    <span class="string">"error"</span>: str(e),
+                    <span class="string">"fallback_tool"</span>: <span class="string">"manual_review"</span>
+                }</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>التدهور التدريجي مقابل الفشل الكامل</h4>
+        <p>
+          الوكلاء الجيدون يتدهورون بأناقة. إذا فشلت أداة البحث، جرّب نسخة مخبأة.
+          إذا فشل الرؤية، اسأل المستخدم. إذا انتهت مهلة تنفيذ الكود، بسّط المشكلة.
+          التدهور التدريجي يبقي الوكلاء مفيدين حتى عندما تتعطل الأمور.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>تجميع الكل — الهندسة الكاملة</h2>
+    </div>
+    <p>
+      لنرَ كيف تتصل الركائز الأربع في مثال كامل وعملي.
+      هذا هو النموذج الذهني الذي تحتاجه لبناء وكلاء الإنتاج.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Full Agent Architecture</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">ReasoningAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.memory = <span class="func">AgentMemory</span>()
+        <span class="param">self</span>.tools = TOOL_REGISTRY
+        <span class="param">self</span>.state = {<span class="string">"status"</span>: <span class="string">"idle"</span>}
+        <span class="param">self</span>.iteration_count = <span class="number">0</span>
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, user_goal: <span class="string">str</span>):
+        <span class="param">self</span>.state[<span class="string">"goal"</span>] = user_goal
+        <span class="param">self</span>.state[<span class="string">"status"</span>] = <span class="string">"in_progress"</span>
+
+        <span class="keyword">while</span> (<span class="param">self</span>.iteration_count &lt; <span class="number">10</span>
+               <span class="keyword">and</span> <span class="param">self</span>.state[<span class="string">"status"</span>] == <span class="string">"in_progress"</span>):
+
+            <span class="comment"># 1. PERCEIVE: Gather context</span>
+            context = <span class="param">self</span>.memory.<span class="func">get_context</span>(user_goal)
+
+            <span class="comment"># 2. REASON: What to do next?</span>
+            thought = <span class="param">self</span>.llm.<span class="func">generate</span>(
+                <span class="string">f"Goal: {user_goal}\nContext: {context}\nWhat's next?"</span>
+            )
+
+            <span class="comment"># 3. ACT: Execute tool</span>
+            tool_name, tool_args = <span class="func">parse_tool</span>(thought)
+            result = <span class="func">execute_with_recovery</span>(tool_name, tool_args)
+
+            <span class="comment"># 4. LEARN: Update memory and state</span>
+            <span class="param">self</span>.memory.<span class="func">add_observation</span>(result)
+            <span class="param">self</span>.iteration_count += <span class="number">1</span>
+
+            <span class="comment"># Check if goal is reached</span>
+            done = <span class="param">self</span>.llm.<span class="func">judge</span>(
+                <span class="string">f"Is this goal achieved? {user_goal}\nEvidence: {result}"</span>
+            )
+            <span class="keyword">if</span> done:
+                <span class="param">self</span>.state[<span class="string">"status"</span>] = <span class="string">"completed"</span>
+
+        <span class="keyword">return</span> <span class="func">synthesize_answer</span>(<span class="param">self</span>.memory)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>رؤى أساسية</h4>
+        <p>
+          هذه الهندسة البسيطة تتضمن كل شيء: التخطيط (الفكر)، واستخدام الأدوات (الإجراء)، والتعافي من الأخطاء،
+          وتتبع الحالة، والتحقق من الهدف. أنظمة الإنتاج الحقيقية تضيف طبقات أكثر (التسجيل، والمراقبة، والتخزين المؤقت)،
+          لكن حلقة العمل الأساسية هذه عالمية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما الذي يرمز إليه ReAct؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فريق الاستخراج والتنفيذ السريع</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">الاستدلال + التنفيذ (Reasoning + Acting)</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">وكلاء إطار عمل React</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">معاملة التعافي والتنفيذ</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. أي نوع من الذاكرة هو الأفضل للبحث الدلالي عبر ملايين المستندات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الذاكرة قصيرة المدى (تاريخ المحادثة)</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">الذاكرة طويلة المدى (قاعدة بيانات متجهية)</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الذاكرة العاملة (المسودة)</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جميعها متساوية في الكفاءة</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما الغرض من سجل الأدوات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تقييد ما يمكن للمستخدمين فعله</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">وصف الأدوات المتاحة حتى يتمكن الوكيل من اختيارها واستخدامها</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تتبع مقاييس أداء الأدوات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">منع الأخطاء</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. في نمط إدارة الحالة، ماذا يتتبع "completed_steps"؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">إجمالي عدد التكرارات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">المهام الفرعية المنجزة، لاستئناف العمل وتصحيح الأخطاء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عدد الأخطاء التي حدثت</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">معدل نجاح الوكيل</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 13</h2>
+    </div>
+    <p>
+      هندسة الوكلاء ترتكز على <strong>أربع ركائز</strong>: التخطيط والاستدلال (نمط ReAct)،
+      والذاكرة (قصيرة المدى/طويلة المدى/عاملة)، والأدوات (سجل للوظائف المتاحة)،
+      وتنفيذ الإجراءات (الإطار الذي يستدعي الأدوات بأمان). <strong>ReAct</strong> (الاستدلال + التنفيذ)
+      يفصل مرحلة التفكير عن مرحلة التنفيذ، مما يجعل الوكلاء أكثر موثوقية.
+      <strong>أنظمة الذاكرة</strong> تمنع الحلقات اللانهائية وتمكّن إعادة استخدام المعرفة.
+      <strong>سجلات الأدوات</strong> تتيح للوكلاء اختيار ما يفعلونه بذكاء.
+      <strong>إدارة الحالة</strong> تمكّن الاستئناف وتصحيح الأخطاء.
+      <strong>استراتيجيات التعافي من الأخطاء</strong> (إعادة المحاولة، إعادة التخطيط، التصعيد، قاطع الدائرة) تبقي الوكلاء يعملون تحت الضغط.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 14: الذاكرة وإدارة السياق</strong><br>
+      <span style="color: var(--text-dim);">ستستكشف الآن كيفية إدارة الذاكرة والسياق بفعالية لبناء وكلاء أذكى وأكثر تماسكاً.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-12-what-are-agents.html">السابق →</a>
+  <span class="nav-info">الموضوع 16 من 23</span>
+  <a class="nav-btn primary" href="topic-memory-context.html">← التالي: الذاكرة وإدارة السياق</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

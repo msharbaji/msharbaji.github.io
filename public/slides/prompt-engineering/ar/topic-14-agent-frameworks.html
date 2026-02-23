@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 14 — أطر عمل الوكلاء | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 78%"></div></div>
+    <span class="progress-label">18 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📦</div>
+    <h1>أطر عمل الوكلاء</h1>
+    <p>LangChain وCrewAI وClaude Agent SDK والمزيد — اختر إطار العمل المناسب لمشروعك. افهم نقاط القوة والمفاضلات لكل نهج.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>لماذا نستخدم إطار عمل؟</h2>
+    </div>
+    <p>
+      بناء الوكلاء من الصفر (كما سنفعل في الموضوع 15) مفيد تعليمياً ويمنحك تحكماً كاملاً.
+      لكن في بيئة الإنتاج، ستجد نفسك تعيد اختراع نفس الأنماط: تحليل الأدوات، إدارة الذاكرة، معالجة الأخطاء،
+      التسجيل، والمراقبة. أطر العمل تتولى كل هذا نيابةً عنك.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1; background: var(--green-dim); border: 1px solid rgba(52, 211, 153, 0.2);">
+        <div class="icon">✅</div>
+        <h4>فوائد أطر العمل</h4>
+        <p>
+          <strong>لا تكرر نفسك:</strong> أنماط مُجرَّبة للتخطيط واستدعاء الأدوات والذاكرة.
+          <strong>النظام البيئي:</strong> تكاملات مع النماذج اللغوية وقواعد البيانات والأدوات وواجهات API.
+          <strong>جاهز للإنتاج:</strong> التسجيل ومعالجة الأخطاء والمراقبة مدمجة.
+          <strong>المجتمع:</strong> آلاف الأمثلة والإضافات وأفضل الممارسات.
+          <strong>تطوير أسرع:</strong> ركّز على منطق عملك، لا على البنية التحتية.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المفاضلة: التعقيد</h4>
+        <p>
+          أطر العمل تضيف تبعيات وطبقات تجريد. إذا لم تفهم كيف تعمل الوكلاء (أنت تفهم الآن!)،
+          فإن تصحيح الأخطاء يكون صعباً. كما يمكن أن تكون أطر العمل أبطأ وأكثر تكلفة من وكيل مخصص بسيط.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>وكلاء LangChain</h2>
+    </div>
+    <p>
+      LangChain هو إطار عمل الوكلاء الأكثر شيوعاً. يُجرّد تفاعلات النموذج اللغوي واستدعاء الأدوات والذاكرة
+      والسلاسل. يعمل مع أي نموذج (Claude وGPT وLlama وغيرها).
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LangChain Agent Example</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> langchain.agents <span class="keyword">import</span> AgentExecutor, <span class="func">Tool</span>, <span class="func">create_react_agent</span>
+<span class="keyword">from</span> langchain_anthropic <span class="keyword">import</span> <span class="func">ChatAnthropic</span>
+
+<span class="comment"># 1. Define your tools</span>
+tools = [
+    <span class="func">Tool</span>(
+        <span class="param">name</span>=<span class="string">"web_search"</span>,
+        <span class="param">func</span>=web_search_impl,
+        <span class="param">description</span>=<span class="string">"Search the web for current information"</span>
+    )
+]
+
+<span class="comment"># 2. Create an agent</span>
+model = <span class="func">ChatAnthropic</span>(<span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>)
+agent = <span class="func">create_react_agent</span>(model, tools, <span class="param">prompt</span>=...)
+executor = <span class="func">AgentExecutor</span>(<span class="param">agent</span>=agent, <span class="param">tools</span>=tools)
+
+<span class="comment"># 3. Run it</span>
+result = executor.<span class="func">invoke</span>({<span class="string">"input"</span>: <span class="string">"What are the latest AI news?"</span>})</pre>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">✅</div>
+        <h4>المزايا</h4>
+        <p>ناضج وموثق جيداً، نظام بيئي ضخم من التكاملات، أدوات ممتازة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">❌</div>
+        <h4>العيوب</h4>
+        <p>تجريد ثقيل، منحنى تعلم أكثر حدة، أبطأ من الوكلاء البسيطة، تصميم مُوجَّه.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>CrewAI — تنسيق الوكلاء المتعددين</h2>
+    </div>
+    <p>
+      CrewAI مبني خصيصاً لأنظمة الوكلاء المتعددين. لكل وكيل دور وأدوات وخبرة محددة.
+      يعملون معاً على مهمة مشتركة. ممتاز لسير العمل المعقد.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — CrewAI Example</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> crewai <span class="keyword">import</span> <span class="func">Agent</span>, <span class="func">Task</span>, <span class="func">Crew</span>
+<span class="keyword">from</span> langchain.tools <span class="keyword">import</span> <span class="func">tool</span>
+
+<span class="comment"># Define agents with specific roles</span>
+researcher = <span class="func">Agent</span>(
+    <span class="param">role</span>=<span class="string">"Research Analyst"</span>,
+    <span class="param">goal</span>=<span class="string">"Find current market trends"</span>,
+    <span class="param">tools</span>=[web_search_tool],
+    <span class="param">model</span>=<span class="string">"gpt-4"</span>
+)
+
+writer = <span class="func">Agent</span>(
+    <span class="param">role</span>=<span class="string">"Report Writer"</span>,
+    <span class="param">goal</span>=<span class="string">"Write a comprehensive report"</span>,
+    <span class="param">tools</span>=[],
+    <span class="param">model</span>=<span class="string">"gpt-4"</span>
+)
+
+<span class="comment"># Define tasks</span>
+research_task = <span class="func">Task</span>(
+    <span class="param">description</span>=<span class="string">"Research AI trends in 2025"</span>,
+    <span class="param">agent</span>=researcher
+)
+
+writing_task = <span class="func">Task</span>(
+    <span class="param">description</span>=<span class="string">"Write a report based on research"</span>,
+    <span class="param">agent</span>=writer
+)
+
+<span class="comment"># Create and run crew</span>
+crew = <span class="func">Crew</span>(
+    <span class="param">agents</span>=[researcher, writer],
+    <span class="param">tasks</span>=[research_task, writing_task]
+)
+result = crew.<span class="func">kickoff</span>()</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>متى تستخدم CrewAI</h4>
+        <p>
+          سير عمل متعدد الوكلاء مع فصل واضح للأدوار. بحث + تحليل + كتابة. مدير يشرف على مهندسين.
+          هذا هو المجال الذي يتألق فيه CrewAI.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Claude Agent SDK — إطار عمل Anthropic الرسمي للوكلاء</h2>
+    </div>
+    <p>
+      مبني خصيصاً لـ Claude من قِبل Anthropic. خفيف الوزن، يركز على استخدام الأدوات عبر ميزة tool_use الأصلية في Claude.
+      ممتاز إذا كنت ملتزماً بنماذج Claude.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Claude Agent SDK Example</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> anthropic <span class="keyword">import</span> <span class="func">Anthropic</span>
+
+client = <span class="func">Anthropic</span>()
+
+tools = [
+    {
+        <span class="string">"name"</span>: <span class="string">"calculate"</span>,
+        <span class="string">"description"</span>: <span class="string">"Perform math calculation"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"expression"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>}
+            }
+        }
+    }
+]
+
+messages = [
+    {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What's 15 + 27?"</span>}
+]
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">tools</span>=tools,
+    <span class="param">messages</span>=messages
+)
+
+<span class="comment"># Claude returns tool_use blocks. Parse and execute.</span>
+<span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+    <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+        tool_result = <span class="func">execute_tool</span>(block.name, block.input)
+        <span class="comment"># Add result back and continue</span></pre>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">✅</div>
+        <h4>المزايا</h4>
+        <p>خفيف الوزن، مُحسَّن لميزة tool_use الأصلية في Claude، توثيق ممتاز، دعم وثيق من Anthropic.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">❌</div>
+        <h4>العيوب</h4>
+        <p>يعمل مع Claude فقط، نظام بيئي أصغر من LangChain، ميزات متقدمة أقل (لا إدارة ذاكرة مدمجة).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>AutoGen (مايكروسوفت) — وكلاء المحادثة</h2>
+    </div>
+    <p>
+      AutoGen يركز على الوكلاء التي تتواصل مع بعضها عبر المحادثة. ممتاز لمحاكاة
+      النقاشات والمناظرات متعددة الأطراف.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — AutoGen Conversation</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> autogen <span class="keyword">import</span> <span class="func">AssistantAgent</span>, <span class="func">UserProxyAgent</span>
+
+<span class="comment"># Create agents that talk to each other</span>
+assistant = <span class="func">AssistantAgent</span>(
+    <span class="param">name</span>=<span class="string">"Assistant"</span>,
+    <span class="param">llm_config</span>={<span class="string">"model"</span>: <span class="string">"gpt-4"</span>}
+)
+
+user_proxy = <span class="func">UserProxyAgent</span>(
+    <span class="param">name</span>=<span class="string">"User"</span>,
+    <span class="param">human_input_mode</span>=<span class="string">"TERMINATE"</span>
+)
+
+<span class="comment"># Start a conversation</span>
+user_proxy.<span class="func">initiate_chat</span>(
+    assistant,
+    <span class="param">message</span>=<span class="string">"Write Python code to count prime numbers up to 100"</span>
+)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>نقطة قوة AutoGen: تنفيذ الكود والتكرار</h4>
+        <p>
+          يتفوق AutoGen في توليد الكود التكراري. المساعد يكتب الكود، ومنفذ الكود يشغّله،
+          ويُبلّغ عن الأخطاء، ثم يصلحها المساعد. ممتاز لمهام البرمجة المعقدة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>جدول مقارنة أطر العمل</h2>
+    </div>
+    <p>
+      إليك مرجعاً سريعاً لمساعدتك في الاختيار:
+    </p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>إطار العمل</th>
+            <th>سهولة الاستخدام</th>
+            <th>المرونة</th>
+            <th>تعدد الوكلاء</th>
+            <th>جاهز للإنتاج</th>
+            <th>المجتمع</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>LangChain</strong></td>
+            <td>متوسط</td>
+            <td>عالية جداً</td>
+            <td>نعم (يدوي)</td>
+            <td>نعم</td>
+            <td>ضخم</td>
+          </tr>
+          <tr>
+            <td><strong>CrewAI</strong></td>
+            <td>سهل</td>
+            <td>متوسطة</td>
+            <td>نعم (أصلي)</td>
+            <td>متنامي</td>
+            <td>متنامي</td>
+          </tr>
+          <tr>
+            <td><strong>Claude SDK</strong></td>
+            <td>سهل</td>
+            <td>متوسطة</td>
+            <td>ممكن</td>
+            <td>نعم</td>
+            <td>صغير (Anthropic)</td>
+          </tr>
+          <tr>
+            <td><strong>AutoGen</strong></td>
+            <td>سهل</td>
+            <td>عالية</td>
+            <td>نعم</td>
+            <td>نعم</td>
+            <td>كبير (مايكروسوفت)</td>
+          </tr>
+          <tr>
+            <td><strong>بناء مخصص</strong></td>
+            <td>صعب</td>
+            <td>غير محدودة</td>
+            <td>نعم</td>
+            <td>يعتمد عليك</td>
+            <td>لا يوجد</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>متى تبني وكيلك الخاص</h2>
+    </div>
+    <p>
+      أحياناً تكون أطر العمل مبالغة. وكيل مخصص بسيط قد يكون الخيار الأفضل:
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ ابنِ مخصصاً إذا:</div>
+        <pre>- المهمة بسيطة (1-3 أدوات)
+- تريد أقل تبعيات ممكنة
+- زمن الاستجابة حرج
+- تحسّن التكلفة
+- قيود إطار العمل مهمة
+- تعلّم/نمذجة أولية</pre>
+      </div>
+      <div class="compare-card bad">
+        <div class="compare-label">❌ استخدم إطار عمل إذا:</div>
+        <pre>- سير عمل معقد
+- أنظمة متعددة الوكلاء
+- تحتاج ذاكرة/استمرارية
+- تكاملات كثيرة مطلوبة
+- نشر إنتاجي
+- عمل جماعي</pre>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Minimal Custom Agent (~30 lines)</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">minimal_agent</span>(goal, tools, llm):
+    messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: goal}]
+
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="func">range</span>(<span class="number">10</span>):
+        response = llm.<span class="func">generate</span>(messages)
+
+        <span class="keyword">if</span> <span class="string">"DONE"</span> <span class="keyword">in</span> response:
+            <span class="keyword">return</span> response.replace(<span class="string">"DONE: "</span>, <span class="string">""</span>)
+
+        tool_name, args = <span class="func">parse</span>(response)
+        <span class="keyword">if</span> tool_name <span class="keyword">in</span> tools:
+            result = tools[tool_name](**args)
+        <span class="keyword">else</span>:
+            result = <span class="string">"Unknown tool"</span>
+
+        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response})
+        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: result})
+
+    <span class="keyword">return</span> <span class="string">"Max iterations reached"</span></pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>التطوير التدريجي</h4>
+        <p>
+          ابدأ ببساطة. ابنِ وكيلاً بسيطاً، تحقق من صحة النهج، ثم أضف أطر العمل عند التوسع.
+          لا تضف تعقيداً مسبقاً. هذا هو المسار العملي في بيئة الإنتاج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. أي إطار عمل مبني خصيصاً لأنظمة الوكلاء المتعددين مع فصل واضح للأدوار؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">LangChain</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">CrewAI</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">Claude Agent SDK</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">AutoGen</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. ما الميزة الرئيسية لبناء وكيل مخصص بدلاً من استخدام إطار عمل؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">إنه دائماً أسرع وأرخص</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تبعيات أقل، زمن استجابة أقل، تحكم كامل للمهام البسيطة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">معالجة أخطاء أفضل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أسهل للتوسع في الإنتاج</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. أي إطار عمل هو الحل الرسمي للوكلاء من Anthropic؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">LangChain</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">CrewAI</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">Claude Agent SDK</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">AutoGen</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. AutoGen قوي بشكل خاص في أي نوع من المهام؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخراج بيانات الويب</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">توليد الكود التكراري وتصحيح الأخطاء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الترجمة متعددة اللغات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">توليد الصور</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 14</h2>
+    </div>
+    <p>
+      أطر العمل توفر لك الوقت وتقدم أنماطاً مُجرَّبة في الميدان، لكنها تضيف تعقيداً وتبعيات.
+      <strong>LangChain</strong> هو الأكثر نضجاً ومرونة، مع أكبر نظام بيئي.
+      <strong>CrewAI</strong> يتفوق في تنسيق الوكلاء المتعددين مع فصل واضح للأدوار.
+      <strong>Claude Agent SDK</strong> خفيف الوزن ومُحسَّن لنماذج Claude.
+      <strong>AutoGen</strong> هو الأفضل لتوليد الكود التكراري ومحادثات الوكلاء.
+      <strong>الوكلاء المخصصة</strong> هي الخيار الصحيح للمشاريع البسيطة أو الحساسة لزمن الاستجابة أو التعليمية.
+      اختر بناءً على تعقيد مهمتك وحجم فريقك واحتياجات النشر — وليس الضجة الإعلامية.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 15: بناء وكيل بسيط من الصفر</strong><br>
+      <span style="color: var(--text-dim);">الآن ستبني وكيل بحث كاملاً بلغة بايثون الصرفة، بدون أطر عمل.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-memory-context.html">السابق →</a>
+  <span class="nav-info">الموضوع 18 من 23</span>
+  <a class="nav-btn primary" href="topic-15-build-simple-agent.html">← التالي: بناء وكيل من الصفر</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

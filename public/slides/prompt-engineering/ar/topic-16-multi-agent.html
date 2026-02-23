@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 16 — أنظمة الوكلاء المتعددين | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 87%"></div></div>
+    <span class="progress-label">20 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">👥</div>
+    <h1>أنظمة الوكلاء المتعددين</h1>
+    <p>عندما لا يكفي وكيل واحد — نظّم عدة وكلاء متخصصين لمعالجة المهام المعقدة. افهم أنماط التعاون التي تحل مشاكل لا يستطيع وكيل واحد حلها.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>لماذا الوكلاء المتعددون؟ قوة التخصص</h2>
+    </div>
+    <p>
+      الوكيل الواحد يكون متعدد المهارات لكن لا يتقن أياً منها بعمق. <strong>نظام الوكلاء المتعددين</strong> يخصص أدواراً محددة:
+      وكيل يبحث، وآخر يحلل، وثالث يكتب. تماماً كفريق تطوير يعمل على منتج.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">👷</div>
+      <div>
+        <h4>تشبيه: فريق تطوير</h4>
+        <p>
+          مطور واحد يمكنه بناء تطبيق، لكن الفريق أفضل: مهندس الواجهة يتولى واجهة المستخدم،
+          ومهندس الخلفية يتولى الـ API، ومهندس DevOps يتولى النشر. كل واحد يتخصص، ثم يتكاملون.
+          أنظمة الوكلاء المتعددين تعمل بنفس الطريقة: كل وكيل خبير، وهم ينسّقون معاً.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>تقسيم العمل</h4>
+        <p>المهام المعقدة تُقسّم إلى مهام فرعية متخصصة. كل وكيل يتفوق في شيء واحد.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>العمل المتوازي</h4>
+        <p>الوكلاء يعملون بالتوازي (أو بالتسلسل) لتسريع إنجاز المهمة الكلية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>تحسين الجودة</h4>
+        <p>مخرجات وكيل تصبح مدخلات لوكيل آخر. التحسين التكراري يرفع الجودة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🛡️</div>
+        <h4>كشف الأخطاء</h4>
+        <p>وكيل ناقد يمكنه التحقق من عمل الوكلاء الآخرين، ويلتقط الأخطاء قبل التسليم.</p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>أنماط الوكلاء المتعددين — أربع بنيات رئيسية</h2>
+    </div>
+    <p>
+      هناك أربعة أنماط مثبتة لتنسيق وكلاء متعددين. كل نمط يناسب أنواعاً مختلفة من المهام.
+    </p>
+
+    <h3>النمط 1: المشرف (المدير)</h3>
+    <p>
+      وكيل مشرف واحد يفوّض المهام للمتخصصين. المشرف يحلل الهدف،
+      ويوزّع المهام الفرعية، ويجمع النتائج، ويدمجها. هذا هو نمط التنسيق الكلاسيكي.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Supervisor Pattern Flow</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>User: "Write a product launch plan"
+       ↓
+Supervisor Agent:
+  - Breaks into: Market Analysis, Budget Planning, Timeline, Risk Mitigation
+  - Assigns to specialists
+       ↓
+Market Analyst: "Competitors, target audience, positioning"
+Budget Planner: "Cost breakdown, revenue projections"
+Timeline Manager: "Phases, milestones, dependencies"
+Risk Analyst: "Risks, mitigation strategies"
+       ↓
+Supervisor: Gathers results, synthesizes into final plan
+       ↓
+User: Complete launch plan</pre>
+    </div>
+
+    <h3>النمط 2: نظير إلى نظير</h3>
+    <p>
+      الوكلاء يعملون معاً على نفس المستوى. كل وكيل يمكنه بدء رسائل للآخرين.
+      مفيد للمشاكل الاستكشافية حيث الحل ينبثق من النقاش.
+    </p>
+
+    <h3>النمط 3: خط الأنابيب</h3>
+    <p>
+      مخرجات وكيل تصبح مدخلات للوكيل التالي. سير عمل خطي.
+      باحث ← محلل ← كاتب ← محرر. تدفق بيانات واضح.
+    </p>
+
+    <h3>النمط 4: المناظرة / الناقد</h3>
+    <p>
+      عدة وكلاء يدافعون عن وجهات نظر مختلفة، وحكم/ناقد يقرر.
+      ممتاز لتحسين الجودة من خلال كشف نقاط الضعف في الاستدلال.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👔</div>
+        <h4>المشرف (هرمي)</h4>
+        <p>منسّق واحد، عدة متخصصين. الأفضل لـ: المهام المحددة ذات المهام الفرعية الواضحة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤝</div>
+        <h4>نظير إلى نظير (مسطّح)</h4>
+        <p>جميع الوكلاء متساوون، ينسّقون ذاتياً. الأفضل لـ: العمل الاستكشافي والتعاوني.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⛓️</div>
+        <h4>خط الأنابيب (تسلسلي)</h4>
+        <p>سلسلة مخرجات ← مدخلات. الأفضل لـ: سير العمل القائم على التحويل (بحث ← تحليل ← كتابة).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚖️</div>
+        <h4>المناظرة/الناقد (تنافسي)</h4>
+        <p>وجهات نظر متعارضة، حكم يقرر. الأفضل لـ: تحسين الجودة، القرارات الصعبة.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>بروتوكولات التواصل — كيف تتحدث الوكلاء</h2>
+    </div>
+    <p>
+      الوكلاء يحتاجون طريقة للتواصل: تمرير البيانات، طلب المعلومات، تنسيق الإجراءات.
+      هناك عدة مقاربات، لكل منها مقايضات.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💬</div>
+        <h4>تمرير الرسائل</h4>
+        <p>الوكلاء يرسلون رسائل منظمة لبعضهم. غير متزامن وقليل الارتباط. مناسب لخطوط الأنابيب.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>الحالة المشتركة</h4>
+        <p>جميع الوكلاء يقرأون ويكتبون في قاموس حالة مشترك. مترابط بشدة لكن سريع. خطر التعارضات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚫</div>
+        <h4>نمط السبورة</h4>
+        <p>"سبورة" مركزية ينشر عليها الوكلاء اكتشافاتهم. الآخرون يقرأون ويبنون على الأفكار. رائع للعمل الاستكشافي.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗂️</div>
+        <h4>قاعدة بيانات/نظام ملفات</h4>
+        <p>تخزين دائم للنتائج الوسيطة. يصمد أمام إعادة تشغيل الوكلاء. الأفضل للإنتاج.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>نمط المشرف — تطبيق كامل</h2>
+    </div>
+    <p>
+      لننفّذ نمط المشرف في بايثون. هذا هو النمط الأكثر عملية لأنظمة الإنتاج.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Supervisor Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">Agent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, name: <span class="string">str</span>, role: <span class="string">str</span>):
+        <span class="param">self</span>.name = name
+        <span class="param">self</span>.role = role
+        <span class="param">self</span>.client = anthropic.<span class="func">Anthropic</span>()
+
+    <span class="keyword">def</span> <span class="func">work</span>(<span class="param">self</span>, task: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="string">"""Execute a task and return result."""</span>
+        response = <span class="param">self</span>.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">system</span>=<span class="func">f</span><span class="string">"You are a {self.role}. Your name is {self.name}. Do excellent work."</span>,
+            <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: task}]
+        )
+        <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+<span class="keyword">class</span> <span class="func">SupervisorAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.supervisor = <span class="func">Agent</span>(<span class="string">"Supervisor"</span>, <span class="string">"Project Manager"</span>)
+        <span class="param">self</span>.specialists = [
+            <span class="func">Agent</span>(<span class="string">"Alice"</span>, <span class="string">"Market Research Analyst"</span>),
+            <span class="func">Agent</span>(<span class="string">"Bob"</span>, <span class="string">"Financial Analyst"</span>),
+            <span class="func">Agent</span>(<span class="string">"Carol"</span>, <span class="string">"Project Manager"</span>)
+        ]
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, goal: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="string">"""Supervisor breaks goal into subtasks, delegates to specialists."""</span>
+
+        <span class="comment"># 1. Supervisor analyzes goal and creates subtasks</span>
+        subtasks_prompt = <span class="func">f</span><span class="string">"""Goal: {goal}
+
+Break this into 3 specific subtasks for different specialists:
+1. For a Market Research Analyst
+2. For a Financial Analyst
+3. For a Project Manager
+
+Format:
+SUBTASK 1: [task for analyst 1]
+SUBTASK 2: [task for analyst 2]
+SUBTASK 3: [task for analyst 3]"""</span>
+
+        subtasks_text = <span class="param">self</span>.supervisor.<span class="func">work</span>(subtasks_prompt)
+
+        <span class="comment"># 2. Parse subtasks (simple regex approach)</span>
+        subtasks = []
+        <span class="keyword">for</span> line <span class="keyword">in</span> subtasks_text.<span class="func">split</span>(<span class="string">"\n"</span>):
+            <span class="keyword">if</span> <span class="string">"SUBTASK"</span> <span class="keyword">in</span> line:
+                subtasks.<span class="func">append</span>(line)
+
+        <span class="comment"># 3. Distribute to specialists</span>
+        results = []
+        <span class="keyword">for</span> i, specialist <span class="keyword">in</span> <span class="func">enumerate</span>(<span class="param">self</span>.specialists):
+            <span class="keyword">if</span> i &lt; <span class="func">len</span>(subtasks):
+                result = specialist.<span class="func">work</span>(subtasks[i])
+                results.<span class="func">append</span>({
+                    <span class="string">"specialist"</span>: specialist.name,
+                    <span class="string">"result"</span>: result
+                })
+
+        <span class="comment"># 4. Supervisor synthesizes results</span>
+        synthesis_prompt = <span class="func">f</span><span class="string">"""You have collected the following results from specialists:
+
+{chr(10).join([f"{r['specialist']}: {r['result'][:300]}" for r in results])}
+
+Synthesize these into a cohesive final deliverable for the goal: {goal}
+
+Provide a comprehensive, well-structured final answer."""</span>
+
+        final_answer = <span class="param">self</span>.supervisor.<span class="func">work</span>(synthesis_prompt)
+        <span class="keyword">return</span> final_answer
+
+<span class="comment"># Usage</span>
+supervisor = <span class="func">SupervisorAgent</span>()
+result = supervisor.<span class="func">run</span>(<span class="string">"Create a launch strategy for a new SaaS product"</span>)
+<span class="func">print</span>(result)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>نمط المناظرة — الجودة من خلال التعاون التنافسي</h2>
+    </div>
+    <p>
+      وكيلان يتناظران من موقفين متعاكسين. حكم يقيّم كليهما ويقرر.
+      هذا يحسّن جودة الإجابة بإجبار الاستدلال على كشف نقاط الضعف.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Debate Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">DebateAgents</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.pro_agent = <span class="func">Agent</span>(<span class="string">"Pro"</span>, <span class="string">"Advocates FOR the proposal"</span>)
+        <span class="param">self</span>.con_agent = <span class="func">Agent</span>(<span class="string">"Con"</span>, <span class="string">"Advocates AGAINST the proposal"</span>)
+        <span class="param">self</span>.judge = <span class="func">Agent</span>(<span class="string">"Judge"</span>, <span class="string">"Evaluates both sides fairly"</span>)
+
+    <span class="keyword">def</span> <span class="func">debate</span>(<span class="param">self</span>, question: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="comment"># Round 1: Pro argues FOR</span>
+        pro_argument = <span class="param">self</span>.pro_agent.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"Argue STRONGLY FOR: {question}\nBe compelling and data-driven."</span>
+        )
+
+        <span class="comment"># Round 2: Con argues AGAINST</span>
+        con_argument = <span class="param">self</span>.con_agent.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"Argue STRONGLY AGAINST: {question}\nAddress Pro's points if possible."</span>
+        )
+
+        <span class="comment"># Round 3: Judge decides</span>
+        judgment = <span class="param">self</span>.judge.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"""Question: {question}
+
+Pro argument: {pro_argument}
+
+Con argument: {con_argument}
+
+Evaluate both arguments. Which is stronger? Why? What's the best decision?"""</span>
+        )
+
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"""
+PRO ARGUMENT:
+{pro_argument}
+
+CON ARGUMENT:
+{con_argument}
+
+JUDGE'S DECISION:
+{judgment}"""</span>
+
+<span class="comment"># Usage</span>
+debate = <span class="func">DebateAgents</span>()
+decision = debate.<span class="func">debate</span>(<span class="string">"Should we adopt microservices architecture?"</span>)
+<span class="func">print</span>(decision)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>متى تفوز المناظرة</h4>
+        <p>
+          القرارات الاستراتيجية، خيارات البنية التقنية، قرارات التوظيف.
+          عندما يكون للإجابة إيجابيات وسلبيات مشروعة، المناظرة التي تكشف كلا الجانبين تحسّن الجودة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>تحديات أنظمة الوكلاء المتعددين</h2>
+    </div>
+    <p>
+      أنظمة الوكلاء المتعددين قوية لكنها تقدم مشاكل جديدة. فهم التحديات أمر حاسم للنجاح.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>التحدي 1: عبء التنسيق</h4>
+        <p>
+          وكلاء أكثر = تواصل أكثر. تمرير الرسائل، مشاركة السياق، إدارة الحالة.
+          للمهام البسيطة، العبء يفوق الفوائد. وكيل واحد قد يكون أسرع.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>التحدي 2: الحلقات اللانهائية</h4>
+        <p>
+          الوكيل أ يسأل الوكيل ب، الذي يسأل الوكيل ج، الذي يسأل الوكيل أ. الحلقات غير المضبوطة تهدر التوكنات والوقت.
+          أضف شروط إنهاء صارمة وكشف الحلقات.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>التحدي 3: المخرجات المتناقضة</h4>
+        <p>
+          وكلاء مختلفون يختلفون أو يتناقضون. تحتاج حكماً أو وسيطاً.
+          ابنِ آلية حل النزاعات في تصميم نظامك.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>التحدي 4: انفجار التكلفة</h4>
+        <p>
+          وكلاء متعددون = استدعاءات LLM متعددة. 5 وكلاء × 10 تكرارات = 50 استدعاء API.
+          التكاليف تتراكم بسرعة. راقب وخطط الميزانية بعناية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>متى تكون الوكلاء المتعددون مبالغة؟</h2>
+    </div>
+    <p>
+      ليست كل مشكلة تحتاج وكلاء متعددين. أحياناً وكيل واحد مصمم جيداً يكون أفضل.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ استخدم الوكلاء المتعددين لـ:</div>
+<pre>- سير عمل معقد ومتعدد الخطوات
+- مهام تحتاج تخصصاً
+- التحقق من الجودة (وكيل ناقد)
+- سيناريوهات استكشافية/مناظرة
+- تنسيق يشبه فريق العمل</pre>
+      </div>
+      <div class="compare-card bad">
+        <div class="compare-label">❌ تجنب الوكلاء المتعددين لـ:</div>
+<pre>- مهام بخطوة واحدة
+- تصنيف/تلخيص بسيط
+- تطبيقات حساسة لزمن الاستجابة
+- نشر حساس للتكلفة
+- سير عمل خطي محدد</pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>ابدأ ببساطة، وسّع تدريجياً</h4>
+        <p>
+          ابنِ وكيلاً واحداً أولاً. إذا لم يستطع التعامل مع المهمة، أضف متخصصين.
+          أضف وكيلاً ناقداً إذا كانت الجودة مشكلة. هذا النهج التدريجي يمنع الإفراط في الهندسة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. في نمط المشرف، ماذا يفعل المشرف؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يقوم بكل العمل بنفسه</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">يقسّم الهدف إلى مهام فرعية، يفوّض للمتخصصين، يدمج النتائج</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يراقب الوكلاء بحثاً عن الأخطاء فقط</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يوزّع المهام عشوائياً</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. نمط المناظرة هو الأفضل لأي نوع من المشاكل؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخراج البيانات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">القرارات الاستراتيجية حيث تهم وجهات النظر المتعددة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">المحادثة الفورية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">توليد الصور</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما أهم المخاطر في أنظمة الوكلاء المتعددين؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هي دائماً أبطأ</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عبء التنسيق، الحلقات اللانهائية، وانفجار التكلفة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لا تستطيع التعامل مع المهام المعقدة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النماذج ترفض التعاون</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. متى يكون الوكيل الواحد أفضل من الوكلاء المتعددين؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">دائماً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">للمهام البسيطة، عندما يكون زمن الاستجابة أو التكلفة حرجاً، أو المهام لا تحتاج تخصصاً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أبداً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط للعمل الإبداعي</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 16</h2>
+    </div>
+    <p>
+      أنظمة الوكلاء المتعددين تطبّق التخصص على المشاكل المعقدة. <strong>أربعة أنماط تسيطر:</strong>
+      المشرف (منسّق واحد، عدة متخصصين)، نظير إلى نظير (تعاون مسطّح)،
+      خط الأنابيب (تحويل تسلسلي)، والمناظرة (تحسين جودة تنافسي).
+      <strong>بروتوكولات التواصل</strong> تحدد كيف ينسّق الوكلاء: تمرير الرسائل، الحالة المشتركة، السبورة، أو قاعدة البيانات.
+      <strong>التحديات</strong> تشمل عبء التنسيق، الحلقات اللانهائية، المخرجات المتناقضة، وانفجار التكاليف.
+      <strong>ليست كل مشكلة تحتاج وكلاء متعددين</strong> — الوكلاء المنفردون أبسط وأرخص للمهام المباشرة.
+      استخدم الوكلاء المتعددين للمشاكل المعقدة فعلاً، متعددة الخطوات، حيث يضيف التخصص قيمة.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 17: مشروع — وكيل متكامل</strong><br>
+      <span style="color: var(--text-dim);">مشروع ختامي: بناء نظام بحث متعدد الوكلاء كامل وجاهز للإنتاج.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-15-build-simple-agent.html">السابق →</a>
+  <span class="nav-info">الموضوع 20 من 23</span>
+  <a class="nav-btn primary" href="topic-17-agent-project.html">← التالي: مشروع — وكيل متكامل</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

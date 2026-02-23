@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Typography */
   --font-display: var(--font-syne), system-ui;
@@ -7,20 +9,25 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-arabic: var(--font-arabic), "Noto Kufi Arabic", sans-serif;
 
-  /* Cool slate + teal palette — OKLCH */
-  --color-background: oklch(9% 0.015 250);
-  --color-surface: oklch(13% 0.015 250);
-  --color-surface-hover: oklch(17% 0.015 250);
-  --color-foreground: oklch(94% 0.005 250);
-  --color-muted: oklch(55% 0.015 250);
-  --color-accent: oklch(72% 0.14 180);
-  --color-accent-hover: oklch(78% 0.14 180);
-  --color-accent-subtle: oklch(72% 0.14 180 / 0.1);
-  --color-border: oklch(18% 0.015 250);
-  --color-border-hover: oklch(25% 0.02 250);
-  --color-card: oklch(12% 0.015 250);
-  --color-card-foreground: oklch(94% 0.005 250);
-  --color-glow: oklch(72% 0.14 180 / 0.08);
+  /* Cool slate + teal palette — OKLCH (light mode defaults) */
+  --color-background: oklch(98% 0.005 250);
+  --color-surface: oklch(94% 0.005 250);
+  --color-surface-hover: oklch(90% 0.008 250);
+  --color-foreground: oklch(15% 0.015 250);
+  --color-muted: oklch(45% 0.015 250);
+  --color-accent: oklch(55% 0.17 180);
+  --color-accent-hover: oklch(48% 0.17 180);
+  --color-accent-subtle: oklch(55% 0.17 180 / 0.1);
+  --color-border: oklch(88% 0.005 250);
+  --color-border-hover: oklch(78% 0.01 250);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(15% 0.015 250);
+  --color-glow: oklch(55% 0.17 180 / 0.08);
+
+  /* Warm amber/gold accent */
+  --color-accent-warm: oklch(62% 0.18 85);
+  --color-accent-warm-hover: oklch(55% 0.18 85);
+  --color-accent-warm-subtle: oklch(62% 0.18 85 / 0.1);
 
   /* Radius */
   --radius-sm: 0.25rem;
@@ -49,6 +56,26 @@
   }
 }
 
+/* Dark mode overrides */
+.dark {
+  --color-background: oklch(9% 0.015 250);
+  --color-surface: oklch(13% 0.015 250);
+  --color-surface-hover: oklch(17% 0.015 250);
+  --color-foreground: oklch(94% 0.005 250);
+  --color-muted: oklch(55% 0.015 250);
+  --color-accent: oklch(72% 0.14 180);
+  --color-accent-hover: oklch(78% 0.14 180);
+  --color-accent-subtle: oklch(72% 0.14 180 / 0.1);
+  --color-border: oklch(18% 0.015 250);
+  --color-border-hover: oklch(25% 0.02 250);
+  --color-card: oklch(12% 0.015 250);
+  --color-card-foreground: oklch(94% 0.005 250);
+  --color-glow: oklch(72% 0.14 180 / 0.08);
+  --color-accent-warm: oklch(75% 0.15 85);
+  --color-accent-warm-hover: oklch(80% 0.15 85);
+  --color-accent-warm-subtle: oklch(75% 0.15 85 / 0.1);
+}
+
 /* Base */
 body {
   background: var(--color-background);
@@ -64,10 +91,14 @@ body::before {
   inset: 0;
   z-index: 100;
   pointer-events: none;
-  opacity: 0.02;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
+}
+
+.dark body::before {
+  opacity: 0.02;
 }
 
 /* Stagger delays */
@@ -115,7 +146,7 @@ body::before {
 .prose p {
   line-height: 1.85;
   margin-bottom: 1.25rem;
-  color: oklch(72% 0.01 250);
+  color: var(--color-muted);
 }
 
 .prose strong {
@@ -151,7 +182,7 @@ body::before {
 .prose a {
   color: var(--color-accent);
   text-decoration: none;
-  border-bottom: 1px solid oklch(72% 0.14 180 / 0.3);
+  border-bottom: 1px solid oklch(from var(--color-accent) l c h / 0.3);
   transition: border-color 0.2s;
 }
 
@@ -187,7 +218,7 @@ body::before {
 
 .prose li {
   margin-bottom: 0.5rem;
-  color: oklch(72% 0.01 250);
+  color: var(--color-muted);
   line-height: 1.75;
 }
 

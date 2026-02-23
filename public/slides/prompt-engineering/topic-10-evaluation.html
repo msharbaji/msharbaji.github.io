@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 10 — Evaluating Prompt Quality | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 52%"></div></div>
+    <span class="progress-label">12 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📊</div>
+    <h1>Evaluating Prompt Quality</h1>
+    <p>Measure, score, and systematically improve your prompts — because you can't improve what you can't measure.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Why Evaluation Matters</h2>
+    </div>
+    <p>
+      Many teams rely on "gut feel" to judge prompt quality: "That feels right" or "I tried a few versions and this one seemed best."
+      This is anecdotal and unreliable. In production, you need systematic evaluation.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>The Anecdotal Testing Problem</h4>
+        <p>
+          Testing on 5 examples doesn't tell you if your prompt works on 100,000. A prompt that "feels good"
+          might actually be brittle. You need data and metrics, not intuition.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">📈</div>
+        <h4>Benefits of Systematic Evaluation</h4>
+        <p>
+          <strong>Measure improvements:</strong> Know if a change actually helped. <strong>Catch regressions:</strong> Detect when updates break previous functionality.
+          <strong>Compare versions:</strong> Objectively choose between prompt variants. <strong>Track trends:</strong> See if quality improves or degrades over time.
+          <strong>Build confidence:</strong> Deploy to production knowing your prompt has been validated.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>The Gold Standard</h4>
+        <p>
+          Create a test dataset (20-50+ examples) with expected outputs. Run your prompt against all test cases.
+          Score the results automatically or with human eval. Track scores over time as you iterate.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Types of Evaluation</h2>
+    </div>
+    <p>
+      There are three main approaches to evaluating prompts. Each has trade-offs.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👥</div>
+        <h4>Human Evaluation</h4>
+        <p><strong>Pros:</strong> Most accurate, catches nuance. <strong>Cons:</strong> Expensive, slow, doesn't scale to thousands of examples.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Automated Metrics</h4>
+        <p><strong>Pros:</strong> Fast, cheap, reproducible. <strong>Cons:</strong> Can miss subtle issues, requires good metric selection.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>LLM-as-Judge</h4>
+        <p><strong>Pros:</strong> Understands nuance, scales well. <strong>Cons:</strong> Expensive, can be biased by judge model's behavior.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>Hybrid</h4>
+        <p><strong>Pros:</strong> Best of all worlds. <strong>Cons:</strong> Most complex to set up.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Restaurant Ratings</h4>
+        <p>
+          <strong>Human eval:</strong> A food critic tastes the dish. <strong>Automated metrics:</strong> Check if it's hot, pH is neutral, etc.
+          <strong>LLM-as-judge:</strong> Another chef tastes it and scores it. Hybrid: Metrics + one critic for edge cases.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Building an Eval Dataset</h2>
+    </div>
+    <p>
+      The foundation of good evaluation is a good test dataset. This takes time to create but pays off.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Structure: Input → Expected Output</p>
+    <p>
+      For each test case, you need an input (prompt) and the expected or ideal output.
+      Store as JSON for easy programmatic access.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON — Eval Dataset Example</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">[
+  {
+    "id": "1",
+    "input": "Summarize: The Great Gatsby is a novel...",
+    "expected_output": "A 1920s-set novel about wealth, love, and the American Dream",
+    "category": "literature"
+  },
+  {
+    "id": "2",
+    "input": "Translate to Spanish: Hello, how are you?",
+    "expected_output": "Hola, ¿cómo estás?",
+    "category": "translation"
+  },
+  {
+    "id": "3",
+    "input": "Fix this code: def add(a, b return a + b",
+    "expected_output": "def add(a, b):\n    return a + b",
+    "category": "code"
+  }
+]</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Dataset Size Recommendations</p>
+    <ul>
+      <li><strong>20-30 examples:</strong> Minimum for catching major issues.</li>
+      <li><strong>50-100 examples:</strong> Good coverage of different scenarios.</li>
+      <li><strong>200+:</strong> Comprehensive testing across categories and edge cases.</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Diverse Examples Matter</h4>
+        <p>
+          Don't just test happy paths. Include edge cases: empty inputs, very long inputs, ambiguous requests,
+          requests in different languages, etc. This catches bugs before they hit production.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>LLM-as-Judge Pattern</h2>
+    </div>
+    <p>
+      Use Claude itself to judge the quality of outputs. It's surprisingly effective and understands nuance
+      that simple metrics miss.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">The Judge Prompt</p>
+    <p>
+      Write a system prompt that describes what good output looks like. Give it the input and output to evaluate.
+      Ask it to score and explain.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LLM-as-Judge</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+judge_system = <span class="string">"""
+You are an expert evaluator of code quality.
+Score code on:
+1. Correctness (does it work?)
+2. Readability (is it clear?)
+3. Efficiency (is it optimal?)
+
+Return a JSON object with:
+- score (1-10)
+- reasoning (brief explanation)
+- issues (list of problems, or empty)
+"""</span>
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">evaluate_code</span>(code_to_review):
+    judge_input = f<span class="string">"""
+Evaluate this code:
+
+```python
+{code_to_review}
+```
+
+Return JSON with score, reasoning, and issues."""</span>
+
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">system</span>=judge_system,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: judge_input
+        }]
+    )
+
+    <span class="comment"># Parse the JSON response</span>
+    result_text = response.content[<span class="number">0</span>].text
+    <span class="keyword">try</span>:
+        result = json.<span class="func">loads</span>(result_text)
+        <span class="keyword">return</span> result[<span class="string">"score"</span>]
+    <span class="keyword">except</span>:
+        <span class="keyword">print</span>(<span class="string">"Failed to parse judge response"</span>)
+        <span class="keyword">return</span> <span class="keyword">None</span></pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Judge Model Bias</h4>
+        <p>
+          The judge model can have bias. Different models might score differently. To mitigate: use the same
+          judge model for all evaluations, be explicit in the judge prompt, double-check with human validation
+          on a subset.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Automated Metrics</h2>
+    </div>
+    <p>
+      For certain tasks, automated metrics work well. They're fast and deterministic.
+      Choose the right metric for your task.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">✓</div>
+        <h4>Exact Match</h4>
+        <p>Output == expected? Binary: yes/no. Good for: translation, structured output. Bad for: open-ended tasks.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📏</div>
+        <h4>BLEU Score</h4>
+        <p>N-gram overlap with reference. Standard for translation. Range: 0-100. Higher is better.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>ROUGE Score</h4>
+        <p>Recall-oriented for summarization. Measures overlap with reference summaries. Good for: summary eval.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>Cosine Similarity</h4>
+        <p>Embedding-based similarity. Captures semantic meaning. Range: 0-1. Good for: open-ended text.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Automated Metrics</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> difflib <span class="keyword">import</span> SequenceMatcher
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Exact Match</span>
+<span class="keyword">def</span> <span class="func">exact_match</span>(output, expected):
+    <span class="keyword">return</span> <span class="number">1.0</span> <span class="keyword">if</span> output.strip() == expected.strip() <span class="keyword">else</span> <span class="number">0.0</span>
+
+<span class="comment"># Sequence Similarity (for closeness)</span>
+<span class="keyword">def</span> <span class="func">similarity_score</span>(output, expected):
+    return SequenceMatcher(None, output, expected).<span class="func">ratio</span>()
+
+<span class="comment"># Usage:</span>
+output = <span class="string">"The Great Gatsby is about wealth and love in the 1920s"</span>
+expected = <span class="string">"A novel exploring American Dream and 1920s wealth"</span>
+
+score1 = <span class="func">exact_match</span>(output, expected)  <span class="comment"># 0.0</span>
+score2 = <span class="func">similarity_score</span>(output, expected)  <span class="comment"># 0.42</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Metric Selection</h4>
+        <p>
+          Use exact match for deterministic tasks (code, translation, math).
+          Use ROUGE/BLEU for summarization.
+          Use cosine similarity or LLM-as-judge for open-ended tasks where many good answers exist.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Building an Eval Pipeline</h2>
+    </div>
+    <p>
+      Here's a complete evaluation pipeline that tests a prompt and generates a score report.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Eval Pipeline</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+<span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">@</span>dataclass
+<span class="keyword">class</span> <span class="func">TestCase</span>:
+    id: str
+    input: str
+    expected_output: str
+
+SYSTEM_PROMPT = <span class="string">"""You are a code reviewer..."""</span>
+
+<span class="keyword">def</span> <span class="func">evaluate_single_case</span>(test_case: TestCase) -> dict:
+    <span class="comment"># Get model output</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">system</span>=SYSTEM_PROMPT,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: test_case.input
+        }]
+    )
+    actual_output = response.content[<span class="number">0</span>].text
+
+    <span class="comment"># Score using LLM-as-judge</span>
+    judge_prompt = f<span class="string">"""
+Input: {test_case.input}
+Expected: {test_case.expected_output}
+Actual: {actual_output}
+
+Score accuracy 1-10."""</span>
+
+    judge_response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">100</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: judge_prompt
+        }]
+    )
+    judge_output = judge_response.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"test_id"</span>: test_case.id,
+        <span class="string">"actual_output"</span>: actual_output,
+        <span class="string">"judge_score"</span>: judge_output
+    }
+
+<span class="keyword">def</span> <span class="func">run_eval_pipeline</span>(test_cases: list[TestCase]) -> dict:
+    results = []
+    scores = []
+
+    <span class="keyword">for</span> test_case <span class="keyword">in</span> test_cases:
+        result = <span class="func">evaluate_single_case</span>(test_case)
+        results.<span class="func">append</span>(result)
+        <span class="comment"># Extract numeric score (simplified)</span>
+        score = int(result[<span class="string">"judge_score"</span>][<span class="number">0</span>]) <span class="keyword">if</span> result[<span class="string">"judge_score"</span>][<span class="number">0</span>].<span class="func">isdigit</span>() <span class="keyword">else</span> <span class="number">5</span>
+        scores.<span class="func">append</span>(score)
+
+    <span class="keyword">return</span> {
+        <span class="string">"total_tests"</span>: <span class="func">len</span>(test_cases),
+        <span class="string">"average_score"</span>: sum(scores) / <span class="func">len</span>(scores),
+        <span class="string">"min_score"</span>: <span class="func">min</span>(scores),
+        <span class="string">"max_score"</span>: <span class="func">max</span>(scores),
+        <span class="string">"results"</span>: results
+    }
+
+<span class="comment"># Usage:</span>
+test_data = [
+    TestCase(<span class="string">"1"</span>, <span class="string">"Review: def x(): pass"</span>, <span class="string">"Good but lacks docstring"</span>),
+    <span class="comment"># ...</span>
+]
+report = <span class="func">run_eval_pipeline</span>(test_data)
+<span class="keyword">print</span>(json.<span class="func">dumps</span>(report, indent=<span class="number">2</span>))</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Continuous Improvement</h2>
+    </div>
+    <p>
+      Evaluation is only useful if you actually use the results to improve. Here's the workflow.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">The Improvement Loop</p>
+    <ol>
+      <li><strong>Baseline:</strong> Evaluate current prompt. Record baseline score.</li>
+      <li><strong>Iterate:</strong> Make targeted improvements (better system prompt, few-shot examples, etc.).</li>
+      <li><strong>Test:</strong> Run full eval pipeline on new version.</li>
+      <li><strong>Compare:</strong> Is the score better? If yes, keep it. If no, revert or try differently.</li>
+      <li><strong>Repeat:</strong> Go back to step 2.</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Regression Testing</p>
+    <p>
+      Keep your eval dataset and re-run it whenever you update the prompt. This catches unintended side effects
+      where a change fixes some cases but breaks others.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Track Improvements</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>scores = {
+    <span class="string">"v1_baseline"</span>: <span class="number">65</span>,
+    <span class="string">"v2_better_system_prompt"</span>: <span class="number">72</span>,
+    <span class="string">"v3_added_examples"</span>: <span class="number">78</span>,
+    <span class="string">"v4_clarified_format"</span>: <span class="number">81</span>
+}
+
+<span class="keyword">for</span> version, score <span class="keyword">in</span> scores.<span class="func">items</span>():
+    improvement = score - <span class="number">65</span>
+    <span class="keyword">print</span>(f<span class="string">"{version}: {score}/100 (+{improvement})"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>CI/CD for Prompts</h4>
+        <p>
+          Some teams integrate eval pipelines into CI/CD. Every commit to the prompt triggers an eval run.
+          If the score drops below a threshold, the commit is blocked. This prevents regressions from reaching production.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Why is systematic evaluation better than anecdotal testing?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's faster than human testing</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">It provides objective metrics, catches regressions, and scales to many examples</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's cheaper to run evaluations</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It always gives perfect scores</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. What is the LLM-as-Judge pattern?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Using multiple LLMs to generate outputs</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Using an LLM to evaluate the quality of other LLM outputs</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Having a human judge LLM performance</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Training an LLM to judge code</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Which metric is best for evaluating code correctness?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Exact match — the code either works or it doesn't</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">ROUGE score</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Cosine similarity</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">BLEU score</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. What is regression testing in the context of prompts?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Going back to older versions of a prompt</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Re-running your eval dataset when you update the prompt to catch unintended side effects</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Using multiple models to test</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Measuring how much worse a prompt gets</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 10 Summary</h2>
+    </div>
+    <p>
+      <strong>Systematic evaluation</strong> beats anecdotal testing. Build an eval dataset with 50+ test cases (input + expected output).
+      Choose evaluation methods: Human eval (most accurate), Automated metrics (fast), LLM-as-judge (scalable).
+      Use the right metric for your task: Exact match for code/translation, ROUGE for summaries, cosine similarity for open-ended.
+      Implement a pipeline that tests your prompt and scores it automatically.
+      Use results to improve iteratively. Track scores over versions to measure progress.
+      Run regression tests whenever you update to catch unintended side effects.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 11: Project - AI-Powered Code Review Tool</strong><br>
+      <span style="color: var(--text-dim);">Apply everything from Phase 2 — build a complete prompt-powered application from scratch.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-structured-output.html">← Structured Output</a>
+  <span class="nav-info">Topic 12 of 23</span>
+  <a class="nav-btn primary" href="topic-safety-guardrails.html">Next: Safety & Guardrails →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

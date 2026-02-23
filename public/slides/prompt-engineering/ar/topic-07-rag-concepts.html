@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 7 — RAG: التوليد المعزز بالاسترجاع | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 35%"></div></div>
+    <span class="progress-label">8 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📚</div>
+    <h1>RAG: التوليد المعزز بالاسترجاع</h1>
+    <p>امنح نموذجك اللغوي وصولاً للمعرفة الخارجية — أهم نمط في أنظمة الذكاء الاصطناعي الإنتاجية.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>المشكلة التي يحلها RAG</h2>
+    </div>
+    <p>
+      تعاني النماذج اللغوية الكبيرة من ثلاث قيود جوهرية يعالجها RAG:
+    </p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🕐</div>
+        <h4>معرفة قديمة</h4>
+        <p>بيانات تدريب النموذج لها تاريخ انتهاء. معرفة Claude Opus تنتهي في أوائل 2025. لا يستطيع الإجابة عن أحداث وقعت بعد ذلك.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤥</div>
+        <h4>الهلوسات</h4>
+        <p>عندما لا تعرف النماذج شيئاً، تختلق إجابات تبدو معقولة بثقة تامة. أعطها حقائق حقيقية، وتنخفض الهلوسات بشكل كبير.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>لا وصول للبيانات الخاصة</h4>
+        <p>لا تستطيع النماذج قراءة مستندات شركتك الداخلية أو قاعدة الكود أو بيانات العملاء. تعمل فقط مع ما تعطيها إياه في البرومبت.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💰</div>
+        <h4>كفاءة التوكنات</h4>
+        <p>لا يمكنك وضع قاعدة معرفتك بالكامل في برومبت النظام. يتيح لك RAG استرجاع المستندات ذات الصلة فقط ديناميكياً، مما يوفر التوكنات والتكلفة.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>RAG = استرجاع + توليد بالنموذج اللغوي</h4>
+        <p>
+          بدلاً من الأمل بأن النموذج يعرف شيئاً ما، تسترجع المستندات ذات الصلة، وتحقنها في البرومبت، ثم تطلب من النموذج الإجابة بناءً على تلك الحقائق.
+          هذا هو أهم نمط في أنظمة الذكاء الاصطناعي الإنتاجية.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>كيف يعمل RAG — المسار الكامل</h2>
+    </div>
+    <p>
+      يتبع RAG مساراً واضحاً من أربع خطوات. فهم كل خطوة هو مفتاح بناء أنظمة موثوقة.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">1. Query</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">2. Retrieve</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">3. Augment</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">4. Generate</div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الخطوة 1: الاستعلام (Query)</p>
+    <p>
+      يطرح المستخدم سؤالاً. يُمرر هذا الاستعلام إلى نظام الاسترجاع. لا يُرسل الاستعلام نفسه إلى Claude بعد —
+      بل يُستخدم للعثور على المستندات ذات الصلة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 2: الاسترجاع (Retrieve)</p>
+    <p>
+      يجد نظام الاسترجاع (عادةً قاعدة بيانات متجهات مثل Pinecone أو Weaviate أو Chroma) المستندات المشابهة للاستعلام.
+      الأكثر شيوعاً هو استخدام <strong>البحث الدلالي</strong> — تحويل الاستعلام إلى أرقام (embeddings) والعثور على المستندات القريبة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 3: التعزيز (Augment)</p>
+    <p>
+      تُحقن المستندات المسترجعة في البرومبت. شكل التعزيز النموذجي يبدو هكذا:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Augmented Prompt</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a helpful customer support agent.
+
+&lt;context&gt;
+The following documents are relevant to the customer's question:
+
+---
+From our Knowledge Base (Product FAQ):
+Q: How do I reset my password?
+A: Click "Forgot Password" on the login page, enter your email,
+   and follow the verification link.
+---
+
+From our Support Docs:
+Resetting passwords typically takes 5-10 minutes. If you don't receive
+the email within 15 minutes, check your spam folder.
+&lt;/context&gt;
+
+Based on the documents above, answer the customer's question.
+If the documents don't contain the answer, say so.
+
+User: I forgot my password. How do I reset it?</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 4: التوليد (Generate)</p>
+    <p>
+      يقرأ Claude البرومبت المعزز (مع السياق) ويولّد رداً مبنياً على الحقائق المسترجعة.
+      لأن النموذج يملك الحقائق أمامه، لا يستطيع الهلوسة — إما يستخدم المستندات أو يرفض الإجابة.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: مساعد باحث</h4>
+        <p>
+          بدون RAG، سؤال Claude يشبه سؤال شخص أن يجيب من ذاكرته فقط. مع RAG،
+          يشبه سؤاله وهو يقرأ المستندات ذات الصلة. يستطيع الاستشهاد بالمصادر
+          ويكون واثقاً من دقة إجابته.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>التضمينات والبحث المتجهي</h2>
+    </div>
+    <p>
+      سحر RAG يحدث في خطوة الاسترجاع. كيف يعرف النظام أي المستندات ذات صلة؟
+      الجواب: <strong>التضمينات (Embeddings)</strong>.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">ما هي التضمينات؟</p>
+    <p>
+      التضمين هو تمثيل رقمي للنص. نموذج (مثل text-embedding-3-small من OpenAI)
+      يحوّل النص إلى متجه — قائمة من الأرقام.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Embedding Example</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">"How do I reset my password?"</span>
+  ↓ (embedding model)
+[0.123, -0.456, 0.789, -0.321, ..., 0.654]  ← 384 or 1536 dimensions</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">التشابه الدلالي</p>
+    <p>
+      الفكرة الأساسية: النصوص المتشابهة تُنتج تضمينات متشابهة. يمكنك قياس التشابه بحساب
+      المسافة بين المتجهات. كلما اقترب متجهان، كان النصان أكثر تشابهاً.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>كيف يعمل البحث المتجهي</h4>
+        <p>1. حوّل الاستعلام إلى تضمين. 2. ابحث عن أقرب المستندات المجاورة في الفضاء المتجهي. 3. أعد أفضل K نتيجة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>قواعد البيانات المتجهية</h4>
+        <p>قواعد بيانات متخصصة (Pinecone، Weaviate، Chroma، Milvus) تخزن التضمينات وتتيح بحث الجار الأقرب السريع عبر ملايين المستندات.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: بطاقات فهرس المكتبة</h4>
+        <p>
+          تخيل فهرس بطاقات المكتبة من عصر ما قبل الرقمنة. كل كتاب له بطاقة فهرس بتصنيفات موضوعية.
+          للعثور على كتب عن "التعلم الآلي"، تبحث في ذلك التصنيف وتحصل على قائمة بالكتب ذات الصلة.
+          التضمينات تعمل بنفس الطريقة — هي "تصنيف موضوعي" رقمي يتيح لك إيجاد المستندات المتشابهة فوراً.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>جودة نموذج التضمين مهمة</h4>
+        <p>
+          ليست كل نماذج التضمين متساوية في الجودة. استخدام نموذج تضمين ضعيف يعني استرجاعاً سيئاً،
+          مما يعني أنك ستمرر مستندات غير ذات صلة لـ Claude. قم دائماً بقياس جودة الاسترجاع.
+          text-embedding-3 من OpenAI وتضمينات Anthropic خيارات جيدة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>استراتيجيات التقسيم</h2>
+    </div>
+    <p>
+      المستندات الخام طويلة جداً لتضمينها بكفاءة. تحتاج لتقسيمها إلى أجزاء (chunks).
+      استراتيجية التقسيم تؤثر بشكل كبير على جودة الاسترجاع.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>التقسيم بحجم ثابت</h4>
+        <p><strong>الطريقة:</strong> قسّم كل N توكن/كلمة. <strong>المزايا:</strong> بسيط ومتوقع. <strong>العيوب:</strong> يتجاهل الحدود الدلالية، قد يقسم الجمل.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>التقسيم الدلالي</h4>
+        <p><strong>الطريقة:</strong> قسّم بناءً على تغييرات الموضوع وفواصل الفقرات. <strong>المزايا:</strong> يحافظ على المعنى. <strong>العيوب:</strong> أكثر تعقيداً، أحجام متغيرة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>التقسيم التكراري</h4>
+        <p><strong>الطريقة:</strong> جرّب الحدود الدلالية أولاً، ثم ارجع للحجم الثابت إذا لزم الأمر. <strong>المزايا:</strong> أفضل ما في العالمين. <strong>العيوب:</strong> أبطأ في التنفيذ.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>تقسيم خاص بالمجال</h4>
+        <p><strong>الطريقة:</strong> احترم البنية (فصول، أقسام، دوال برمجية). <strong>المزايا:</strong> مثالي للمجال. <strong>العيوب:</strong> يتطلب معرفة بالمجال.</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">أفضل الممارسات</p>
+    <ul>
+      <li><strong>ابدأ بأجزاء من 512-1024 توكن:</strong> هذا الحجم الافتراضي الجيد. الأجزاء الأكبر أقل دقة؛ الأصغر قد تفتقر للسياق.</li>
+      <li><strong>استخدم التداخل:</strong> أضف 20-50 توكناً من التداخل بين الأجزاء للحفاظ على السياق عبر الحدود.</li>
+      <li><strong>قم بالقياس:</strong> اختبر أحجام أجزاء مختلفة على استعلامات حقيقية وقس دقة الاسترجاع.</li>
+      <li><strong>احفظ البيانات الوصفية:</strong> تتبع المستند المصدر والقسم والموقع في المستند الأصلي.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Simple Chunking</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">chunk_text</span>(text, chunk_size=512, overlap=50):
+    <span class="comment"># Simple fixed-size chunking with overlap</span>
+    tokens = text.split()
+    chunks = []
+
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="number">0</span>, <span class="func">len</span>(tokens), chunk_size - overlap):
+        chunk = <span class="string">' '</span>.<span class="func">join</span>(tokens[i:i + chunk_size])
+        chunks.<span class="func">append</span>(chunk)
+
+    <span class="keyword">return</span> chunks
+
+<span class="comment"># Usage:</span>
+doc = <span class="string">"Your long document here..."</span>
+chunks = <span class="func">chunk_text</span>(doc, chunk_size=512, overlap=50)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>نمط برومبت RAG</h2>
+    </div>
+    <p>
+      كيف تحقن السياق المسترجع في البرومبت؟ هناك نمط مجرّب يعمل بشكل جيد.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — RAG Prompt Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># 1. Retrieve relevant documents (from vector DB)</span>
+query = <span class="string">"How do I configure API authentication?"</span>
+retrieved_docs = retrieve_from_vector_db(query)  <span class="comment"># Returns top K docs</span>
+
+<span class="comment"># 2. Format context</span>
+context = <span class="string">"\n\n---\n\n"</span>.<span class="func">join</span>(retrieved_docs)
+
+<span class="comment"># 3. Build augmented prompt</span>
+SYSTEM_PROMPT = <span class="string">"""You are a technical support assistant.
+Use the provided documentation to answer questions.
+If the docs don't contain the answer, say so clearly.
+Never make up information."""</span>
+
+user_message = f<span class="string">"""&lt;context&gt;
+{context}
+&lt;/context&gt;
+
+User Question: {query}"""</span>
+
+<span class="comment"># 4. Call Claude with augmented prompt</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=SYSTEM_PROMPT,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_message}]
+)
+
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>استخدم وسوم XML للوضوح</h4>
+        <p>
+          استخدام وسوم <code>&lt;context&gt;</code> يوضح للنموذج أين توجد المستندات المسترجعة.
+          Claude (والنماذج الأخرى) يحلل بنية XML بشكل ممتاز. فكر أيضاً بوسم المستندات الفردية:
+          <code>&lt;document source="FAQ.md"&gt;...&lt;/document&gt;</code>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>مشاكل RAG الشائعة وحلولها</h2>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">1. استرجاع غير ذي صلة</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المشكلة</h4>
+        <p>
+          تسترجع مستندات لا تجيب فعلاً على السؤال. قاعدة البيانات المتجهية تجد
+          مستندات متعلقة بالموضوع لكن ليس الإجابة المحددة.
+        </p>
+      </div>
+    </div>
+    <p><strong>الحلول:</strong> نموذج تضمين أفضل، تقسيم أفضل، زيادة عدد النتائج top-K، بحث هجين (متجهي + كلمات مفتاحية).</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">2. الضياع في المنتصف</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المشكلة</h4>
+        <p>
+          عندما تسترجع مستندات كثيرة (+10)، يتجاهل Claude أحياناً معلومات مهمة في المنتصف
+          ويركز على البداية والنهاية.
+        </p>
+      </div>
+    </div>
+    <p><strong>الحلول:</strong> أعد ترتيب المستندات حسب الصلة قبل الحقن، اكتفِ بأفضل 3 إلى 5، أو استخدم نموذجاً أحدث (يتعامل مع السياق الطويل بشكل أفضل).</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">3. تجاوز السياق</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المشكلة</h4>
+        <p>
+          تسترجع سياقاً كثيراً بحيث تتجاوز نافذة سياق النموذج أو تجعل الطلب مكلفاً جداً.
+        </p>
+      </div>
+    </div>
+    <p><strong>الحلول:</strong> أحجام أجزاء أصغر، top-K أقل، تقدير حجم السياق قبل استدعاء API، استخدام نماذج أصغر للتحقق.</p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">4. معلومات متناقضة</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المشكلة</h4>
+        <p>
+          تسترجع مستندات بمعلومات متناقضة. على Claude أن يختار أيها يثق به،
+          وقد لا يختار الصحيح.
+        </p>
+      </div>
+    </div>
+    <p>
+      <strong>الحلول:</strong> أضف بيانات وصفية للمصدر (تاريخ المستند، الإصدار)، أخبر Claude أي المصادر موثوقة،
+      تحقق من التناقضات في قاعدة معرفتك.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>تطبيق عملي: RAG بسيط ببايثون</h2>
+    </div>
+    <p>
+      لنبنِ نظام RAG كاملاً باستخدام Chroma (قاعدة بيانات متجهية مفتوحة المصدر) وواجهة Anthropic API.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete RAG System</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment">#!/usr/bin/env python3</span>
+<span class="keyword">import</span> anthropic
+<span class="keyword">import</span> chromadb
+<span class="keyword">from</span> chromadb.<span class="func">config</span> <span class="keyword">import</span> Settings
+
+<span class="comment"># Initialize clients</span>
+client = anthropic.<span class="func">Anthropic</span>()
+chroma_client = chromadb.<span class="func">Client</span>()
+
+<span class="comment"># Create a collection (like a table)</span>
+collection = chroma_client.<span class="func">create_collection</span>(name=<span class="string">"company_docs"</span>)
+
+<span class="comment"># Add documents to the vector store</span>
+documents = [
+    <span class="string">"Our API uses OAuth 2.0 for authentication. "
+    "Request an access token with your client ID and secret."</span>,
+
+    <span class="string">"Rate limits: 100 requests per minute for free tier, "
+    "1000 per minute for premium."</span>,
+
+    <span class="string">"To set up webhooks, go to Settings > Integrations. "
+    "All webhook payloads include a signature for verification."</span>,
+]
+
+<span class="comment"># Chroma automatically embeds documents</span>
+collection.<span class="func">add</span>(
+    documents=documents,
+    ids=[<span class="string">"doc1"</span>, <span class="string">"doc2"</span>, <span class="string">"doc3"</span>]
+)
+
+<span class="comment"># User query</span>
+query = <span class="string">"How do I authenticate with your API?"</span>
+
+<span class="comment"># Retrieve relevant documents</span>
+results = collection.<span class="func">query</span>(
+    query_texts=[query],
+    n_results=2  <span class="comment"># Top 2 results</span>
+)
+
+<span class="comment"># Format retrieved docs</span>
+context = <span class="string">"\n"</span>.<span class="func">join</span>(results[<span class="string">"documents"</span>][<span class="number">0</span>])
+
+<span class="comment"># Build augmented prompt</span>
+system_prompt = <span class="string">"""You are a helpful API documentation assistant.
+Answer questions using the provided documentation.
+If the docs don't address the question, say so."""</span>
+
+user_message = f<span class="string">"""&lt;context&gt;
+{context}
+&lt;/context&gt;
+
+Question: {query}"""</span>
+
+<span class="comment"># Call Claude</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">system</span>=system_prompt,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_message}]
+)
+
+<span class="keyword">print</span>(<span class="string">"Answer:"</span>, response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>جرّب بنفسك</h4>
+        <p>
+          ثبّت المتطلبات: <code>pip install anthropic chromadb</code>
+          اضبط مفتاح API: <code>export ANTHROPIC_API_KEY="..."</code>
+          شغّل السكريبت. سيسترجع المستندات ذات الصلة ويولّد إجابة مبنية على قاعدة معرفتك.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>الخطوات التالية</h4>
+        <p>
+          في الإنتاج، استبدل Chroma بـ Pinecone أو Weaviate للتوسعة. أضف بيانات وصفية للمستندات (المصدر، التاريخ).
+          نفّذ إعادة الترتيب لتصفية النتائج منخفضة الصلة. راقب جودة الاسترجاع بمجموعة اختبارات.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما هي القيود الثلاثة الرئيسية للنماذج اللغوية التي يعالجها RAG؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الهلوسات والتحيز وبطء الاستدلال</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">المعرفة القديمة والهلوسات وعدم الوصول للبيانات الخاصة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">نافذة سياق محدودة واستدلال ضعيف وعدم القدرة على البرمجة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استدعاءات API مكلفة وحواجز اللغة ونقص المعرفة المتخصصة</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. ما هي الخطوة الثانية في مسار RAG؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تعزيز المستندات بالبيانات الوصفية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">استرجاع المستندات ذات الصلة من قاعدة بيانات متجهية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">توليد تضمينات لاستعلام المستخدم</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تنسيق البرومبت لـ Claude</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما هو التضمين (Embedding)؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">مرجع إلى مستند مصدر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تمثيل رقمي (متجه) للنص يُستخدم لقياس التشابه الدلالي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جزء من النص تم تصنيفه ببيانات وصفية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تقنية لتقسيم المستندات الكبيرة إلى أجزاء أصغر</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. ما هو "الضياع في المنتصف" (Lost in the Middle)؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تُرتب المستندات المسترجعة بشكل خاطئ</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عندما يركز النموذج على بداية ونهاية السياق ويفوّت معلومات مهمة في المنتصف</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما لا يحتوي الفضاء المتجهي للتضمينات على الاستعلام</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تُقسم المستندات بدون تداخل مناسب</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 7</h2>
+    </div>
+    <p>
+      <strong>RAG (التوليد المعزز بالاسترجاع)</strong> هو أهم نمط في أنظمة الذكاء الاصطناعي الإنتاجية.
+      يحل ثلاث قيود جوهرية للنماذج اللغوية: المعرفة القديمة والهلوسات وعدم الوصول للبيانات الخاصة.
+      المسار بسيط: <strong>استعلام ← استرجاع ← تعزيز ← توليد</strong>.
+      يستخدم الاسترجاع <strong>التضمينات</strong> والبحث المتجهي لإيجاد المستندات ذات الصلة.
+      <strong>استراتيجية التقسيم</strong> تؤثر بشكل كبير على جودة الاسترجاع.
+      المشاكل الشائعة تشمل الاسترجاع غير ذي الصلة وتأثير الضياع في المنتصف وتجاوز السياق والمعلومات المتناقضة —
+      ولكل منها حلول عملية.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 8: استخدام الأدوات واستدعاء الدوال</strong><br>
+      <span style="color: var(--text-dim);">وسّع نموذجك اللغوي إلى ما هو أبعد من النص — اجعله يستدعي APIs ويشغّل كوداً ويتخذ إجراءات في العالم الحقيقي.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-06-api-hands-on.html">السابق →</a>
+  <span class="nav-info">الموضوع 8 من 23</span>
+  <a class="nav-btn primary" href="topic-08-tool-use.html">← التالي: استخدام الأدوات واستدعاء الدوال</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

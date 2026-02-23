@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 12 — ما هي وكلاء الذكاء الاصطناعي؟ | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 65%"></div></div>
+    <span class="progress-label">15 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🤖</div>
+    <h1>ما هي وكلاء الذكاء الاصطناعي؟</h1>
+    <p>افهم التحول الجذري من روبوتات المحادثة إلى الوكلاء المستقلين الذين يخططون ويستدلون ويتصرفون. اكتشف كيف يختلف الوكلاء عن روبوتات المحادثة التقليدية ولماذا يمثلون مستقبل تطبيقات الذكاء الاصطناعي.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>من روبوتات المحادثة إلى الوكلاء — التطور</h2>
+    </div>
+    <p>
+      لسنوات، عملت أنظمة الذكاء الاصطناعي بهذه الطريقة: تطرح سؤالاً، يفكر النموذج للحظة، ثم يُعيد إجابة.
+      هذا يعمل جيداً للعديد من المهام — كتابة رسائل البريد الإلكتروني، وشرح المفاهيم، وتوليد مقتطفات من الكود.
+      لكن ماذا يحدث عندما تطلب منه شيئاً يتطلب خطوات متعددة؟
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ روبوت المحادثة التقليدي</div>
+        <pre>User: "Research AI agents and write a summary"
+Model: Tries to generate full answer from memory
+Result: Outdated info, no real research, hallucinations</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ وكيل الذكاء الاصطناعي</div>
+        <pre>User: "Research AI agents and write a summary"
+Agent: Plan → Search web → Read articles → Synthesize → Write
+Result: Current, accurate, cited information</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>الفرق الجوهري</h4>
+        <p>
+          <strong>روبوت المحادثة</strong> هو آلة للإجابة على الأسئلة. تسأل، فيُجيب.
+          أما <strong>الوكيل</strong> فهو نظام يسعى لتحقيق هدف. تحدد هدفاً، فيكتشف الخطوات، ويتخذ إجراءً، ويراقب النتائج، ويُعدّل مساره. الوكلاء لديهم حلقات تكرارية؛ روبوتات المحادثة لديها استجابات من لقطة واحدة.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>تعريف الوكيل: الإدراك، الاستدلال، التصرف، التعلم</h2>
+    </div>
+    <p>
+      الوكيل الذكي هو في جوهره نموذج لغوي كبير مجهّز بالقدرة على التفاعل مع العالم بما يتجاوز النص فقط.
+      إليك القدرات الأربع الأساسية:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👁️</div>
+        <h4>الإدراك</h4>
+        <p>قراءة المدخلات: طلبات المستخدم، ومخرجات الأدوات، وبيانات الاستشعار، والملفات، وصفحات الويب. يجمع الوكيل معلومات عن بيئته.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>الاستدلال</h4>
+        <p>التخطيط للخطوات التالية: تقسيم الأهداف إلى مهام فرعية، وتحديد الأداة المناسبة، وتقييم الخيارات. هنا تتألق قدرة النموذج اللغوي على الاستدلال.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>التصرف</h4>
+        <p>استخدام الأدوات: استدعاء واجهات البرمجة، وتشغيل الكود، وتعديل الملفات، وإرسال الرسائل. يتخذ الوكيل إجراءات ملموسة في العالم.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>التعلم والتكيف</h4>
+        <p>معالجة النتائج: دمج مخرجات الأدوات، ومعالجة الأخطاء، وتعديل الاستراتيجية. تستمر الحلقة حتى يتحقق الهدف.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Conceptual Pseudocode — The Four Phases</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">while</span> not goal_achieved:
+    <span class="comment"># 1. Perceive: gather information</span>
+    observations = <span class="func">read_inputs</span>()
+    previous_results = <span class="func">get_last_action_result</span>()
+
+    <span class="comment"># 2. Reason: decide what to do</span>
+    thought = llm.<span class="func">generate</span>(
+        <span class="string">"Given these observations, what should I do next?"</span>,
+        context=observations + previous_results
+    )
+
+    <span class="comment"># 3. Act: use a tool</span>
+    action = <span class="func">parse_tool_choice</span>(thought)
+    result = <span class="func">execute_tool</span>(action)
+
+    <span class="comment"># 4. Learn: process the result</span>
+    goal_achieved = <span class="func">check_goal</span>(result)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>الوكيل مقابل السلسلة: الفرق الجوهري</h2>
+    </div>
+    <p>
+      ربما سمعت عن "سلاسل البرومبت" — هذه تشبه الوكلاء، لكنها تختلف جوهرياً في نقطة حاسمة واحدة.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">⛓️ سلسلة البرومبت (جامدة)</div>
+        <pre>Step 1 → Step 2 → Step 3 → Step 4
+Predefined sequence.
+Model executes each step in order.
+No branching or adaptation.
+Works for linear workflows.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">🤖 الوكيل (مرن)</div>
+        <pre>Step 1 → Decide → Step 2 or 3?
+Agent decides what's next.
+Loop continues until goal reached.
+Can branch, retry, skip steps.
+Adapts to unexpected results.</pre>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">🎯</div>
+      <div>
+        <h4>تشبيه: نظام الملاحة GPS</h4>
+        <p>
+          <strong>السلسلة</strong> تشبه قراءة تعليمات الاتجاهات خطوة بخطوة: "انعطف يساراً عند الشارع الرئيسي، اسلك مسافة 2 كيلومتر، ثم انعطف يميناً."
+          إذا كان الطريق مغلقاً، ستعلق.
+          أما <strong>الوكيل</strong> فيشبه امتلاك نظام GPS حقيقي مع حركة المرور الفورية: يعيد التوجيه، ويجد بدائل، ويتكيف.
+          الوكلاء لديهم استقلالية — يستجيبون لبيئتهم.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>أمثلة حقيقية على الوكلاء</h2>
+    </div>
+    <p>
+      الوكلاء موجودون بالفعل في كل مكان. إليك بعض الأنظمة الحقيقية التي يمكنك استخدامها أو التعلم منها:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💻</div>
+        <h4>مساعدو البرمجة (Cursor، Claude Code)</h4>
+        <p>
+          يقرأون قاعدة الكود الخاصة بك، ويفهمون البنية، ويعدلون الملفات، ويشغلون الاختبارات، ويكررون العملية.
+          لا يقترحون الكود فحسب — بل يفهمون السياق ويتخذون قرارات بشأن ما يجب إصلاحه.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔬</div>
+        <h4>وكلاء البحث</h4>
+        <p>
+          يبحثون في الويب، ويقرأون الأوراق البحثية، ويستخرجون المعلومات الرئيسية، ويتحققون من النتائج المتقاطعة، ويكتبون التقارير.
+          يحل الوكلاء مشكلة "الهلوسة" عبر إسناد إجاباتهم إلى مصادر حقيقية.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>وكلاء تحليل البيانات</h4>
+        <p>
+          يحمّلون مجموعات البيانات، ويولدون استعلامات SQL، ويشغلون التحليلات، ويعرضون النتائج بصرياً، ويكتبون الرؤى.
+          يسدّون الفجوة بين أسئلة اللغة الطبيعية والإجابات المبنية على البيانات.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎧</div>
+        <h4>وكلاء خدمة العملاء</h4>
+        <p>
+          يتعاملون مع التذاكر، ويسترجعون سجل العميل، وينفذون الإجراءات (المبالغ المستردة، الإلغاءات)، ويصعدون الأمر عند الحاجة.
+          يقلصون وقت الاستجابة من ساعات إلى ثوانٍ.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>حلقة الوكيل: راقب ← فكّر ← تصرّف ← كرّر</h2>
+    </div>
+    <p>
+      في قلب كل وكيل توجد حلقة بسيطة لكنها قوية. فهم هذه الحلقة هو كل شيء.
+    </p>
+
+    <div class="anatomy-block">
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--blue);"></div> المراقبة</div>
+        <div class="anatomy-content">يجمع الوكيل الحالة الراهنة: استعلام المستخدم، ومخرجات الأدوات، والذاكرة، والبيئة. "ماذا أعرف الآن؟"</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--cyan);"></div> التفكير</div>
+        <div class="anatomy-content">يولّد النموذج اللغوي الاستدلال: "بناءً على ما أراقبه، ماذا يجب أن أفعل بعد ذلك؟ أي أداة يجب أن أستخدم؟"</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--green);"></div> التصرف</div>
+        <div class="anatomy-content">ينفذ الوكيل الإجراء المختار: يستدعي أداة، أو يعدل الحالة، أو يرسل رسالة. يتخذ خطوة ملموسة.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--orange);"></div> النتيجة</div>
+        <div class="anatomy-content">تعيد الأداة المخرجات. يحدّث الوكيل معرفته. تستمر الحلقة أو تنتهي بناءً على حالة الهدف.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>إنهاء الحلقة</h4>
+        <p>
+          تتوقف الحلقة عندما يتحقق أحد هذه الشروط: (1) تحقق الهدف، (2) الوصول للحد الأقصى من التكرارات (للأمان)،
+          (3) حدوث خطأ غير قابل للاسترداد، (4) إيقاف المستخدم لها صراحةً. بدون شروط الإنهاء، يمكن للوكلاء أن يدوروا في حلقة لا نهائية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>متى تستخدم الوكلاء بدلاً من البرومبتات البسيطة</h2>
+    </div>
+    <p>
+      ليست كل مهمة تحتاج إلى وكيل. الوكلاء يضيفون تعقيداً. إليك إطار عمل لاتخاذ القرار:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1; background: var(--green-dim); border: 1px solid rgba(52, 211, 153, 0.2);">
+        <div class="icon">✅</div>
+        <h4>استخدم وكيلاً عندما:</h4>
+        <p>
+          تتطلب المهمة خطوات متعددة، أو اتخاذ قرارات، أو استخدام أدوات.
+          تحتاج معلومات حقيقية وحالية (بحث في الويب).
+          المسار نحو الهدف غير محدد مسبقاً.
+          تريد استرداد الأخطاء وإعادة المحاولة.
+          مثال: "ابحث عن أحدث اتجاهات تمويل الذكاء الاصطناعي واكتب تقريراً من 500 كلمة."
+        </p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1; background: var(--red-dim); border: 1px solid rgba(248, 113, 113, 0.2);">
+        <div class="icon">❌</div>
+        <h4>استخدم برومبتاً بسيطاً عندما:</h4>
+        <p>
+          يكفي التوليد من لقطة واحدة. المهمة محددة جيداً وخطية. لا تستدعي أدوات خارجية.
+          زمن الاستجابة حرج (الوكلاء أبطأ). تريد قابلية التنبؤ والتحكم في التكاليف.
+          مثال: "اكتب هايكو عن القمر."
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>مقايضة التعقيد</h4>
+        <p>
+          الوكلاء قويون لكنهم أبطأ وأكثر تكلفة من البرومبتات البسيطة. إذا كانت مهمتك قابلة للحل ببرومبت مباشر، فافعل ذلك.
+          استخدم الوكلاء للعمل المعقد حقاً، متعدد الخطوات، والتكيفي. لا تبالغ في التصميم الهندسي.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما هو الفرق الجوهري بين روبوت المحادثة والوكيل؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">روبوتات المحادثة تستخدم نماذج لغوية كبيرة، والوكلاء لا يستخدمونها</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">روبوتات المحادثة تجيب على سؤال واحد؛ الوكلاء يدورون في حلقات ويخططون ويتكيفون حتى يتحقق الهدف</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الوكلاء مخصصون لخدمة العملاء فقط</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لا يوجد فرق ذو معنى بعد الآن</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. أي من هذه ليست قدرة أساسية لوكيل الذكاء الاصطناعي؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الإدراك — قراءة المدخلات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">التصرف — استخدام الأدوات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">التنبؤ — توقع الأحداث المستقبلية بدقة عالية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الاستدلال — التخطيط للخطوات التالية</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. كيف يختلف الوكلاء عن سلاسل البرومبت؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">الوكلاء يقررون إجراءهم التالي بأنفسهم؛ السلاسل تتبع خطوات محددة مسبقاً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">السلاسل تستخدم نماذج لغوية كبيرة؛ الوكلاء يستخدمون أنظمة قائمة على القواعد</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لا يوجد فرق</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">السلاسل تقنية أحدث</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. متى يجب استخدام وكيل بدلاً من برومبت بسيط؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">دائماً — الوكلاء أفضل في كل الحالات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عندما تتطلب المهمة خطوات متعددة، أو اتخاذ قرارات، أو استخدام أدوات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أبداً — البرومبتات البسيطة كافية دائماً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط لمهام الكتابة</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 12</h2>
+    </div>
+    <p>
+      أنت الآن تفهم ما هي وكلاء الذكاء الاصطناعي ولماذا تمثل تحولاً جذرياً عن روبوتات المحادثة التقليدية.
+      <strong>الوكلاء أنظمة مستقلة</strong> تدرك بيئتها وتستدل حولها وتتخذ إجراءات وتتعلم من النتائج.
+      تتبع <strong>بنية قائمة على الحلقات</strong> (راقب ← فكّر ← تصرّف ← كرّر) بدلاً من الإجابة من لقطة واحدة.
+      <strong>الوكلاء مقابل السلاسل</strong>: الوكلاء يقررون مسارهم بأنفسهم؛ السلاسل تتبع خطوات محددة مسبقاً.
+      <strong>ليست كل مهمة تحتاج وكيلاً</strong> — استخدمهم للعمل متعدد الخطوات والتكيفي مع أدوات الوقت الحقيقي.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 13: بنية الوكيل</strong><br>
+      <span style="color: var(--text-dim);">الآن ستتعمق في البنية التقنية: التخطيط، والذاكرة، والأدوات، وإدارة الحالة.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-11-mini-project.html">السابق →</a>
+  <span class="nav-info">الموضوع 15 من 23</span>
+  <a class="nav-btn primary" href="topic-13-agent-architecture.html">← التالي: بنية الوكيل</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

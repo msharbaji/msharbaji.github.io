@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans, Geist_Mono, Noto_Kufi_Arabic } from "next/font/google";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
@@ -79,10 +80,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Inline locale detection — runs before paint to prevent LTR→RTL layout shift */}
+        <meta name="theme-color" content="#f8f9fa" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0f1117" media="(prefers-color-scheme: dark)" />
+        {/* Inline theme + locale detection — runs before paint to prevent flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var l=localStorage.getItem("locale");if(!l){var n=navigator.language||"";l=n.startsWith("ar")?"ar":"en"}if(l==="ar"){var d=document.documentElement;d.lang="ar";d.dir="rtl";d.classList.add("font-arabic")}}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem("theme");var d=document.documentElement;if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme:dark)").matches)){d.classList.add("dark")}var l=localStorage.getItem("locale");if(!l){var n=navigator.language||"";l=n.startsWith("ar")?"ar":"en"}if(l==="ar"){d.lang="ar";d.dir="rtl";d.classList.add("font-arabic")}}catch(e){}})()`,
           }}
         />
         <script
@@ -93,23 +96,25 @@ export default function RootLayout({
       <body
         className={`${syne.variable} ${dmSans.variable} ${geistMono.variable} ${notoKufiArabic.variable} min-h-screen antialiased`}
       >
-        <LanguageProvider>
-          <a
-            href="#main-content"
-            className="absolute left-4 top-4 z-[100] -translate-y-24 rounded-md bg-accent px-4 py-2 font-mono text-sm font-medium text-background transition-transform duration-200 focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
-          >
-            Skip to main content
-          </a>
-          <Header />
-          <main
-            id="main-content"
-            className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
-            tabIndex={-1}
-          >
-            {children}
-          </main>
-          <Footer />
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <a
+              href="#main-content"
+              className="absolute left-4 top-4 z-[100] -translate-y-24 rounded-md bg-accent px-4 py-2 font-mono text-sm font-medium text-background transition-transform duration-200 focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+            >
+              Skip to main content
+            </a>
+            <Header />
+            <main
+              id="main-content"
+              className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
+              tabIndex={-1}
+            >
+              {children}
+            </main>
+            <Footer />
+          </LanguageProvider>
+        </ThemeProvider>
         {process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN && (
           <script
             defer

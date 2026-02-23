@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 12 — What Are AI Agents? | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 65%"></div></div>
+    <span class="progress-label">15 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🤖</div>
+    <h1>What Are AI Agents?</h1>
+    <p>Understand the paradigm shift from chatbots to autonomous agents that plan, reason, and act. Discover how agents differ from traditional chatbots and why they represent the future of AI applications.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>From Chatbots to Agents — The Evolution</h2>
+    </div>
+    <p>
+      For years, AI systems worked like this: you ask a question, the model thinks for a moment, and returns an answer.
+      This works well for many tasks — writing emails, explaining concepts, generating code snippets.
+      But what happens when you ask it to do something that requires multiple steps?
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Traditional Chatbot</div>
+        <pre>User: "Research AI agents and write a summary"
+Model: Tries to generate full answer from memory
+Result: Outdated info, no real research, hallucinations</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ AI Agent</div>
+        <pre>User: "Research AI agents and write a summary"
+Agent: Plan → Search web → Read articles → Synthesize → Write
+Result: Current, accurate, cited information</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>The Core Difference</h4>
+        <p>
+          A <strong>chatbot</strong> is a question-answering machine. You ask, it responds.
+          An <strong>agent</strong> is a goal-seeking system. You set an objective, it figures out the steps, takes action, observes results, and adjusts. Agents have loops; chatbots have one-shot responses.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>The Agent Definition: Perceive, Reason, Act, Learn</h2>
+    </div>
+    <p>
+      An AI agent is fundamentally an LLM equipped with the ability to interact with the world beyond just text.
+      Here are the four core capabilities:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👁️</div>
+        <h4>Perceive</h4>
+        <p>Read inputs: user requests, tool outputs, sensor data, files, web pages. The agent gathers information about its environment.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>Reason</h4>
+        <p>Plan next steps: break down goals into subtasks, decide which tool to use, evaluate options. This is where the LLM's reasoning shines.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Act</h4>
+        <p>Use tools: call APIs, run code, modify files, send messages. The agent takes concrete actions in the world.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>Learn & Adapt</h4>
+        <p>Process results: incorporate tool outputs, handle errors, adjust strategy. The loop continues until the goal is reached.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Conceptual Pseudocode — The Four Phases</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">while</span> not goal_achieved:
+    <span class="comment"># 1. Perceive: gather information</span>
+    observations = <span class="func">read_inputs</span>()
+    previous_results = <span class="func">get_last_action_result</span>()
+
+    <span class="comment"># 2. Reason: decide what to do</span>
+    thought = llm.<span class="func">generate</span>(
+        <span class="string">"Given these observations, what should I do next?"</span>,
+        context=observations + previous_results
+    )
+
+    <span class="comment"># 3. Act: use a tool</span>
+    action = <span class="func">parse_tool_choice</span>(thought)
+    result = <span class="func">execute_tool</span>(action)
+
+    <span class="comment"># 4. Learn: process the result</span>
+    goal_achieved = <span class="func">check_goal</span>(result)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Agent vs. Chain: The Key Difference</h2>
+    </div>
+    <p>
+      You might have heard of "prompt chains" — these are similar to agents, but fundamentally different in one crucial way.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">⛓️ Prompt Chain (Rigid)</div>
+        <pre>Step 1 → Step 2 → Step 3 → Step 4
+Predefined sequence.
+Model executes each step in order.
+No branching or adaptation.
+Works for linear workflows.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">🤖 Agent (Flexible)</div>
+        <pre>Step 1 → Decide → Step 2 or 3?
+Agent decides what's next.
+Loop continues until goal reached.
+Can branch, retry, skip steps.
+Adapts to unexpected results.</pre>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">🎯</div>
+      <div>
+        <h4>Analogy: GPS Navigation</h4>
+        <p>
+          A <strong>chain</strong> is like reading turn-by-turn directions: "Turn left at Main, go straight 2 miles, turn right on Oak."
+          If the road is blocked, you're stuck.
+          An <strong>agent</strong> is like having a real GPS with real-time traffic: it re-routes, finds alternatives, and adapts.
+          Agents have agency — they respond to their environment.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Real-World Agent Examples</h2>
+    </div>
+    <p>
+      Agents are already everywhere. Here are some real systems you can use or learn from:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💻</div>
+        <h4>Coding Assistants (Cursor, Claude Code)</h4>
+        <p>
+          Read your codebase, understand the architecture, modify files, run tests, and iterate.
+          They don't just suggest code — they understand context and make decisions about what to fix.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔬</div>
+        <h4>Research Agents</h4>
+        <p>
+          Search the web, read papers, extract key info, cross-reference findings, and write reports.
+          Agents solve the "hallucination problem" by grounding their answers in real sources.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>Data Analysis Agents</h4>
+        <p>
+          Load datasets, generate SQL queries, run analysis, visualize results, and write insights.
+          They bridge the gap between natural language questions and data-driven answers.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎧</div>
+        <h4>Customer Support Agents</h4>
+        <p>
+          Handle tickets, retrieve customer history, execute actions (refunds, cancellations), and escalate when needed.
+          They reduce response time from hours to seconds.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The Agent Loop: Observe → Think → Act → Repeat</h2>
+    </div>
+    <p>
+      At the heart of every agent is a simple but powerful loop. Understanding this loop is everything.
+    </p>
+
+    <div class="anatomy-block">
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--blue);"></div> Observe</div>
+        <div class="anatomy-content">Agent gathers current state: user query, tool outputs, memory, environment. "What do I know right now?"</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--cyan);"></div> Think</div>
+        <div class="anatomy-content">LLM generates reasoning: "Given what I observe, what should I do next? Which tool should I use?"</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--green);"></div> Act</div>
+        <div class="anatomy-content">Agent executes the chosen action: calls a tool, modifies state, sends a message. Takes a concrete step.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--orange);"></div> Result</div>
+        <div class="anatomy-content">Tool returns output. Agent updates its knowledge. Loop continues or terminates based on goal status.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>Loop Termination</h4>
+        <p>
+          The loop stops when one of these is true: (1) the goal is achieved, (2) max iterations reached (safety),
+          (3) an unrecoverable error occurs, (4) the user explicitly stops it. Without termination conditions, agents can loop forever.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>When to Use Agents vs. Simple Prompts</h2>
+    </div>
+    <p>
+      Not every task needs an agent. Agents add complexity. Here's a decision framework:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1; background: var(--green-dim); border: 1px solid rgba(52, 211, 153, 0.2);">
+        <div class="icon">✅</div>
+        <h4>Use an Agent When:</h4>
+        <p>
+          The task requires multiple steps, decision-making, or tool use.
+          You need real, current information (web search).
+          The path to the goal isn't predetermined.
+          You want error recovery and retries.
+          Example: "Research the latest AI funding trends and write a 500-word report."
+        </p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1; background: var(--red-dim); border: 1px solid rgba(248, 113, 113, 0.2);">
+        <div class="icon">❌</div>
+        <h4>Use a Simple Prompt When:</h4>
+        <p>
+          One-shot generation is enough. The task is well-defined and linear. You're not calling external tools.
+          Latency is critical (agents are slower). You want predictability and cost control.
+          Example: "Write a haiku about the moon."
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>The Complexity Tradeoff</h4>
+        <p>
+          Agents are powerful but slower and more expensive than simple prompts. If your task can be solved with a direct prompt, do that.
+          Use agents for genuinely complex, multi-step, adaptive work. Don't over-engineer.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What is the core difference between a chatbot and an agent?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Chatbots use LLMs, agents don't</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Chatbots answer one question; agents loop, plan, and adapt until a goal is reached</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Agents are only for customer support</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">There is no meaningful difference anymore</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Which of these is NOT a core capability of an AI agent?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Perceive — read inputs</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Act — use tools</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Predict — forecast future events with high accuracy</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Reason — plan next steps</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. How do agents differ from prompt chains?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Agents decide their own next action; chains follow predefined steps</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Chains use LLMs; agents use rule-based systems</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">There is no difference</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Chains are newer technology</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. When should you use an agent instead of a simple prompt?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Always — agents are always better</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">When the task requires multiple steps, decision-making, or tool use</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Never — simple prompts are always sufficient</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Only for writing tasks</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 12 Summary</h2>
+    </div>
+    <p>
+      You now understand what AI agents are and why they represent a paradigm shift from traditional chatbots.
+      <strong>Agents are autonomous systems</strong> that perceive their environment, reason about it, take actions, and learn from results.
+      They follow a <strong>loop-based architecture</strong> (Observe → Think → Act → Repeat) rather than one-shot question-answering.
+      <strong>Agents vs. Chains</strong>: agents decide their own path; chains follow predefined steps.
+      <strong>Not every task needs an agent</strong> — use them for multi-step, adaptive work with real-time tools.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 13: Agent Architecture</strong><br>
+      <span style="color: var(--text-dim);">Now you'll dive deep into the technical architecture: planning, memory, tools, and state management.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-11-mini-project.html">← Topic 11</a>
+  <span class="nav-info">Topic 15 of 23</span>
+  <a class="nav-btn primary" href="topic-13-agent-architecture.html">Topic 13 →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

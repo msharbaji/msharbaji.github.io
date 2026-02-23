@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 13 — Agent Architecture | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 70%"></div></div>
+    <span class="progress-label">16 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🏛️</div>
+    <h1>Agent Architecture</h1>
+    <p>Deep dive into the technical foundations: planning, memory, tool use, and the reasoning loop that makes agents work at scale. Understand how to build robust, production-ready agent systems.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Four Pillars of Agent Architecture</h2>
+    </div>
+    <p>
+      Every functional agent rests on four core components. These aren't optional — without any one of them,
+      your agent will fail or behave unpredictably. Let's build a mental model of how they interact.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">🎯</div>
+        <h4>1. Planning & Reasoning</h4>
+        <p>
+          The agent's ability to break down a complex goal into subtasks and decide the next action.
+          This is where the LLM's reasoning shines. It's the "thinking" phase.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>Memory</h4>
+        <p>Short-term (conversation), long-term (vector database), working (scratchpad). Agents need memory to avoid infinite loops and maintain context.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Tools</h4>
+        <p>External functions the agent can invoke: APIs, databases, calculators, web search. Tools ground the agent in reality.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>Action Execution</h4>
+        <p>The framework that calls tools, parses results, and feeds them back to the agent. The "doing" phase.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Architecture Diagram</h4>
+        <p>
+          User Input → Planning (LLM decides what to do) → Tool Selection → Action Execution → Result Processing →
+          Memory Update → Loop back to Planning (if goal not met). This cycle is the agent.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Planning & Reasoning — The ReAct Pattern</h2>
+    </div>
+    <p>
+      <strong>ReAct</strong> stands for "Reasoning + Acting". It's a proven pattern where the agent generates
+      a reasoning step (what to do), then an action step (which tool to use), then observes the result.
+      This cycle is remarkably effective.
+    </p>
+
+    <div class="anatomy-block">
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--blue);"></div> Thought</div>
+        <div class="anatomy-content">Agent's internal reasoning: "I need to search for current AI agent frameworks to answer this question accurately."</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--cyan);"></div> Action</div>
+        <div class="anatomy-content">Tool to invoke: web_search("AI agent frameworks 2025")</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--green);"></div> Observation</div>
+        <div class="anatomy-content">Tool result: [search results with links to LangChain, Claude SDK, CrewAI docs]</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — ReAct Pattern Implementation</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">react_loop</span>(user_input: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="comment"># Build the context with tools available</span>
+    available_tools = [<span class="string">"web_search"</span>, <span class="string">"calculator"</span>, <span class="string">"code_executor"</span>]
+
+    <span class="comment"># Keep track of the thought-action-observation history</span>
+    history = []
+
+    <span class="keyword">while</span> <span class="keyword">not</span> goal_reached:
+        <span class="comment"># 1. THOUGHT: What should I do?</span>
+        thought = llm.<span class="func">generate</span>(
+            <span class="string">f"Given {user_input} and my tools {available_tools}, what's my next step?"</span>
+        )
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"thought"</span>, <span class="string">"content"</span>: thought})
+
+        <span class="comment"># 2. ACTION: Execute the tool</span>
+        tool_name, tool_args = <span class="func">parse_action</span>(thought)
+        result = <span class="func">execute_tool</span>(tool_name, tool_args)
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"action"</span>, <span class="string">"tool"</span>: tool_name})
+
+        <span class="comment"># 3. OBSERVATION: What happened?</span>
+        history.<span class="func">append</span>({<span class="string">"type"</span>: <span class="string">"observation"</span>, <span class="string">"content"</span>: result})
+
+        <span class="comment"># Check if we're done</span>
+        goal_reached = <span class="func">check_goal</span>(result)
+
+    <span class="keyword">return</span> <span class="func">synthesize_final_answer</span>(history)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>Why ReAct Works</h4>
+        <p>
+          By separating thought from action, the model becomes more explicit about its reasoning.
+          This makes debugging easier and helps the model avoid mistakes. It's slower than single-shot responses
+          but far more reliable for complex tasks.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Memory Systems — Three Layers</h2>
+    </div>
+    <p>
+      Agents need different types of memory to function effectively. Think of it like human memory:
+      short-term (what you're thinking right now), long-term (facts you learned long ago), and working (your notepad).
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💭</div>
+        <h4>Short-Term Memory</h4>
+        <p>The conversation history. Recent messages and tool results. Limited to context window (4K-200K tokens). Cleared each session.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>Long-Term Memory</h4>
+        <p>Persistent knowledge. Vector databases for semantic search. Facts learned across sessions. Can be enormous (millions of documents).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>Working Memory</h4>
+        <p>Scratchpad for current task. Intermediate results, reasoning chains, state variables. Kept in short-term but separate from conversation.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Examples</h4>
+        <p><strong>Short:</strong> Last 10 messages. <strong>Long:</strong> Customer history in vector DB. <strong>Working:</strong> Current subtask list, iteration count.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Memory Architecture Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">AgentMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="comment"># Short-term: conversation history</span>
+        <span class="param">self</span>.conversation = []
+
+        <span class="comment"># Long-term: vector database</span>
+        <span class="param">self</span>.vector_db = <span class="func">VectorDatabase</span>()
+
+        <span class="comment"># Working: current task state</span>
+        <span class="param">self</span>.scratchpad = {
+            <span class="string">"current_task"</span>: <span class="keyword">None</span>,
+            <span class="string">"subtasks_remaining"</span>: [],
+            <span class="string">"iteration_count"</span>: <span class="number">0</span>,
+            <span class="string">"max_iterations"</span>: <span class="number">10</span>
+        }
+
+    <span class="keyword">def</span> <span class="func">add_observation</span>(<span class="param">self</span>, text: <span class="string">str</span>):
+        <span class="param">self</span>.conversation.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"observation"</span>, <span class="string">"content"</span>: text})
+        <span class="param">self</span>.vector_db.<span class="func">add</span>(text)  <span class="comment"># Also store for long-term retrieval</span>
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>, query: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="comment"># Combine short-term + relevant long-term</span>
+        recent = <span class="param">self</span>.conversation[<span class="param">-10</span>:]  <span class="comment"># Last 10 messages</span>
+        relevant = <span class="param">self</span>.vector_db.<span class="func">search</span>(query, top_k=<span class="number">5</span>)
+        <span class="keyword">return</span> <span class="func">format_context</span>(recent + relevant)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Tool Integration — Dynamic Tool Selection</h2>
+    </div>
+    <p>
+      The agent needs to know what tools are available and when to use each one.
+      This is solved with a tool registry pattern where each tool is described with a JSON schema.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Registry Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>TOOL_REGISTRY = {
+    <span class="string">"web_search"</span>: {
+        <span class="string">"description"</span>: <span class="string">"Search the web for current information"</span>,
+        <span class="string">"parameters"</span>: {
+            <span class="string">"query"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>, <span class="string">"description"</span>: <span class="string">"Search terms"</span>}
+        },
+        <span class="string">"function"</span>: web_search_impl
+    },
+    <span class="string">"execute_code"</span>: {
+        <span class="string">"description"</span>: <span class="string">"Run Python code safely"</span>,
+        <span class="string">"parameters"</span>: {
+            <span class="string">"code"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>, <span class="string">"description"</span>: <span class="string">"Python code to execute"</span>}
+        },
+        <span class="string">"function"</span>: execute_code_impl
+    }
+}
+
+<span class="keyword">def</span> <span class="func">execute_tool</span>(tool_name: <span class="string">str</span>, args: <span class="keyword">dict</span>) -> <span class="string">str</span>:
+    <span class="keyword">if</span> tool_name <span class="keyword">not</span> <span class="keyword">in</span> TOOL_REGISTRY:
+        <span class="keyword">raise</span> <span class="func">ValueError</span>(<span class="string">f"Tool {tool_name} not found"</span>)
+
+    func = TOOL_REGISTRY[tool_name][<span class="string">"function"</span>]
+    <span class="keyword">try</span>:
+        result = <span class="func">func</span>(**args)
+        <span class="keyword">return</span> result
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="string">f"Error: {str(e)}"</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Declarative Tool Definitions</h4>
+        <p>
+          By defining tools in JSON, the agent can read the descriptions and decide which tool to use.
+          This is how Claude's tool use works — the model sees the schema and chooses intelligently.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>State Management — Tracking Agent Progress</h2>
+    </div>
+    <p>
+      As an agent works through a task, it needs to track state: what's been done, what's pending, error counts, etc.
+      This is critical for resumability and debugging.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — State Dictionary Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>agent_state = {
+    <span class="string">"goal"</span>: <span class="string">"Write a report on quantum computing"</span>,
+    <span class="string">"status"</span>: <span class="string">"in_progress"</span>,  <span class="comment"># pending, in_progress, completed, failed</span>
+    <span class="string">"iteration"</span>: <span class="number">3</span>,
+    <span class="string">"max_iterations"</span>: <span class="number">10</span>,
+    <span class="string">"current_step"</span>: <span class="string">"searching_for_recent_papers"</span>,
+    <span class="string">"completed_steps"</span>: [<span class="string">"plan_outline"</span>, <span class="string">"search_quantum_basics"</span>],
+    <span class="string">"pending_steps"</span>: [<span class="string">"synthesize_findings"</span>, <span class="string">"write_draft"</span>, <span class="string">"review"</span>],
+    <span class="string">"errors"</span>: {
+        <span class="string">"search_failed"</span>: <span class="number">1</span>,
+        <span class="string">"rate_limited"</span>: <span class="number">0</span>
+    },
+    <span class="string">"results"</span>: [],
+    <span class="string">"memory_tokens_used"</span>: <span class="number">3456</span>,
+    <span class="string">"started_at"</span>: <span class="string">"2025-02-17T10:30:00Z"</span>,
+    <span class="string">"updated_at"</span>: <span class="string">"2025-02-17T10:35:22Z"</span>
+}</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>State Persistence</h4>
+        <p>
+          Long-running agents should persist state to disk or database. If the agent crashes, it can resume
+          from where it left off. This is crucial for production systems handling expensive operations.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Error Recovery — When Things Go Wrong</h2>
+    </div>
+    <p>
+      Production agents will fail. Tools fail, networks are unreliable, models make mistakes.
+      Great agents have strategies to recover gracefully.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ Retry Strategy</div>
+        <pre>Tool fails → Wait (exponential backoff)
+→ Retry up to 3 times → Fallback
+to different tool or human</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Re-plan Strategy</div>
+        <pre>Tool returns unexpected result
+→ Agent re-reasons → Chooses
+different tool or approach</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Escalation</div>
+        <pre>Tool fails 3+ times → Mark
+as failed → Skip step → Try
+next step or ask human</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Circuit Breaker</div>
+        <pre>Tool fails repeatedly → Disable
+it temporarily → Use fallback
+tools → Monitor for recovery</pre>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Error Recovery Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">execute_with_recovery</span>(tool_name: <span class="string">str</span>, args, max_retries=<span class="number">3</span>):
+    retry_count = <span class="number">0</span>
+    wait_time = <span class="number">1</span>  <span class="comment"># seconds, exponential backoff</span>
+
+    <span class="keyword">while</span> retry_count &lt; max_retries:
+        <span class="keyword">try</span>:
+            result = <span class="func">execute_tool</span>(tool_name, args)
+            <span class="keyword">return</span> {<span class="string">"success"</span>: <span class="keyword">True</span>, <span class="string">"result"</span>: result}
+
+        <span class="keyword">except</span> <span class="func">ToolError</span> <span class="keyword">as</span> e:
+            retry_count += <span class="number">1</span>
+            <span class="keyword">if</span> retry_count &lt; max_retries:
+                <span class="func">time</span>.<span class="func">sleep</span>(wait_time)
+                wait_time *= <span class="number">2</span>  <span class="comment"># exponential backoff</span>
+                <span class="keyword">continue</span>
+            <span class="keyword">else</span>:
+                <span class="keyword">return</span> {
+                    <span class="string">"success"</span>: <span class="keyword">False</span>,
+                    <span class="string">"error"</span>: str(e),
+                    <span class="string">"fallback_tool"</span>: <span class="string">"manual_review"</span>
+                }</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">🔑</div>
+      <div>
+        <h4>Degradation vs. Failure</h4>
+        <p>
+          Good agents degrade gracefully. If a search tool fails, try a cached version.
+          If vision fails, ask the user. If code execution times out, simplify the problem.
+          Graceful degradation keeps agents useful even when things break.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Putting It Together — Complete Architecture</h2>
+    </div>
+    <p>
+      Let's see how all four pillars connect in a complete, functional example.
+      This is the mental model you need to build production agents.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Full Agent Architecture</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">ReasoningAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.memory = <span class="func">AgentMemory</span>()
+        <span class="param">self</span>.tools = TOOL_REGISTRY
+        <span class="param">self</span>.state = {<span class="string">"status"</span>: <span class="string">"idle"</span>}
+        <span class="param">self</span>.iteration_count = <span class="number">0</span>
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, user_goal: <span class="string">str</span>):
+        <span class="param">self</span>.state[<span class="string">"goal"</span>] = user_goal
+        <span class="param">self</span>.state[<span class="string">"status"</span>] = <span class="string">"in_progress"</span>
+
+        <span class="keyword">while</span> (<span class="param">self</span>.iteration_count &lt; <span class="number">10</span>
+               <span class="keyword">and</span> <span class="param">self</span>.state[<span class="string">"status"</span>] == <span class="string">"in_progress"</span>):
+
+            <span class="comment"># 1. PERCEIVE: Gather context</span>
+            context = <span class="param">self</span>.memory.<span class="func">get_context</span>(user_goal)
+
+            <span class="comment"># 2. REASON: What to do next?</span>
+            thought = <span class="param">self</span>.llm.<span class="func">generate</span>(
+                <span class="string">f"Goal: {user_goal}\nContext: {context}\nWhat's next?"</span>
+            )
+
+            <span class="comment"># 3. ACT: Execute tool</span>
+            tool_name, tool_args = <span class="func">parse_tool</span>(thought)
+            result = <span class="func">execute_with_recovery</span>(tool_name, tool_args)
+
+            <span class="comment"># 4. LEARN: Update memory and state</span>
+            <span class="param">self</span>.memory.<span class="func">add_observation</span>(result)
+            <span class="param">self</span>.iteration_count += <span class="number">1</span>
+
+            <span class="comment"># Check if goal is reached</span>
+            done = <span class="param">self</span>.llm.<span class="func">judge</span>(
+                <span class="string">f"Is this goal achieved? {user_goal}\nEvidence: {result}"</span>
+            )
+            <span class="keyword">if</span> done:
+                <span class="param">self</span>.state[<span class="string">"status"</span>] = <span class="string">"completed"</span>
+
+        <span class="keyword">return</span> <span class="func">synthesize_answer</span>(<span class="param">self</span>.memory)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Key Insights</h4>
+        <p>
+          This simple architecture includes everything: planning (thought), tool use (action), error recovery,
+          state tracking, and goal checking. Real production systems add more layers (logging, monitoring, caching),
+          but this core loop is universal.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What does ReAct stand for?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Rapid Extract Action Team</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Reasoning + Acting</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">React Framework Agents</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Recovery and Execution Transaction</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Which memory type is best for semantic search across millions of documents?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Short-term memory (conversation history)</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Long-term memory (vector database)</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Working memory (scratchpad)</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">All are equally good</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What is a tool registry used for?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To limit what users can do</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">To describe available tools so the agent can select and use them</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To track tool performance metrics</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">To prevent errors</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. In the state management pattern, what does "completed_steps" track?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Total number of iterations</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Subtasks already done, for resumability and debugging</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Number of errors encountered</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Agent success rate</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 13 Summary</h2>
+    </div>
+    <p>
+      Agent architecture rests on <strong>four pillars</strong>: Planning & Reasoning (the ReAct pattern),
+      Memory (short-term/long-term/working), Tools (a registry of available functions), and
+      Action Execution (the framework that calls tools safely). <strong>ReAct</strong> (Reasoning + Acting)
+      separates the thinking phase from the doing phase, making agents more reliable.
+      <strong>Memory systems</strong> prevent infinite loops and enable knowledge reuse.
+      <strong>Tool registries</strong> let agents choose what to do next intelligently.
+      <strong>State management</strong> enables resumability and debugging.
+      <strong>Error recovery strategies</strong> (retry, replan, escalate, circuit breaker) keep agents functional under stress.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 14: Agent Frameworks</strong><br>
+      <span style="color: var(--text-dim);">Now you'll explore existing frameworks (LangChain, CrewAI, Claude SDK) that implement these architectures for you.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-12-what-are-agents.html">← Topic 12</a>
+  <span class="nav-info">Topic 16 of 23</span>
+  <a class="nav-btn primary" href="topic-memory-context.html">Next: Memory & Context →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

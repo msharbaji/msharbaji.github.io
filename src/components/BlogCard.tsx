@@ -14,7 +14,7 @@ export default function BlogCard({
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group flex h-full flex-col rounded-xl border border-border/40 bg-card/50 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/20 hover:bg-card/80"
+      className="group flex h-full flex-col rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_0_40px_-12px] hover:shadow-accent/15"
     >
       <div className="flex items-center gap-3 font-mono text-[10px] tracking-wider text-muted">
         <time>{post.date}</time>
@@ -31,7 +31,7 @@ export default function BlogCard({
         {post.tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-md bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-widest text-accent/70"
+            className="rounded-md border border-accent/20 bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-widest text-accent/70"
           >
             {tag}
           </span>

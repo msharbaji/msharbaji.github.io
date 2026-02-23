@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 1 — How LLMs Actually Work | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 4%"></div></div>
+    <span class="progress-label">1 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🧠</div>
+    <h1>How LLMs Actually Work</h1>
+    <p>Understand the engine behind ChatGPT, Claude, and every AI tool — from tokens to text generation.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What Is a Large Language Model?</h2>
+    </div>
+    <p>
+      A <strong>Large Language Model (LLM)</strong> is a neural network trained on massive amounts of text data.
+      Its core job is deceptively simple: <em>given a sequence of text, predict the most likely next word (token).</em>
+    </p>
+    <p>
+      That's it. Every impressive thing you've seen — writing code, answering questions, reasoning about math —
+      emerges from this single mechanism, scaled up enormously.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: The World's Best Autocomplete</h4>
+        <p>
+          Think of your phone's autocomplete, but trained on trillions of words from books, code, websites,
+          and conversations. It doesn't just predict the next word — it has learned patterns of logic,
+          grammar, facts, and reasoning from all that data.
+        </p>
+      </div>
+    </div>
+
+    <!-- Pipeline diagram -->
+    <div class="diagram">
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="icon">📝</div>
+          <div class="label">Your Prompt</div>
+          <div class="desc">"What is Python?"</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🔤</div>
+          <div class="label">Tokenizer</div>
+          <div class="desc">Text → [Token IDs]</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🧠</div>
+          <div class="label">Transformer</div>
+          <div class="desc">Process + Predict</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🎯</div>
+          <div class="label">Sampling</div>
+          <div class="desc">Pick next token</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">💬</div>
+          <div class="label">Output</div>
+          <div class="desc">"Python is a..."</div>
+        </div></div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Tokens: The Language of LLMs</h2>
+    </div>
+    <p>
+      LLMs don't read words like humans do. They break text into <strong>tokens</strong> — chunks that might be
+      a word, part of a word, or even a single character. This is called <strong>tokenization</strong>.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔡</div>
+        <h4>Common words = 1 token</h4>
+        <p>"hello" → <code>[hello]</code><br>"the" → <code>[the]</code><br>Simple words are kept whole.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">✂️</div>
+        <h4>Long words = multiple tokens</h4>
+        <p>"extraordinary" → <code>[extra][ordinary]</code><br>"tokenization" → <code>[token][ization]</code></p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔢</div>
+        <h4>Numbers get split</h4>
+        <p>"12345" → <code>[123][45]</code><br>This is why LLMs struggle with exact math!</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📏</div>
+        <h4>~1 token ≈ 4 characters</h4>
+        <p>A rough rule of thumb: 1 token is about 4 characters or ¾ of a word in English.</p>
+      </div>
+    </div>
+
+    <!-- Interactive Tokenizer Demo -->
+    <div class="demo-box">
+      <h4>🧪 Try It: Simple Tokenizer Simulator</h4>
+      <div class="demo-label">Enter any text to see approximate tokenization:</div>
+      <textarea class="demo-input" id="tokenInput" rows="2" placeholder='Type something like "Hello, how are you today?"'>Hello, how are you today?</textarea>
+      <button class="demo-btn" onclick="tokenize()">Tokenize</button>
+      <div class="demo-output" id="tokenOutput"></div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Why Tokens Matter for Prompt Engineering</h4>
+        <p>
+          Every LLM has a <strong>token limit</strong> (context window). Claude 3.5 Sonnet has ~200K tokens.
+          GPT-4o has ~128K tokens. Your prompt + the model's response must fit within this limit.
+          Longer prompts = more cost, more latency. Token efficiency is a core skill.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>The Context Window</h2>
+    </div>
+    <p>
+      The <strong>context window</strong> is the model's "working memory" — the total amount of text (in tokens)
+      it can see at once. This includes your system prompt, conversation history, and the response being generated.
+    </p>
+
+    <div class="diagram" style="text-align: left; padding: 24px; overflow-x: auto;">
+      <div class="context-bar-wrapper" style="display: flex; align-items: stretch; gap: 0; min-height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+        <div style="background: var(--accent); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">System Prompt</div>
+        <div style="background: var(--blue); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Conversation History</div>
+        <div style="background: var(--green); flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Current Prompt</div>
+        <div style="background: var(--orange); flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Response</div>
+        <div style="background: var(--surface); flex: 2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-dim); border: 1px dashed var(--border); padding: 8px 4px; text-align: center;">Remaining Space</div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-dim); text-align: center;">
+        ← Total Context Window (e.g. 200K tokens) →
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Key Insight</h4>
+        <p>
+          The model has <strong>no memory between conversations</strong>. Each API call starts fresh.
+          Everything the model "knows" about your conversation must be inside the context window.
+          This is why chat apps send the entire conversation history with every message.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Temperature & Sampling: Controlling Creativity</h2>
+    </div>
+    <p>
+      When the model predicts the next token, it doesn't just pick the single best one.
+      It calculates a <strong>probability distribution</strong> over all possible next tokens.
+      Then it <em>samples</em> from that distribution. The <strong>temperature</strong> parameter controls how.
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>Parameter</th><th>Value</th><th>Effect</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>temperature</code></td>
+          <td><code>0.0</code></td>
+          <td>Always picks the most probable token. Deterministic, focused, repetitive.</td>
+        </tr>
+        <tr>
+          <td><code>temperature</code></td>
+          <td><code>0.7</code></td>
+          <td>Balanced — creative but coherent. Good default for most tasks.</td>
+        </tr>
+        <tr>
+          <td><code>temperature</code></td>
+          <td><code>1.0+</code></td>
+          <td>Very random. Creative writing, brainstorming. Can be incoherent.</td>
+        </tr>
+        <tr>
+          <td><code>top_p</code></td>
+          <td><code>0.0–1.0</code></td>
+          <td>Only consider tokens in the top P% of probability mass. Alternative to temperature.</td>
+        </tr>
+        <tr>
+          <td><code>max_tokens</code></td>
+          <td>integer</td>
+          <td>Maximum number of tokens the model will generate in its response.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- Interactive Temperature Demo -->
+    <div class="demo-box">
+      <h4>🎮 Interactive: See Temperature in Action</h4>
+      <p style="font-size: 13.5px; color: var(--text-dim); margin-bottom: 14px;">
+        Given the prompt <strong>"The best programming language is"</strong>, see how temperature affects the completion:
+      </p>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>Temperature</span>
+          <span id="tempValue">0.0</span>
+        </div>
+        <input type="range" id="tempSlider" min="0" max="100" value="0" oninput="updateTemp()">
+      </div>
+
+      <div class="demo-output" id="tempOutput" style="display: block;">
+        Click "Generate" to see the effect of temperature.
+      </div>
+      <button class="demo-btn" onclick="generateTemp()">Generate Completion</button>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Your First API Call (Python)</h2>
+    </div>
+    <p>
+      Since you know Python, let's see what an actual LLM API call looks like.
+      Here's how to call Claude using the Anthropic SDK:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install: pip install anthropic</span>
+<span class="keyword">import</span> anthropic
+
+<span class="comment"># Create client (uses ANTHROPIC_API_KEY env variable)</span>
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># Make an API call</span>
+message = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">temperature</span>=<span class="number">0.7</span>,
+    <span class="param">system</span>=<span class="string">"You are a helpful coding tutor."</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Explain Python decorators in 3 sentences."</span>}
+    ]
+)
+
+<span class="func">print</span>(message.content[<span class="number">0</span>].text)
+<span class="comment"># Also useful:</span>
+<span class="func">print</span>(<span class="string">f"Tokens used: </span>{message.usage.input_tokens}<span class="string"> in, </span>{message.usage.output_tokens}<span class="string"> out"</span>)</pre>
+    </div>
+
+    <p>And here's the equivalent with OpenAI's API for comparison:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install: pip install openai</span>
+<span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+client = OpenAI()  <span class="comment"># uses OPENAI_API_KEY</span>
+
+response = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">temperature</span>=<span class="number">0.7</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"system"</span>, <span class="string">"content"</span>: <span class="string">"You are a helpful coding tutor."</span>},
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Explain Python decorators in 3 sentences."</span>}
+    ]
+)
+
+<span class="func">print</span>(response.choices[<span class="number">0</span>].message.content)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Notice the Pattern</h4>
+        <p>
+          Both APIs share the same core structure: <strong>model</strong> (which LLM),
+          <strong>messages</strong> (the conversation), and <strong>parameters</strong> (temperature, max_tokens).
+          This pattern is universal across all LLM providers.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Key Mental Models</h2>
+    </div>
+    <p>Before we move to prompt engineering techniques, internalize these mental models. They'll shape how you think about every prompt you write.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎰</div>
+        <h4>It's Probabilistic</h4>
+        <p>LLMs are stochastic — the same prompt can produce different outputs. This isn't a bug, it's a feature you can control with temperature.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🪞</div>
+        <h4>Garbage In, Garbage Out</h4>
+        <p>The quality of the output is directly proportional to the quality of the input. Vague prompts → vague answers.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>No Hidden State</h4>
+        <p>The model only knows what's in the context window. It has no memory, no files, no internet access (unless you give it tools).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎭</div>
+        <h4>It's a Role Player</h4>
+        <p>LLMs are trained to complete text. If you set up a scenario (system prompt), it will play that role. This is the foundation of prompt engineering.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 3 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What does an LLM fundamentally do?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Searches the internet for answers</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Predicts the most likely next token given previous tokens</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Stores information in a database and retrieves it</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Runs code to compute answers</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. If you want a deterministic, focused output (e.g., JSON parsing), what temperature should you use?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">0.0</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">0.7</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">1.0</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">2.0</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Why do LLMs sometimes struggle with math like "What is 7,391 × 4,528?"</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They weren't trained on enough math data</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They're text models, not calculators — they can't do any math</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Numbers get split into tokens, so the model processes digits in chunks rather than as whole numbers</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The temperature is set too high</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 1 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      <strong>LLMs are next-token predictors</strong> trained on massive text data. They process text as <strong>tokens</strong>
+      (~4 chars each) within a fixed <strong>context window</strong>. You control output randomness with
+      <strong>temperature</strong> (0 = deterministic, 1+ = creative). The model has <strong>no memory</strong>
+      between calls — everything must be in the context window.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 2: Model Selection & Comparison</strong><br>
+      <span style="color: var(--text-dim);">You'll learn how to evaluate and choose the right LLM for your task — from GPT to Claude to open-source models.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <span class="nav-btn" style="opacity: 0.4; cursor: default;">← Previous</span>
+  <span class="nav-info">Topic 1 of 23</span>
+  <a class="nav-btn primary" href="topic-model-selection.html">Next: Model Selection →</a>
+</div>
+
+<script>
+// ── Tokenizer Demo ──
+function tokenize() {
+  const input = document.getElementById('tokenInput').value;
+  const output = document.getElementById('tokenOutput');
+  if (!input.trim()) { output.style.display = 'block'; output.textContent = 'Please enter some text!'; return; }
+
+  // Simple simulation of tokenization
+  const tokens = [];
+  const words = input.split(/(\s+|[.,!?;:'"()\[\]{}])/);
+  words.forEach(w => {
+    if (!w || w.trim() === '') { if (w) tokens.push(w); return; }
+    if (w.length <= 4) { tokens.push(w); }
+    else if (w.length <= 8) { tokens.push(w.slice(0, 4)); tokens.push(w.slice(4)); }
+    else { tokens.push(w.slice(0, 4)); tokens.push(w.slice(4, 8)); tokens.push(w.slice(8)); }
+  });
+
+  const colored = tokens.map((t, i) => {
+    const colors = ['#c792ea', '#c3e88d', '#82aaff', '#f78c6c', '#f59e0b', '#34d399', '#f87171', '#60a5fa'];
+    const bg = colors[i % colors.length] + '22';
+    const fg = colors[i % colors.length];
+    return `<span style="background:${bg};color:${fg};padding:2px 4px;border-radius:3px;margin:1px;">${t.replace(/</g,'&lt;')}</span>`;
+  }).join('');
+
+  const count = tokens.filter(t => t.trim()).length;
+  output.innerHTML = `Tokens (≈${count}): ${colored}`;
+  output.style.display = 'block';
+}
+
+// ── Temperature Demo ──
+const tempResponses = {
+  low: [
+    "Python, because of its versatility, large ecosystem, and readability. It is widely used in web development, data science, machine learning, and automation.",
+    "Python. It has the largest community, most libraries, and is used across virtually every domain from web development to artificial intelligence.",
+  ],
+  mid: [
+    "It depends on the context! Python excels in data science and AI, JavaScript dominates the web, and Rust is gaining traction for performance-critical systems.",
+    "There's no single answer — Python is great for beginners and data work, TypeScript for web apps, and Go for scalable backend services. Pick the right tool for the job.",
+  ],
+  high: [
+    "Honestly? Brainfuck. Just kidding — but the question itself is a trap! Languages are tools. Would you ask a carpenter what the 'best' hammer is? Learn the problem space first, then the language picks itself.",
+    "What a delightfully controversial question! I'd argue the best language is the one that makes your specific problem disappear. For a poet writing haiku generators? Python. For a systems wizard taming bare metal? Rust or Zig. For chaos agents? Malbolge.",
+  ]
+};
+
+function updateTemp() {
+  const val = document.getElementById('tempSlider').value / 100;
+  document.getElementById('tempValue').textContent = val.toFixed(2);
+}
+
+function generateTemp() {
+  const val = document.getElementById('tempSlider').value / 100;
+  const output = document.getElementById('tempOutput');
+  let category, label, color;
+
+  if (val < 0.3) { category = 'low'; label = 'Focused & Deterministic'; color = '#60a5fa'; }
+  else if (val < 0.7) { category = 'mid'; label = 'Balanced & Thoughtful'; color = '#34d399'; }
+  else { category = 'high'; label = 'Creative & Unpredictable'; color = '#f59e0b'; }
+
+  const responses = tempResponses[category];
+  const response = responses[Math.floor(Math.random() * responses.length)];
+
+  output.innerHTML = `<span style="color:${color};font-weight:600;">[temp=${val.toFixed(2)}] ${label}</span>\n\n"The best programming language is... ${response}"`;
+  output.style.display = 'block';
+}
+
+</script>
+
+<script src="slides.js"></script>
+</body>
+</html>

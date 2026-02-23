@@ -23,14 +23,14 @@ export default function Hero() {
             {locale === "en" ? (
               <>
                 Mohamad{" "}
-                <span className="bg-gradient-to-r from-accent to-cyan-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-accent to-emerald-300 bg-clip-text text-transparent">
                   Alsharbaji
                 </span>
               </>
             ) : (
               <>
                 محمد{" "}
-                <span className="bg-gradient-to-r from-accent to-cyan-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-accent to-emerald-300 bg-clip-text text-transparent">
                   الشربجي
                 </span>
               </>
@@ -86,7 +86,7 @@ export default function Hero() {
             </a>
             <a
               href={`mailto:${socials.email}`}
-              className="group flex items-center gap-2 rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-xs font-medium text-background transition-all duration-200 hover:border-accent-hover hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background sm:gap-2.5 sm:px-5 sm:py-2.5 sm:text-sm"
+              className="group flex items-center gap-2 rounded-lg border border-accent-warm bg-accent-warm px-3.5 py-2.5 text-xs font-medium text-background transition-all duration-200 hover:border-accent-warm-hover hover:bg-accent-warm-hover focus:outline-none focus:ring-2 focus:ring-accent-warm focus:ring-offset-2 focus:ring-offset-background sm:gap-2.5 sm:px-5 sm:py-2.5 sm:text-sm"
             >
               <svg
                 className="size-3.5 sm:size-4"
@@ -109,7 +109,7 @@ export default function Hero() {
         {/* Profile photo */}
         <div className="animate-scale-in stagger-3 flex justify-center lg:justify-end">
           <div className="relative">
-            <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-accent/20 via-cyan-500/10 to-transparent blur-2xl" />
+            <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-accent/20 via-accent/10 to-transparent blur-2xl" />
             <div className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-accent/50 via-accent/15 to-transparent" />
             <Image
               src="/images/profile.jpg"

@@ -38,10 +38,10 @@ export default function EducationSection() {
           {certifications.map((cert, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-lg border border-border bg-surface/50 px-4 py-2.5 transition-colors hover:border-accent/30"
+              className="flex items-center gap-2.5 rounded-lg border border-border bg-surface/50 px-4 py-2.5 transition-colors hover:border-accent-warm/30"
             >
               <svg
-                className="size-4 shrink-0 text-accent"
+                className="size-4 shrink-0 text-accent-warm"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

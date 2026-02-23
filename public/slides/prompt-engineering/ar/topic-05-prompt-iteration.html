@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 5 — تكرار وتصحيح البرومبتات | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 26%"></div></div>
+    <span class="progress-label">6 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔄</div>
+    <h1>تكرار وتصحيح البرومبتات</h1>
+    <p>تعلّم العملية المنهجية لتحسين البرومبتات — من المسودة الأولى إلى الجاهزية للإنتاج.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>حلقة التكرار</h2>
+    </div>
+    <p>
+      هندسة البرومبت <strong>ليست عملية من خطوة واحدة</strong>. البرومبتات الممتازة تُبنى من خلال التكرار:
+      اكتب ← اختبر ← حلّل ← حسّن ← كرّر. هذه الدورة تُحسّن جودة المخرجات بشكل أُسّي.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">حلقة التكرار (بالتفصيل):</p>
+    <ol style="margin-right: 20px;">
+      <li><strong>اكتب:</strong> صُغ مسودة البرومبت الأولى بناءً على المتطلبات</li>
+      <li><strong>اختبر:</strong> شغّل البرومبت على حالات اختبار تمثيلية (10-20 مثالاً كحد أدنى)</li>
+      <li><strong>حلّل:</strong> افحص حالات الفشل والأنماط. اسأل "لماذا فشل؟"</li>
+      <li><strong>حسّن:</strong> أجرِ تعديلات مستهدفة لمعالجة الأسباب الجذرية</li>
+      <li><strong>كرّر:</strong> استمر حتى تصبح النتائج مقبولة</li>
+    </ol>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: تطوير البرمجيات</h4>
+        <p>
+          هندسة البرومبت تشبه كتابة الكود. مسودتك الأولى لن تكون مثالية.
+          تختبر وتصحح وتعيد هيكلة وتكرر. الفرق: مع البرومبتات،
+          "اختباراتك" هي استدعاءات API صغيرة، وليست مجموعات اختبار كاملة.
+        </p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الحلقة عملياً:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Iteration Loop</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># Test cases</span>
+test_cases = [
+    (<span class="string">"I love this!"</span>, <span class="string">"positive"</span>),
+    (<span class="string">"Terrible product."</span>, <span class="string">"negative"</span>),
+    (<span class="string">"It's okay."</span>, <span class="string">"neutral"</span>),
+]
+
+<span class="keyword">def</span> <span class="func">test_prompt</span>(prompt, test_data):
+    <span class="string">"""Run prompt on test cases and check accuracy."""</span>
+    correct = <span class="number">0</span>
+    <span class="keyword">for</span> text, expected in test_data:
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">100</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"{prompt}\n\nText: {text}"</span>
+            }]
+        )
+        result = response.content[<span class="number">0</span>].text.<span class="func">strip</span>().<span class="func">lower</span>()
+        <span class="keyword">if</span> expected <span class="keyword">in</span> result:
+            correct += <span class="number">1</span>
+    accuracy = (correct / <span class="func">len</span>(test_data)) * <span class="number">100</span>
+    <span class="keyword">return</span> accuracy
+
+<span class="comment"># Iteration cycle</span>
+prompt_v1 = <span class="string">"Classify sentiment: positive, negative, or neutral."</span>
+acc_v1 = <span class="func">test_prompt</span>(prompt_v1, test_cases)
+<span class="func">print</span>(<span class="string">f"V1: {acc_v1}%"</span>)
+
+<span class="comment"># Analyze and improve</span>
+prompt_v2 = <span class="string">"""Classify sentiment.
+Examples: "love" → positive, "bad" → negative.
+Return ONE word: positive, negative, or neutral."""</span>
+acc_v2 = <span class="func">test_prompt</span>(prompt_v2, test_cases)
+<span class="func">print</span>(<span class="string">f"V2: {acc_v2}%"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>قِس كل شيء</h4>
+        <p>
+          حدّد مقاييس النجاح مسبقاً (الدقة، زمن الاستجابة، التكلفة).
+          بدون مقاييس، أنت تكرر بشكل أعمى. قِس قبل وبعد كل تعديل.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>أنماط الفشل الشائعة</h2>
+    </div>
+    <p>
+      معظم حالات فشل البرومبتات تقع في أنماط يمكن التنبؤ بها. تعلّم التعرف عليها، وستصحح الأخطاء بشكل أسرع.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">نمط الفشل 1: البرومبتات المُسهبة جداً</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ المشكلة</div>
+<pre>Your job is to carefully read the
+text and think deeply about whether
+the sentiment is positive or negative.
+Please consider all nuances...</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ الحل</div>
+<pre>Classify sentiment: positive or
+negative. Be concise. One word
+answer only.</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>لماذا يفشل:</strong> البرومبتات الطويلة تُربك النموذج وتهدر التوكنات.
+      <strong>كيف تُصلح:</strong> احذف الكلمات الزائدة. كن محدداً، لا مُسهباً.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">نمط الفشل 2: الهلوسات</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ المشكلة</div>
+<pre>What is the annual revenue of
+company X?</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ الحل</div>
+<pre>Based ONLY on this text, extract
+the annual revenue. If not mentioned,
+say "Not found".</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>لماذا يفشل:</strong> النموذج يختلق معلومات عندما يكون غير متأكد.
+      <strong>كيف تُصلح:</strong> أخبره بما يفعل عندما لا تتوفر المعلومات.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">نمط الفشل 3: تنسيق المخرجات الخاطئ</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ المشكلة</div>
+<pre>Return the data as JSON.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ الحل</div>
+<pre>Return valid JSON (no markdown).
+{
+  "name": "...",
+  "score": 0-100
+}</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>لماذا يفشل:</strong> كلمة "JSON" غامضة. قد يُرجع النموذج JSON ملفوفاً بـ markdown.
+      <strong>كيف تُصلح:</strong> أظهر التنسيق المتوقع بدقة مع مثال.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">نمط الفشل 4: تجاهل التعليمات</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ المشكلة</div>
+<pre>Don't be too creative. Just summarize
+the text factually.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ الحل</div>
+<pre>Summarize ONLY facts from the text.
+Do NOT add interpretations or
+creative additions.</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>لماذا يفشل:</strong> النفي الضعيف ("don't") أقل فعالية.
+      <strong>كيف تُصلح:</strong> استخدم برومبت النظام للقواعد الصارمة. كن صريحاً.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">نمط الفشل 5: الردود الكسولة</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ المشكلة</div>
+<pre>Summarize the meeting.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ الحل</div>
+<pre>Summarize the meeting covering:
+1. Key decisions (at least 3)
+2. Action items with owners
+3. Next meeting date
+Format: markdown with headers</pre>
+      </div>
+    </div>
+    <p style="font-size: 14px; color: var(--text-dim); margin-top: 12px;">
+      <strong>لماذا يفشل:</strong> التعليمات الغامضة تسمح بردود منخفضة الجهد.
+      <strong>كيف تُصلح:</strong> حدّد بدقة ما تريده. ضع توقعات واضحة.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>اختبر مقابل أنماط الفشل</h4>
+        <p>
+          عندما تلاحظ فشلاً، حدّد أي نمط فشل هو. ثم طبّق الحل المستهدف.
+          لا تقل فقط "البرومبت سيئ" — شخّص المشكلة المحددة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>تقنيات التصحيح</h2>
+    </div>
+    <p>
+      عندما يفشل برومبت، تحتاج لعزل السبب. هل هو برومبت النظام؟ بيانات الإدخال؟
+      مواصفات تنسيق المخرجات؟ التصحيح هو عمل تحقيقي.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">عملية التصحيح المنهجي:</p>
+    <ol style="margin-right: 20px;">
+      <li><strong>اعزل:</strong> اختبر كل مكوّن على حدة (برومبت النظام، الأمثلة، مواصفات التنسيق)</li>
+      <li><strong>بسّط:</strong> أنشئ حالات اختبار بسيطة تعيد إنتاج الفشل</li>
+      <li><strong>افترض:</strong> كوّن نظرية حول ما هو خطأ</li>
+      <li><strong>اختبر:</strong> أجرِ تغييراً واحداً وقِس التأثير</li>
+      <li><strong>كرّر:</strong> إذا كان الافتراض صحيحاً، طبّقه على جميع الحالات</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال تصحيح: "النموذج يُرجع markdown عندما أريد JSON"</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Systematic Debugging</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># Debug: Is it the format spec or the system prompt?</span>
+
+<span class="comment"># Test 1: Just format spec (no system prompt)</span>
+response_1 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 1 (no system):"</span>, response_1.content[<span class="number">0</span>].text)
+
+<span class="comment"># Test 2: With system prompt that says to be helpful</span>
+response_2 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">system</span>=<span class="string">"Be helpful"</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 2 (vague system):"</span>, response_2.content[<span class="number">0</span>].text)
+
+<span class="comment"># Test 3: Strong system prompt about JSON only</span>
+response_3 = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">system</span>=<span class="string">"Return ONLY valid JSON. No markdown. No explanation."</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Return valid JSON: {\"name\": \"...\"}"</span>
+    }]
+)
+<span class="func">print</span>(<span class="string">"Test 3 (strong system):"</span>, response_3.content[<span class="number">0</span>].text)
+
+<span class="comment"># Conclusion: Hypothesis was right! System prompt was too weak.</span></pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>تغيير واحد في المرة</h4>
+        <p>
+          لا تغيّر أشياء متعددة في وقت واحد. غيّر متغيراً واحداً، قِس، ثم انتقل للتالي.
+          وإلا لن تعرف أي تغيير سبّب التحسن.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>اختبار A/B للبرومبتات</h2>
+    </div>
+    <p>
+      عندما يكون لديك نسختان متنافستان من البرومبت، <strong>اختبرهما A/B</strong> على مجموعة بياناتك.
+      لا تعتمد على الحدس. دع البيانات تقرر.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">عملية اختبار A/B:</p>
+    <ol style="margin-right: 20px;">
+      <li>أنشئ مجموعة بيانات اختبار (50-200 مثال بإجابات صحيحة معروفة)</li>
+      <li>شغّل البرومبت A على جميع الأمثلة، وقِس الدقة/الجودة</li>
+      <li>شغّل البرومبت B على جميع الأمثلة، وقِس نفس المقاييس</li>
+      <li>قارن: أيهما أداؤه أفضل؟ بكم؟</li>
+      <li>إذا كان B أفضل، اعتمده. إذا كان متعادلاً أو بفارق هامشي، ابقَ مع A (الأبسط).</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Python: كود اختبار A/B</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — A/B Testing Framework</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">from</span> anthropic <span class="keyword">import</span> Anthropic
+
+client = Anthropic()
+
+<span class="comment"># Test dataset</span>
+test_data = [
+    {<span class="string">"text"</span>: <span class="string">"I love this!"</span>, <span class="string">"expected"</span>: <span class="string">"positive"</span>},
+    {<span class="string">"text"</span>: <span class="string">"Awful experience."</span>, <span class="string">"expected"</span>: <span class="string">"negative"</span>},
+    {<span class="string">"text"</span>: <span class="string">"It's okay."</span>, <span class="string">"expected"</span>: <span class="string">"neutral"</span>},
+]
+
+<span class="keyword">def</span> <span class="func">test_prompt_version</span>(prompt, dataset):
+    <span class="string">"""Test a prompt and return accuracy."""</span>
+    results = []
+    <span class="keyword">for</span> item <span class="keyword">in</span> dataset:
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">100</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"{prompt}\n\nText: {item['text']}"</span>
+            }]
+        )
+        result = response.content[<span class="number">0</span>].text.<span class="func">strip</span>().<span class="func">lower</span>()
+        correct = item[<span class="string">"expected"</span>] <span class="keyword">in</span> result
+        results.<span class="func">append</span>({
+            <span class="string">"input"</span>: item[<span class="string">"text"</span>],
+            <span class="string">"expected"</span>: item[<span class="string">"expected"</span>],
+            <span class="string">"output"</span>: result,
+            <span class="string">"correct"</span>: correct
+        })
+    accuracy = (<span class="func">sum</span>(<span class="number">1</span> <span class="keyword">for</span> r <span class="keyword">in</span> results <span class="keyword">if</span> r[<span class="string">"correct"</span>])) / <span class="func">len</span>(results) * <span class="number">100</span>
+    <span class="keyword">return</span> accuracy, results
+
+<span class="comment"># Prompt A (basic)</span>
+prompt_a = <span class="string">"Classify sentiment: positive, negative, or neutral."</span>
+
+<span class="comment"># Prompt B (improved with examples)</span>
+prompt_b = <span class="string">"""Classify sentiment: positive, negative, neutral.
+Examples:
+- "love" → positive
+- "hate" → negative
+- "ok" → neutral
+
+Return ONE word only."""</span>
+
+<span class="comment"># Run A/B test</span>
+acc_a, results_a = <span class="func">test_prompt_version</span>(prompt_a, test_data)
+acc_b, results_b = <span class="func">test_prompt_version</span>(prompt_b, test_data)
+
+<span class="func">print</span>(<span class="string">f"Prompt A accuracy: {acc_a}%"</span>)
+<span class="func">print</span>(<span class="string">f"Prompt B accuracy: {acc_b}%"</span>)
+<span class="func">print</span>(<span class="string">f"Winner: {'B' if acc_b > acc_a else 'A'}"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>الأهمية الإحصائية</h4>
+        <p>
+          التحسنات الصغيرة (1-2%) قد تكون ضوضاء. ابحث عن فجوات أكبر (5%+) قبل إعلان فائز.
+          على مجموعات بيانات أكبر (1000+ مثال)، التحسنات الصغيرة تصبح ذات معنى.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>إدارة إصدارات البرومبتات</h2>
+    </div>
+    <p>
+      تتبّع إصدارات برومبتاتك كما تتتبع الكود. إدارة الإصدارات تتيح لك المقارنة، والتراجع، وفهم
+      ما تغيّر ولماذا. هذا أمر أساسي في الإنتاج.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال على سجل تغييرات البرومبت:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Prompt Changelog</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">## Sentiment Classifier Prompt Changelog
+
+### v1.0 (2025-01-15)
+- Initial: "Classify sentiment: positive, negative, neutral"
+- Accuracy: 72%
+- Issue: Too vague, model guesses
+
+### v1.1 (2025-01-16)
+- Added few-shot examples
+- Added "Return ONE word only" constraint
+- Accuracy: 85%
+- Improvement: +13%
+
+### v1.2 (2025-01-17)
+- Moved examples to system prompt
+- Added "If unsure, say 'unclear'"
+- Accuracy: 87%
+- Improvement: +2%
+
+### v2.0 (2025-01-18)
+- Full XML structure with tags
+- Explicit JSON output format
+- Accuracy: 89%
+- Improvement: +2%, better production-grade</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">أفضل الممارسات لإدارة الإصدارات:</p>
+    <ul style="margin-right: 20px;">
+      <li><strong>الإصدار الدلالي:</strong> v1.0, v1.1, v2.0 (رئيسي.فرعي.تصحيحي)</li>
+      <li><strong>الطوابع الزمنية:</strong> أضف التاريخ لتتبع متى حدثت التغييرات</li>
+      <li><strong>المقاييس:</strong> سجّل دائماً مقاييس الدقة/الجودة</li>
+      <li><strong>المبرر:</strong> اشرح لماذا أجريت كل تغيير</li>
+      <li><strong>المقارنة:</strong> أظهر المقاييس قبل/بعد لإثبات التحسن</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>خزّن البرومبتات في نظام التحكم بالإصدارات</h4>
+        <p>
+          احفظ البرومبتات في Git (أو ما يعادله) بجانب كودك. ضع علامات للإصدارات.
+          هذا يتيح لك التراجع لإصدار سابق إذا كان برومبت جديد أقل أداءً.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>دراسة حالة واقعية: برومبت مراجعة الكود</h2>
+    </div>
+    <p>
+      لنستعرض مثالاً حقيقياً لتكرار برومبت مراجعة كود من سيئ (v1) إلى ممتاز (v5).
+      لاحظ نمط التحسينات التدريجية.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V1 (سيئ) — المحاولة الأولى</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V1: Too Vague</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">Review this code.</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>المشكلة:</strong> لا خصوصية. النموذج يعطي ملاحظات عامة.
+      <strong>الدقة:</strong> 30% (يفوّت الأخطاء، يعطي تعليقات غير ذات صلة)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V2 (مقبول) — إضافة بعض السياق</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V2: Basic Structure</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a code reviewer.
+Review this Python code for bugs and improvements.
+List issues and suggestions.
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>التحسن:</strong> أكثر تحديداً، لكن لا يزال فضفاضاً.
+      <strong>الدقة:</strong> 60% (يكتشف بعض المشاكل، لكن المخرجات مطوّلة)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V3 (أفضل) — إضافة تنسيق وأمثلة</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V3: Structured Format</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a senior Python engineer.
+Review code focusing on:
+1. Security issues (highest priority)
+2. Performance problems
+3. Code quality improvements
+
+Output format:
+## Security Issues
+[list with severity]
+
+## Performance
+[specific suggestions]
+
+## Code Quality
+[improvements with examples]
+
+Code:
+[code here]</span></pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>التحسن:</strong> تنسيق واضح، أولويات.
+      <strong>الدقة:</strong> 75% (يكتشف معظم المشاكل، منظّم بشكل أفضل)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V4 (ممتاز) — إضافة علامات XML وحواجز حماية</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V4: Production-Grade</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python engineer at a Fortune 500
+company with 15 years of experience. Your code
+reviews are known for catching subtle bugs and
+suggesting high-impact improvements.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Review this Python code. Flag issues in priority order.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;priorities&gt;</span>
+1. Security vulnerabilities (SQL injection, etc.)
+2. Race conditions or concurrency issues
+3. Memory leaks or performance problems
+4. Code quality and style issues
+<span class="tag">&lt;/priorities&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+## 🔴 Critical Issues
+- Issue 1 (line X): description
+- Issue 2 (line Y): description
+
+## 🟡 Warnings
+- Warning 1: description
+
+## 💡 Improvements
+- Suggestion 1: description
+
+## ✅ Positive Notes
+- What's good about the code
+<span class="tag">&lt;/output_format&gt;</span>
+
+<span class="tag">&lt;rules&gt;</span>
+- Cite specific line numbers
+- Provide code examples for fixes
+- Be constructive, not dismissive
+- Don't comment on style preferences
+- If you're unsure, say "needs clarification"
+<span class="tag">&lt;/rules&gt;</span>
+
+Code:
+[code here]</pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>التحسن:</strong> دور قوي، قواعد واضحة، تنسيق منظّم.
+      <strong>الدقة:</strong> 88% (يكتشف تقريباً جميع المشاكل، مفيد جداً)
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">V5 (مثالي) — إضافة أمثلة ومعالجة الأخطاء</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — V5: Fully Optimized</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python engineer at a Fortune 500
+company with 15 years of experience. Your code
+reviews are known for catching subtle bugs and
+suggesting high-impact improvements.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;examples&gt;</span>
+Example 1: SQL injection vulnerability
+```python
+result = db.execute(f"SELECT * FROM users WHERE id = {user_id}")
+```
+Review: "🔴 Critical security issue on line 2. This is vulnerable to
+SQL injection. Fix: Use parameterized queries."
+
+Example 2: Good code
+```python
+def calculate_total(items: list[float]) -> float:
+    """Calculate sum of items with validation."""
+    return sum(item for item in items if isinstance(item, (int, float)))
+```
+Review: "✅ Good: Type hints, docstring, and defensive code."
+<span class="tag">&lt;/examples&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Review this Python code. Flag issues in priority order.
+<span class="tag">&lt;/instructions&gt;</span>
+
+... [rest of v4 structure] ...
+
+Code:
+[code here]</pre>
+    </div>
+    <p style="font-size: 13px; color: var(--text-dim);">
+      <strong>التحسن:</strong> أمثلة قليلة تعلّم السلوك المطلوب.
+      <strong>الدقة:</strong> 92% (جاهز للإنتاج، متسق، قابل للتنفيذ)
+    </p>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>التدرج</h4>
+        <p>
+          لاحظ أن كل إصدار يبني على السابق: v1 ← v2 (إضافة سياق) ← v3 (هيكلة) ←
+          v4 (علامات XML، حواجز حماية) ← v5 (أمثلة). هذا هو المسار الذي تسلكه معظم البرومبتات نحو الإنتاج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما هي خطوات حلقة تكرار البرومبت؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">اكتب ← اختبر ← حلّل ← حسّن ← كرّر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">خطط ← صمّم ← برمج ← انشر ← صِن</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اقرأ ← افهم ← ولّد ← راجع ← أرسل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اسأل ← انتظر ← تحقق ← أصلح ← انشر</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. أي نمط فشل يُعالَج بإضافة "Return ONLY JSON. No markdown"؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الهلوسات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الردود الكسولة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تنسيق المخرجات الخاطئ</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">البرومبتات المُسهبة جداً</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. عند تصحيح برومبت، ماذا يجب أن تفعل؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">غيّر أشياء متعددة في وقت واحد لتسريع الإصلاح</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">غيّر متغيراً واحداً في كل مرة وقِس كل تغيير</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أعد كتابة البرومبت بالكامل من الصفر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اطلب من النموذج أن يصلح نفسه</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. لماذا يجب أن تدير إصدارات برومبتاتك؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">لتتبع التغييرات، ومقارنة الإصدارات، والتراجع عند الحاجة، وفهم ما نجح</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لجعلها أقصر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لمشاركتها مع المستخدمين</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هذا اختياري وغير مهم</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 5</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      <strong>التكرار هو كل شيء.</strong> ابدأ ببساطة، اختبر، وحسّن.
+      <strong>أنماط الفشل يمكن التنبؤ بها.</strong> تعلّم التعرف عليها وإصلاحها.
+      <strong>التصحيح منهجي.</strong> اعزل، افترض، اختبر تغييراً واحداً في كل مرة.
+      <strong>اختبار A/B يلغي التخمين.</strong> دع البيانات تقرر بين الإصدارات.
+      <strong>إدارة الإصدارات تمنع الفوضى.</strong> تتبع التغييرات مثل الكود.
+      <strong>دراسات الحالة تُظهر المسار.</strong> معظم البرومبتات تتبع تدرجاً من v1 إلى v5 نحو الإنتاج.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 6: تطبيق عملي — واجهات LLM</strong><br>
+      <span style="color: var(--text-dim);">اكتب كود Python حقيقي لاستدعاء واجهات Claude وOpenAI مع البث والتعامل مع الأخطاء والأنماط العملية.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-04-advanced-prompting.html">السابق →</a>
+  <span class="nav-info">الموضوع 6 من 23</span>
+  <a class="nav-btn primary" href="topic-06-api-hands-on.html">← التالي: تطبيق عملي — واجهات LLM</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

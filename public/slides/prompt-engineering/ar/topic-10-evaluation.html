@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 12 — تقييم جودة البرومبت | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 52%"></div></div>
+    <span class="progress-label">12 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📊</div>
+    <h1>تقييم جودة البرومبت</h1>
+    <p>قِس وسجّل وحسّن برومبتاتك بشكل منهجي — لأنك لا تستطيع تحسين ما لا تستطيع قياسه.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>لماذا التقييم مهم</h2>
+    </div>
+    <p>
+      تعتمد فرق كثيرة على "الحدس" للحكم على جودة البرومبت: "هذا يبدو صحيحاً" أو "جربت عدة نسخ وهذه بدت الأفضل."
+      هذا أسلوب قصصي وغير موثوق. في بيئة الإنتاج، تحتاج إلى تقييم منهجي.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>مشكلة الاختبار القصصي</h4>
+        <p>
+          الاختبار على 5 أمثلة لا يخبرك إن كان البرومبت يعمل على 100,000 مثال. البرومبت الذي "يبدو جيداً"
+          قد يكون هشاً في الواقع. تحتاج إلى بيانات ومقاييس، وليس حدساً.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">📈</div>
+        <h4>فوائد التقييم المنهجي</h4>
+        <p>
+          <strong>قياس التحسينات:</strong> اعرف إن كان التغيير قد ساعد فعلاً. <strong>اكتشاف الانحدارات:</strong> اكتشف متى تعطّل التحديثات وظائف سابقة.
+          <strong>مقارنة النسخ:</strong> اختر بين بدائل البرومبت بشكل موضوعي. <strong>تتبع الاتجاهات:</strong> راقب إن كانت الجودة تتحسن أو تتراجع بمرور الوقت.
+          <strong>بناء الثقة:</strong> انشر في بيئة الإنتاج وأنت واثق أن البرومبت تم التحقق منه.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>المعيار الذهبي</h4>
+        <p>
+          أنشئ مجموعة بيانات اختبار (20-50+ مثالاً) مع المخرجات المتوقعة. شغّل البرومبت على جميع حالات الاختبار.
+          سجّل النتائج تلقائياً أو بتقييم بشري. تتبّع الدرجات بمرور الوقت أثناء التكرار.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>أنواع التقييم</h2>
+    </div>
+    <p>
+      هناك ثلاث مقاربات رئيسية لتقييم البرومبتات. لكل منها مزايا وعيوب.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👥</div>
+        <h4>التقييم البشري</h4>
+        <p><strong>المزايا:</strong> الأكثر دقة، يلتقط الفروق الدقيقة. <strong>العيوب:</strong> مكلف، بطيء، لا يتوسع لآلاف الأمثلة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>المقاييس الآلية</h4>
+        <p><strong>المزايا:</strong> سريع، رخيص، قابل للتكرار. <strong>العيوب:</strong> قد يفوّت مشاكل دقيقة، يتطلب اختيار مقياس جيد.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>نموذج لغوي كحَكَم</h4>
+        <p><strong>المزايا:</strong> يفهم الفروق الدقيقة، يتوسع بشكل جيد. <strong>العيوب:</strong> مكلف، قد يكون متحيزاً بسلوك نموذج الحَكَم.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>هجين</h4>
+        <p><strong>المزايا:</strong> الأفضل من جميع العوالم. <strong>العيوب:</strong> الأكثر تعقيداً في الإعداد.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: تقييمات المطاعم</h4>
+        <p>
+          <strong>التقييم البشري:</strong> ناقد طعام يتذوق الطبق. <strong>المقاييس الآلية:</strong> تحقق إن كان ساخناً، ودرجة الحموضة متعادلة، وما إلى ذلك.
+          <strong>نموذج لغوي كحَكَم:</strong> طاهٍ آخر يتذوقه ويعطيه درجة. <strong>هجين:</strong> مقاييس + ناقد واحد للحالات الحدية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>بناء مجموعة بيانات التقييم</h2>
+    </div>
+    <p>
+      أساس التقييم الجيد هو مجموعة بيانات اختبار جيدة. إنشاؤها يستغرق وقتاً لكنه يستحق العناء.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">البنية: مدخل ← مخرج متوقع</p>
+    <p>
+      لكل حالة اختبار، تحتاج مدخلاً (برومبت) والمخرج المتوقع أو المثالي.
+      خزّنها كـ JSON للوصول البرمجي السهل.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON — Eval Dataset Example</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">[
+  {
+    "id": "1",
+    "input": "Summarize: The Great Gatsby is a novel...",
+    "expected_output": "A 1920s-set novel about wealth, love, and the American Dream",
+    "category": "literature"
+  },
+  {
+    "id": "2",
+    "input": "Translate to Spanish: Hello, how are you?",
+    "expected_output": "Hola, ¿cómo estás?",
+    "category": "translation"
+  },
+  {
+    "id": "3",
+    "input": "Fix this code: def add(a, b return a + b",
+    "expected_output": "def add(a, b):\n    return a + b",
+    "category": "code"
+  }
+]</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">توصيات حجم مجموعة البيانات</p>
+    <ul>
+      <li><strong>20-30 مثالاً:</strong> الحد الأدنى لاكتشاف المشاكل الكبرى.</li>
+      <li><strong>50-100 مثال:</strong> تغطية جيدة لسيناريوهات مختلفة.</li>
+      <li><strong>200+:</strong> اختبار شامل عبر الفئات والحالات الحدية.</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>تنوع الأمثلة مهم</h4>
+        <p>
+          لا تختبر فقط المسارات السعيدة. أضف حالات حدية: مدخلات فارغة، مدخلات طويلة جداً، طلبات غامضة،
+          طلبات بلغات مختلفة، وما إلى ذلك. هذا يكتشف الأخطاء قبل وصولها إلى بيئة الإنتاج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>نمط النموذج اللغوي كحَكَم</h2>
+    </div>
+    <p>
+      استخدم Claude نفسه للحكم على جودة المخرجات. إنه فعّال بشكل مدهش ويفهم فروقاً دقيقة
+      تفوتها المقاييس البسيطة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">برومبت الحَكَم</p>
+    <p>
+      اكتب برومبت نظام يصف شكل المخرج الجيد. أعطه المدخل والمخرج للتقييم.
+      اطلب منه التسجيل والشرح.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LLM-as-Judge</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+judge_system = <span class="string">"""
+You are an expert evaluator of code quality.
+Score code on:
+1. Correctness (does it work?)
+2. Readability (is it clear?)
+3. Efficiency (is it optimal?)
+
+Return a JSON object with:
+- score (1-10)
+- reasoning (brief explanation)
+- issues (list of problems, or empty)
+"""</span>
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">evaluate_code</span>(code_to_review):
+    judge_input = f<span class="string">"""
+Evaluate this code:
+
+```python
+{code_to_review}
+```
+
+Return JSON with score, reasoning, and issues."""</span>
+
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">system</span>=judge_system,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: judge_input
+        }]
+    )
+
+    <span class="comment"># Parse the JSON response</span>
+    result_text = response.content[<span class="number">0</span>].text
+    <span class="keyword">try</span>:
+        result = json.<span class="func">loads</span>(result_text)
+        <span class="keyword">return</span> result[<span class="string">"score"</span>]
+    <span class="keyword">except</span>:
+        <span class="keyword">print</span>(<span class="string">"Failed to parse judge response"</span>)
+        <span class="keyword">return</span> <span class="keyword">None</span></pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>تحيز نموذج الحَكَم</h4>
+        <p>
+          قد يكون لنموذج الحَكَم تحيز. نماذج مختلفة قد تعطي درجات مختلفة. للتخفيف: استخدم نفس نموذج الحَكَم
+          لجميع التقييمات، كن صريحاً في برومبت الحَكَم، تحقق يدوياً بالتقييم البشري على مجموعة فرعية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>المقاييس الآلية</h2>
+    </div>
+    <p>
+      لمهام معينة، تعمل المقاييس الآلية بشكل جيد. إنها سريعة وحتمية.
+      اختر المقياس المناسب لمهمتك.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">✓</div>
+        <h4>التطابق الدقيق</h4>
+        <p>هل المخرج == المتوقع؟ ثنائي: نعم/لا. جيد لـ: الترجمة، المخرجات المنظمة. سيء لـ: المهام المفتوحة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📏</div>
+        <h4>درجة BLEU</h4>
+        <p>تداخل N-gram مع المرجع. معيار للترجمة. النطاق: 0-100. كلما ارتفع كان أفضل.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>درجة ROUGE</h4>
+        <p>موجّه نحو الاستدعاء للتلخيص. يقيس التداخل مع الملخصات المرجعية. جيد لـ: تقييم الملخصات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>تشابه الجيب تمام</h4>
+        <p>تشابه قائم على التضمين. يلتقط المعنى الدلالي. النطاق: 0-1. جيد لـ: النصوص المفتوحة.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Automated Metrics</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> difflib <span class="keyword">import</span> SequenceMatcher
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Exact Match</span>
+<span class="keyword">def</span> <span class="func">exact_match</span>(output, expected):
+    <span class="keyword">return</span> <span class="number">1.0</span> <span class="keyword">if</span> output.strip() == expected.strip() <span class="keyword">else</span> <span class="number">0.0</span>
+
+<span class="comment"># Sequence Similarity (for closeness)</span>
+<span class="keyword">def</span> <span class="func">similarity_score</span>(output, expected):
+    return SequenceMatcher(None, output, expected).<span class="func">ratio</span>()
+
+<span class="comment"># Usage:</span>
+output = <span class="string">"The Great Gatsby is about wealth and love in the 1920s"</span>
+expected = <span class="string">"A novel exploring American Dream and 1920s wealth"</span>
+
+score1 = <span class="func">exact_match</span>(output, expected)  <span class="comment"># 0.0</span>
+score2 = <span class="func">similarity_score</span>(output, expected)  <span class="comment"># 0.42</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>اختيار المقياس</h4>
+        <p>
+          استخدم التطابق الدقيق للمهام الحتمية (الكود، الترجمة، الرياضيات).
+          استخدم ROUGE/BLEU للتلخيص.
+          استخدم تشابه الجيب تمام أو النموذج اللغوي كحَكَم للمهام المفتوحة حيث توجد إجابات صحيحة متعددة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>بناء خط أنابيب التقييم</h2>
+    </div>
+    <p>
+      إليك خط أنابيب تقييم كامل يختبر البرومبت ويولّد تقرير درجات.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Eval Pipeline</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+<span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">@</span>dataclass
+<span class="keyword">class</span> <span class="func">TestCase</span>:
+    id: str
+    input: str
+    expected_output: str
+
+SYSTEM_PROMPT = <span class="string">"""You are a code reviewer..."""</span>
+
+<span class="keyword">def</span> <span class="func">evaluate_single_case</span>(test_case: TestCase) -> dict:
+    <span class="comment"># Get model output</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">system</span>=SYSTEM_PROMPT,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: test_case.input
+        }]
+    )
+    actual_output = response.content[<span class="number">0</span>].text
+
+    <span class="comment"># Score using LLM-as-judge</span>
+    judge_prompt = f<span class="string">"""
+Input: {test_case.input}
+Expected: {test_case.expected_output}
+Actual: {actual_output}
+
+Score accuracy 1-10."""</span>
+
+    judge_response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">100</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: judge_prompt
+        }]
+    )
+    judge_output = judge_response.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"test_id"</span>: test_case.id,
+        <span class="string">"actual_output"</span>: actual_output,
+        <span class="string">"judge_score"</span>: judge_output
+    }
+
+<span class="keyword">def</span> <span class="func">run_eval_pipeline</span>(test_cases: list[TestCase]) -> dict:
+    results = []
+    scores = []
+
+    <span class="keyword">for</span> test_case <span class="keyword">in</span> test_cases:
+        result = <span class="func">evaluate_single_case</span>(test_case)
+        results.<span class="func">append</span>(result)
+        <span class="comment"># Extract numeric score (simplified)</span>
+        score = int(result[<span class="string">"judge_score"</span>][<span class="number">0</span>]) <span class="keyword">if</span> result[<span class="string">"judge_score"</span>][<span class="number">0</span>].<span class="func">isdigit</span>() <span class="keyword">else</span> <span class="number">5</span>
+        scores.<span class="func">append</span>(score)
+
+    <span class="keyword">return</span> {
+        <span class="string">"total_tests"</span>: <span class="func">len</span>(test_cases),
+        <span class="string">"average_score"</span>: sum(scores) / <span class="func">len</span>(scores),
+        <span class="string">"min_score"</span>: <span class="func">min</span>(scores),
+        <span class="string">"max_score"</span>: <span class="func">max</span>(scores),
+        <span class="string">"results"</span>: results
+    }
+
+<span class="comment"># Usage:</span>
+test_data = [
+    TestCase(<span class="string">"1"</span>, <span class="string">"Review: def x(): pass"</span>, <span class="string">"Good but lacks docstring"</span>),
+    <span class="comment"># ...</span>
+]
+report = <span class="func">run_eval_pipeline</span>(test_data)
+<span class="keyword">print</span>(json.<span class="func">dumps</span>(report, indent=<span class="number">2</span>))</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>التحسين المستمر</h2>
+    </div>
+    <p>
+      التقييم مفيد فقط إذا استخدمت النتائج فعلاً للتحسين. إليك سير العمل.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">حلقة التحسين</p>
+    <ol>
+      <li><strong>خط الأساس:</strong> قيّم البرومبت الحالي. سجّل درجة خط الأساس.</li>
+      <li><strong>التكرار:</strong> أجرِ تحسينات مستهدفة (برومبت نظام أفضل، أمثلة قليلة، إلخ).</li>
+      <li><strong>الاختبار:</strong> شغّل خط أنابيب التقييم الكامل على النسخة الجديدة.</li>
+      <li><strong>المقارنة:</strong> هل الدرجة أفضل؟ إذا نعم، احتفظ بها. إذا لا، تراجع أو جرّب بطريقة مختلفة.</li>
+      <li><strong>التكرار:</strong> عد إلى الخطوة 2.</li>
+    </ol>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">اختبار الانحدار</p>
+    <p>
+      احتفظ بمجموعة بيانات التقييم وأعد تشغيلها كلما حدّثت البرومبت. هذا يكتشف الآثار الجانبية غير المقصودة
+      حيث يُصلح تغيير بعض الحالات لكنه يعطّل أخرى.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Track Improvements</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>scores = {
+    <span class="string">"v1_baseline"</span>: <span class="number">65</span>,
+    <span class="string">"v2_better_system_prompt"</span>: <span class="number">72</span>,
+    <span class="string">"v3_added_examples"</span>: <span class="number">78</span>,
+    <span class="string">"v4_clarified_format"</span>: <span class="number">81</span>
+}
+
+<span class="keyword">for</span> version, score <span class="keyword">in</span> scores.<span class="func">items</span>():
+    improvement = score - <span class="number">65</span>
+    <span class="keyword">print</span>(f<span class="string">"{version}: {score}/100 (+{improvement})"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>CI/CD للبرومبتات</h4>
+        <p>
+          بعض الفرق تدمج خطوط أنابيب التقييم في CI/CD. كل commit للبرومبت يطلق جولة تقييم.
+          إذا انخفضت الدرجة عن حد معين، يُحظر الـ commit. هذا يمنع الانحدارات من الوصول إلى بيئة الإنتاج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. لماذا التقييم المنهجي أفضل من الاختبار القصصي؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لأنه أسرع من الاختبار البشري</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">لأنه يوفر مقاييس موضوعية، ويكتشف الانحدارات، ويتوسع لأمثلة كثيرة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لأن تشغيل التقييمات أرخص</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لأنه يعطي دائماً درجات مثالية</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. ما هو نمط النموذج اللغوي كحَكَم؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخدام نماذج لغوية متعددة لتوليد المخرجات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">استخدام نموذج لغوي لتقييم جودة مخرجات نماذج لغوية أخرى</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جعل إنسان يحكم على أداء النموذج اللغوي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تدريب نموذج لغوي للحكم على الكود</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. أي مقياس هو الأفضل لتقييم صحة الكود؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">التطابق الدقيق — الكود إما يعمل أو لا يعمل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">درجة ROUGE</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تشابه الجيب تمام</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">درجة BLEU</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. ما هو اختبار الانحدار في سياق البرومبتات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">العودة إلى نسخ أقدم من البرومبت</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">إعادة تشغيل مجموعة بيانات التقييم عند تحديث البرومبت لاكتشاف الآثار الجانبية غير المقصودة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخدام نماذج متعددة للاختبار</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">قياس مدى تدهور البرومبت</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 12</h2>
+    </div>
+    <p>
+      <strong>التقييم المنهجي</strong> يتفوق على الاختبار القصصي. أنشئ مجموعة بيانات تقييم بـ 50+ حالة اختبار (مدخل + مخرج متوقع).
+      اختر طرق التقييم: التقييم البشري (الأكثر دقة)، المقاييس الآلية (سريع)، النموذج اللغوي كحَكَم (قابل للتوسع).
+      استخدم المقياس المناسب لمهمتك: التطابق الدقيق للكود/الترجمة، ROUGE للملخصات، تشابه الجيب تمام للمهام المفتوحة.
+      نفّذ خط أنابيب يختبر البرومبت ويسجّله تلقائياً.
+      استخدم النتائج للتحسين التكراري. تتبّع الدرجات عبر النسخ لقياس التقدم.
+      شغّل اختبارات الانحدار كلما حدّثت لاكتشاف الآثار الجانبية غير المقصودة.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 13: السلامة والحواجز الوقائية</strong><br>
+      <span style="color: var(--text-dim);">تعلّم كيف تحمي تطبيقاتك من الاستخدام الضار وكيف تبني حواجز وقائية فعّالة.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-structured-output.html">السابق →</a>
+  <span class="nav-info">الموضوع 12 من 23</span>
+  <a class="nav-btn primary" href="topic-safety-guardrails.html">← التالي: السلامة والحواجز الوقائية</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

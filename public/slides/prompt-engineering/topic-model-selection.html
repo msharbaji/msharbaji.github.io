@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 2 — Model Selection & Comparison | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 9%"></div></div>
+    <span class="progress-label">2 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⚖️</div>
+    <h1>Model Selection & Comparison</h1>
+    <p>Learn to evaluate and choose the right LLM for your task — from GPT to Claude to open-source models.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Model Landscape</h2>
+    </div>
+    <p>
+      The LLM ecosystem has evolved into a competitive landscape with several major players.
+      Each provider brings different strengths, pricing models, and design philosophies.
+      Understanding the landscape is the first step to making informed choices.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🟢</div>
+        <h4>OpenAI (GPT)</h4>
+        <p><strong>GPT-4o</strong> — fast, multimodal flagship. <strong>o1 / o3</strong> — reasoning models with chain-of-thought. Strong at coding, general tasks, and broad tool ecosystem.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🟠</div>
+        <h4>Anthropic (Claude)</h4>
+        <p><strong>Claude 4.5 Sonnet</strong> — balanced speed and intelligence. <strong>Claude Opus 4</strong> — top-tier reasoning and analysis. Known for safety, long context (200K), and instruction following.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔵</div>
+        <h4>Google (Gemini)</h4>
+        <p><strong>Gemini 2.5 Pro</strong> — massive 1M token context window. <strong>Gemini 2.5 Flash</strong> — fast and cost-effective. Native multimodal support for text, images, audio, and video.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🟣</div>
+        <h4>Meta (Llama)</h4>
+        <p><strong>Llama 4</strong> — leading open-source family. Free to use, can run locally or on your own infrastructure. Strong community, fine-tuning ecosystem, and full data control.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Choosing a Vehicle</h4>
+        <p>
+          Picking an LLM is like choosing a vehicle. A sports car (GPT-4o) is fast and flashy.
+          A luxury sedan (Claude Opus 4) is refined and comfortable for long trips. An SUV (Gemini 2.5 Pro)
+          handles massive cargo. And building your own kit car (Llama 4) gives you total control
+          — but you need to do the assembly.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Decision Factors</h2>
+    </div>
+    <p>
+      Choosing the right model isn't about finding the "best" one — it's about finding the best fit for
+      <em>your specific requirements</em>. Here are the key factors to evaluate:
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>Factor</th><th>Description</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Quality / Intelligence</strong></td>
+          <td>How well the model handles complex reasoning, nuance, and accuracy</td>
+          <td>Claude Opus 4 and GPT-4o lead on hard reasoning tasks</td>
+        </tr>
+        <tr>
+          <td><strong>Speed / Latency</strong></td>
+          <td>Time to first token and overall generation speed</td>
+          <td>Gemini Flash and GPT-4o-mini respond in under 500ms</td>
+        </tr>
+        <tr>
+          <td><strong>Cost (per token)</strong></td>
+          <td>Input and output token pricing — adds up fast at scale</td>
+          <td>GPT-4o-mini is ~50x cheaper than GPT-4o per token</td>
+        </tr>
+        <tr>
+          <td><strong>Context Window</strong></td>
+          <td>Maximum tokens the model can process in a single request</td>
+          <td>Gemini 2.5 Pro: 1M tokens, Claude: 200K, GPT-4o: 128K</td>
+        </tr>
+        <tr>
+          <td><strong>Multimodal Support</strong></td>
+          <td>Ability to process images, audio, video, and files</td>
+          <td>Gemini handles video natively; GPT-4o and Claude handle images</td>
+        </tr>
+        <tr>
+          <td><strong>Safety / Alignment</strong></td>
+          <td>How well the model avoids harmful outputs and follows guidelines</td>
+          <td>Claude is known for strong alignment; important for regulated industries</td>
+        </tr>
+        <tr>
+          <td><strong>Open Source vs Proprietary</strong></td>
+          <td>Whether you can inspect, modify, and self-host the model</td>
+          <td>Llama 4 is open-source; GPT-4o and Claude are proprietary APIs</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Prioritize Your Constraints</h4>
+        <p>
+          Most teams only have 2-3 factors that truly matter. A startup building a chatbot cares most about
+          <strong>cost</strong> and <strong>speed</strong>. A legal firm processing contracts cares about
+          <strong>accuracy</strong> and <strong>context window</strong>. Identify your non-negotiables first.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Benchmarks & Evaluation</h2>
+    </div>
+    <p>
+      The AI community uses standardized benchmarks to compare models. While imperfect, they provide
+      a useful starting point for understanding model capabilities.
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>Benchmark</th><th>What It Measures</th><th>Why It Matters</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MMLU</strong></td>
+          <td>Massive Multitask Language Understanding — 57 academic subjects</td>
+          <td>Broad knowledge across domains (history, science, law, etc.)</td>
+        </tr>
+        <tr>
+          <td><strong>HumanEval</strong></td>
+          <td>Code generation — writing Python functions from docstrings</td>
+          <td>Critical for coding assistants and developer tools</td>
+        </tr>
+        <tr>
+          <td><strong>GPQA</strong></td>
+          <td>Graduate-level science questions (physics, chemistry, biology)</td>
+          <td>Tests deep expert-level reasoning</td>
+        </tr>
+        <tr>
+          <td><strong>MATH</strong></td>
+          <td>Competition-level mathematics problems</td>
+          <td>Tests formal reasoning and step-by-step problem solving</td>
+        </tr>
+        <tr>
+          <td><strong>Arena ELO</strong></td>
+          <td>Human preference rankings from blind A/B comparisons (Chatbot Arena)</td>
+          <td>The closest proxy to "what do real users prefer?"</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Benchmarks Don't Tell the Whole Story</h4>
+        <p>
+          Benchmarks measure general tasks, but real-world performance often differs from benchmark scores.
+          A model that scores 92% on MMLU might still struggle with your specific domain.
+          Models can also be optimized for benchmarks in ways that don't generalize.
+          Always treat benchmarks as a <strong>starting point</strong>, not a final answer.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Evaluate on YOUR Use Case</h4>
+        <p>
+          The most reliable evaluation is testing 2-3 candidate models on <strong>your actual data and tasks</strong>.
+          Create a set of 20-50 representative examples from your real workload, run them through each model,
+          and compare the outputs. This "vibe check" is worth more than any benchmark leaderboard.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Open Source vs Proprietary</h2>
+    </div>
+    <p>
+      One of the biggest decisions in model selection is whether to use a proprietary API (OpenAI, Anthropic)
+      or an open-source model (Llama, Mistral) that you can host yourself. Each path has distinct trade-offs.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💰</div>
+        <h4>Cost</h4>
+        <p><strong>Proprietary:</strong> Pay per token, predictable pricing, no infra overhead. <strong>Open-source:</strong> Free model weights, but you pay for GPU compute and ops.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>Privacy / Control</h4>
+        <p><strong>Proprietary:</strong> Data goes to a third-party API. <strong>Open-source:</strong> Full control — data never leaves your infrastructure. Critical for healthcare, finance, and government.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔧</div>
+        <h4>Customization</h4>
+        <p><strong>Proprietary:</strong> Limited to fine-tuning APIs and prompt engineering. <strong>Open-source:</strong> Full fine-tuning, LoRA adapters, quantization, and architecture modifications.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🏆</div>
+        <h4>Performance</h4>
+        <p><strong>Proprietary:</strong> Generally highest raw quality on hard tasks. <strong>Open-source:</strong> Catching up fast — often sufficient for focused, narrow use cases.</p>
+      </div>
+    </div>
+
+    <p>Here is how to get started with a local open-source model using Ollama:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install Ollama</span>
+curl -fsSL https://ollama.com/install.sh | sh
+
+<span class="comment"># Pull and run Llama 4</span>
+ollama pull llama4
+ollama run llama4 <span class="string">"Explain quantum computing in 2 sentences"</span></pre>
+    </div>
+
+    <p>And you can integrate it into Python applications just as easily:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install: pip install ollama</span>
+<span class="keyword">import</span> ollama
+
+<span class="comment"># Chat with a local model — no API key needed</span>
+response = ollama.<span class="func">chat</span>(
+    <span class="param">model</span>=<span class="string">"llama4"</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Explain quantum computing in 2 sentences"</span>}
+    ]
+)
+
+<span class="func">print</span>(response[<span class="string">"message"</span>][<span class="string">"content"</span>])
+
+<span class="comment"># List available local models</span>
+models = ollama.<span class="func">list</span>()
+<span class="keyword">for</span> m <span class="keyword">in</span> models[<span class="string">"models"</span>]:
+    <span class="func">print</span>(<span class="string">f"</span>{m[<span class="string">'name'</span>]}<span class="string"> — </span>{m[<span class="string">'size'</span>] // <span class="number">1_000_000_000</span>}<span class="string">GB"</span>)</pre>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Renting vs Owning</h4>
+        <p>
+          Using a proprietary API is like renting an apartment — easy to start, someone else handles maintenance,
+          but you follow their rules. Running an open-source model is like owning a house — more upfront work,
+          but you can renovate however you want, and nobody can raise your rent.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Practical Selection Framework</h2>
+    </div>
+    <p>
+      Use this step-by-step framework to systematically choose the right model for any project.
+      Don't skip straight to "which model is best" — start with your requirements.
+    </p>
+
+    <!-- Pipeline diagram -->
+    <div class="diagram">
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="icon">🎯</div>
+          <div class="label">Define Task</div>
+          <div class="desc">What exactly will the model do?</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">📏</div>
+          <div class="label">Set Constraints</div>
+          <div class="desc">Budget, latency, privacy</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">📋</div>
+          <div class="label">Shortlist</div>
+          <div class="desc">Pick 2-3 candidates</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🧪</div>
+          <div class="label">Benchmark</div>
+          <div class="desc">Test on YOUR data</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🚀</div>
+          <div class="label">Deploy</div>
+          <div class="desc">Ship and monitor</div>
+        </div>
+      </div>
+    </div>
+
+    <p>Here are common use cases mapped to recommended models:</p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>Use Case</th><th>Recommended Models</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Code generation</strong></td>
+          <td>Claude Sonnet 4.5 / GPT-4o</td>
+          <td>Strong coding benchmarks, good at following complex specs</td>
+        </tr>
+        <tr>
+          <td><strong>Creative writing</strong></td>
+          <td>Claude Opus 4 / GPT-4o</td>
+          <td>Nuanced language, strong stylistic control, deep reasoning</td>
+        </tr>
+        <tr>
+          <td><strong>Data extraction</strong></td>
+          <td>GPT-4o-mini / Claude Haiku</td>
+          <td>Fast, cheap, and reliable for structured output at high volume</td>
+        </tr>
+        <tr>
+          <td><strong>Long document analysis</strong></td>
+          <td>Gemini 2.5 Pro (1M) / Claude (200K)</td>
+          <td>Massive context windows handle entire books or codebases</td>
+        </tr>
+        <tr>
+          <td><strong>On-premise / privacy</strong></td>
+          <td>Llama 4 / Mistral</td>
+          <td>Open-source weights, full data control, no API dependency</td>
+        </tr>
+        <tr>
+          <td><strong>Cost-sensitive</strong></td>
+          <td>GPT-4o-mini / Claude Haiku / open-source</td>
+          <td>Smallest models that meet quality bar — orders of magnitude cheaper</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- Interactive Model Picker Demo -->
+    <div class="demo-box">
+      <h4>🧪 Try It: Model Picker</h4>
+      <div class="demo-label">Select the factor that matters MOST for your project:</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('quality')">Highest Quality</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('speed')">Fastest Speed</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('cost')">Lowest Cost</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('context')">Largest Context</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('privacy')">Data Privacy</button>
+      </div>
+      <div class="demo-output" id="pickerOutput"></div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Key Mental Models</h2>
+    </div>
+    <p>Keep these principles in mind whenever you're evaluating or choosing a model. They'll save you from common pitfalls.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>No Best Model</h4>
+        <p>The right model depends on your specific task, budget, and constraints. A $20/month model can outperform a $200/month model for the right use case.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧪</div>
+        <h4>Test Before You Commit</h4>
+        <p>Always benchmark 2-3 models on YOUR actual data before making a decision. What works for others may not work for you.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💡</div>
+        <h4>Cost ≠ Quality</h4>
+        <p>Smaller, cheaper models often outperform larger ones for narrow, well-defined tasks. Don't default to the most expensive option.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>The Landscape Shifts Fast</h4>
+        <p>Today's best model may be surpassed next month. Build your system so you can swap models easily — avoid tight coupling to any single provider.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 3 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Which factor matters MOST when choosing between GPT-4o and Claude Sonnet for a code review tool?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The model's name</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">How it performs on YOUR specific code review tasks</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Which has more parameters</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The company's stock price</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. When would you choose an open-source model over a proprietary one?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When you need the absolute highest quality</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">When data privacy and on-premise deployment are critical</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When you want the easiest setup</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When cost doesn't matter</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Why shouldn't you rely solely on benchmarks to choose a model?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Benchmarks are always wrong</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Benchmarks measure general tasks but your use case may be specific</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Benchmarks only measure speed</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Models cheat on benchmarks</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 2 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      The LLM landscape spans <strong>four major families</strong> — OpenAI, Anthropic, Google, and Meta's open-source models.
+      Choosing between them depends on <strong>your specific constraints</strong>: quality, speed, cost, context window,
+      privacy, and multimodal needs. <strong>Benchmarks</strong> are a useful starting point but no substitute for testing
+      on your own data. <strong>Open-source models</strong> give you full control at the cost of operational complexity.
+      The most important principle: <strong>there is no universally "best" model</strong> — only the best model for your task.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 3: Prompt Structure Basics</strong><br>
+      <span style="color: var(--text-dim);">You'll learn about roles, system prompts, instruction design, and how to structure prompts that consistently get great results.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-01-how-llms-work.html">← Previous</a>
+  <span class="nav-info">Topic 2 of 23</span>
+  <a class="nav-btn primary" href="topic-02-prompt-structure-basics.html">Next: Prompt Structure →</a>
+</div>
+
+<script>
+// ── Model Picker Demo ──
+function pickModel(priority) {
+  const output = document.getElementById('pickerOutput');
+  const recommendations = {
+    quality: {
+      label: 'Highest Quality',
+      color: '#c792ea',
+      result: 'Claude Opus 4 or GPT-4o\n\nThese models lead on complex reasoning, nuanced analysis, and creative tasks. Use them when accuracy and depth matter more than speed or cost.\n\nTip: For reasoning-heavy tasks, also consider OpenAI o3 which excels at multi-step logic.'
+    },
+    speed: {
+      label: 'Fastest Speed',
+      color: '#34d399',
+      result: 'GPT-4o-mini or Gemini 2.5 Flash\n\nSub-second response times, ideal for real-time applications like chatbots and autocomplete. These models sacrifice some quality for dramatic speed improvements.\n\nTip: Claude Haiku is another excellent fast option with strong instruction-following.'
+    },
+    cost: {
+      label: 'Lowest Cost',
+      color: '#f59e0b',
+      result: 'GPT-4o-mini, Claude Haiku, or Llama 4 (self-hosted)\n\nSmall proprietary models are pennies per million tokens. Self-hosted open-source models have zero per-token cost after hardware investment.\n\nTip: Many tasks that seem to need a large model actually work fine with a small model + better prompts.'
+    },
+    context: {
+      label: 'Largest Context Window',
+      color: '#60a5fa',
+      result: 'Gemini 2.5 Pro (1M tokens) or Claude (200K tokens)\n\nGemini\'s 1M token window can process entire codebases or books in a single request. Claude\'s 200K is sufficient for most document analysis tasks.\n\nTip: Larger context doesn\'t always mean better results — models can lose focus in very long inputs. Consider chunking strategies.'
+    },
+    privacy: {
+      label: 'Data Privacy',
+      color: '#f87171',
+      result: 'Llama 4 or Mistral (self-hosted)\n\nOpen-source models running on your own infrastructure mean your data never leaves your servers. Essential for healthcare, finance, legal, and government use cases.\n\nTip: Use Ollama for quick local setup, or vLLM/TGI for production-grade serving.'
+    }
+  };
+
+  const rec = recommendations[priority];
+  output.innerHTML = `<span style="color:${rec.color};font-weight:600;">Priority: ${rec.label}</span>\n\n${rec.result}`;
+  output.style.display = 'block';
+}
+
+</script>
+
+<script src="slides.js"></script>
+</body>
+</html>

@@ -8,10 +8,15 @@ export default function BackLink({
   label,
 }: {
   href: string;
-  label: "backToBlog" | "backToProjects";
+  label: "backToBlog" | "backToProjects" | "backToCourses";
 }) {
   const { t } = useLanguage();
-  const text = label === "backToBlog" ? t.blog.backToBlog : t.projects.backToProjects;
+  const text =
+    label === "backToBlog"
+      ? t.blog.backToBlog
+      : label === "backToCourses"
+        ? t.courses.backToCourses
+        : t.projects.backToProjects;
 
   return (
     <Link

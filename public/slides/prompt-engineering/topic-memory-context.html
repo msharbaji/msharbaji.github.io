@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 17 — Memory & Context Management | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 74%"></div></div>
+    <span class="progress-label">17 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🧩</div>
+    <h1>Memory & Context Management</h1>
+    <p>Give your AI agents persistent memory — from conversation buffers to vector stores and hierarchical memory systems.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Memory Problem</h2>
+    </div>
+    <p>
+      Every time you call an LLM, it starts completely fresh. It has <strong>no memory</strong> of anything that happened before.
+      This is a fundamental architectural constraint — and the biggest challenge when building agents that need to maintain continuity.
+    </p>
+    <p>
+      The core issues are clear:
+    </p>
+    <ul style="margin-bottom: 14px; padding-left: 20px;">
+      <li><strong>LLMs are stateless</strong> — every API call starts from scratch</li>
+      <li><strong>Context windows are finite</strong> — you can't send the entire history forever</li>
+      <li><strong>Users expect continuity</strong> — "remember what I told you yesterday"</li>
+      <li><strong>Agents need past context</strong> — decisions depend on prior interactions</li>
+    </ul>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>Short-term Memory</h4>
+        <p>The current conversation — messages in the active context window. Lost when the session ends.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💾</div>
+        <h4>Long-term Memory</h4>
+        <p>Persisted across sessions — stored in databases, files, or vector stores. Survives restarts.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📸</div>
+        <h4>Episodic Memory</h4>
+        <p>Specific events and experiences — "the user reported a bug on Tuesday" or "we deployed v2.1 last week."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📚</div>
+        <h4>Semantic Memory</h4>
+        <p>General knowledge and facts — "the user prefers Python" or "the project uses PostgreSQL."</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: Amnesia in the Moment</h4>
+        <p>
+          Think of an LLM without memory like a person with amnesia — brilliant in the moment, but can't remember
+          yesterday's conversation. Every interaction, you have to re-introduce yourself and re-explain the context.
+          Memory systems are how we cure that amnesia.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Memory Types</h2>
+    </div>
+    <p>
+      There are four core memory patterns (based on Lilian Weng's framework). Each makes a different tradeoff
+      between <strong>completeness</strong>, <strong>token efficiency</strong>, and <strong>relevance</strong>.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>Buffer Memory</h4>
+        <p>Store the full conversation history. Simple and complete, but grows unbounded and eventually overflows the context window.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🪟</div>
+        <h4>Window Memory</h4>
+        <p>Keep only the last N turns. Caps token usage but loses older context — the agent forgets early parts of the conversation.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>Summary Memory</h4>
+        <p>Use the LLM itself to summarize older messages. Preserves key information in fewer tokens, but lossy by nature.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Vector Memory</h4>
+        <p>Embed messages as vectors and retrieve only relevant ones via similarity search. Scales to massive histories.</p>
+      </div>
+    </div>
+
+    <p><strong>Buffer Memory</strong> — the simplest approach. Store everything:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">BufferMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        self.messages = []
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.messages.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>) -> list[dict]:
+        <span class="keyword">return</span> self.messages.copy()</pre>
+    </div>
+
+    <p><strong>Summary Memory</strong> — compress older messages using the LLM:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">SummaryMemory</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, <span class="param">client</span>):
+        self.client = client
+        self.summary = <span class="string">""</span>
+        self.recent = []  <span class="comment"># Last 3 turns</span>
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.recent.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+        <span class="keyword">if</span> <span class="func">len</span>(self.recent) > <span class="number">6</span>:  <span class="comment"># 3 turns = 6 messages</span>
+            self._compress()
+
+    <span class="keyword">def</span> <span class="func">_compress</span>(<span class="param">self</span>):
+        old = self.recent[:<span class="number">4</span>]
+        self.recent = self.recent[<span class="number">4</span>:]
+        <span class="comment"># Ask LLM to update summary</span>
+        resp = self.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-haiku-4-5-20251001"</span>,
+            <span class="param">max_tokens</span>=<span class="number">300</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"Current summary:\n{self.summary}\n\n"</span>
+                           <span class="string">f"New messages:\n{old}\n\n"</span>
+                           <span class="string">"Update the summary concisely."</span>
+            }]
+        )
+        self.summary = resp.content[<span class="number">0</span>].text</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Context Window Strategies</h2>
+    </div>
+    <p>
+      Making the most of a limited context window is critical. Here are the main strategies, from simplest to most sophisticated:
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>Strategy</th><th>How It Works</th><th>Tradeoff</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Truncation</strong></td>
+          <td>Drop the oldest messages when the window fills up</td>
+          <td>Simple but loses early context completely</td>
+        </tr>
+        <tr>
+          <td><strong>Sliding Window</strong></td>
+          <td>Keep only the last N tokens of conversation</td>
+          <td>Predictable cost, but no long-term recall</td>
+        </tr>
+        <tr>
+          <td><strong>Summarization</strong></td>
+          <td>Compress history into a rolling summary</td>
+          <td>Retains key info, but lossy — details get dropped</td>
+        </tr>
+        <tr>
+          <td><strong>RAG</strong></td>
+          <td>Retrieve only relevant context from a vector store</td>
+          <td>Scales well, but retrieval quality is critical</td>
+        </tr>
+        <tr>
+          <td><strong>Hierarchical</strong></td>
+          <td>Combine summary + recent messages + retrieved context</td>
+          <td>Best quality, but most complex to implement</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>
+      A well-designed context window allocates space for each component. Here's a typical layout:
+    </p>
+
+    <div class="diagram" style="text-align: left; padding: 24px; overflow-x: auto;">
+      <div class="context-bar-wrapper" style="display: flex; align-items: stretch; gap: 0; min-height: 40px; border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+        <div style="background: var(--accent); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">System Prompt</div>
+        <div style="background: var(--blue); flex: 1.2; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Summary</div>
+        <div style="background: #a78bfa; flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Retrieved Context</div>
+        <div style="background: var(--green); flex: 1.5; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Recent Messages</div>
+        <div style="background: var(--orange); flex: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; padding: 8px 4px; text-align: center;">Current Input</div>
+        <div style="background: var(--surface); flex: 1.8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--text-dim); border: 1px dashed var(--border); padding: 8px 4px; text-align: center;">Response Space</div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-dim); text-align: center;">
+        ← Total Context Window →
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Don't Fill the Entire Window</h4>
+        <p>
+          Never fill the entire context window — always leave room for the model's response.
+          A good rule: use no more than 75% for input. If you stuff the window full, the model either
+          truncates its response or produces degraded output.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Vector Memory</h2>
+    </div>
+    <p>
+      Vector memory uses <strong>embeddings</strong> to convert text into numerical vectors, then retrieves relevant
+      memories via similarity search. The flow is: <em>text → embedding model → vector → store in database → query by similarity</em>.
+    </p>
+    <p>
+      This approach mirrors how human memory works — you don't recall every conversation you've ever had.
+      Instead, the current context triggers retrieval of <strong>relevant</strong> memories.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> chromadb
+
+client = chromadb.<span class="func">Client</span>()
+collection = client.<span class="func">create_collection</span>(<span class="string">"memories"</span>)
+
+<span class="comment"># Store a memory</span>
+collection.<span class="func">add</span>(
+    <span class="param">documents</span>=[<span class="string">"User prefers Python over JavaScript"</span>],
+    <span class="param">ids</span>=[<span class="string">"mem_001"</span>],
+    <span class="param">metadatas</span>=[{<span class="string">"type"</span>: <span class="string">"preference"</span>, <span class="string">"date"</span>: <span class="string">"2025-01-15"</span>}]
+)
+
+<span class="comment"># Retrieve relevant memories</span>
+results = collection.<span class="func">query</span>(
+    <span class="param">query_texts</span>=[<span class="string">"What programming language should I recommend?"</span>],
+    <span class="param">n_results</span>=<span class="number">3</span>
+)
+
+<span class="comment"># Inject into prompt</span>
+memories = <span class="string">"\n"</span>.join(results[<span class="string">"documents"</span>][<span class="number">0</span>])
+system = <span class="string">f"User context:\n{memories}\n\nBe helpful."</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Why Vector Memory Matters</h4>
+        <p>
+          Vector memory is the closest thing to how humans remember — you don't recall everything, just what's
+          relevant to the current situation. A well-tuned vector store can search across thousands of past
+          interactions and surface exactly the context the agent needs.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Advanced Patterns</h2>
+    </div>
+    <p>
+      Production memory systems typically combine multiple memory types into a <strong>hierarchical architecture</strong>.
+      This gives you the best of all worlds — recent context is complete, older context is summarized, and
+      everything else is retrievable via semantic search.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">HierarchicalMemory</span>:
+    <span class="string">"""Combines buffer + summary + vector memory."""</span>
+
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, <span class="param">client</span>, <span class="param">vector_store</span>):
+        self.client = client
+        self.vector_store = vector_store
+        self.recent = []          <span class="comment"># Last 5 turns (buffer)</span>
+        self.summary = <span class="string">""</span>         <span class="comment"># Rolling summary</span>
+
+    <span class="keyword">def</span> <span class="func">add</span>(<span class="param">self</span>, <span class="param">role</span>: <span class="param">str</span>, <span class="param">content</span>: <span class="param">str</span>):
+        self.recent.append({<span class="string">"role"</span>: role, <span class="string">"content"</span>: content})
+        <span class="comment"># Also store in vector DB for long-term retrieval</span>
+        self.vector_store.<span class="func">add</span>(
+            <span class="param">documents</span>=[content],
+            <span class="param">ids</span>=[<span class="string">f"msg_{</span><span class="func">len</span>(self.recent)<span class="string">}"</span>],
+            <span class="param">metadatas</span>=[{<span class="string">"role"</span>: role, <span class="string">"type"</span>: <span class="string">"conversation"</span>}]
+        )
+        <span class="keyword">if</span> <span class="func">len</span>(self.recent) > <span class="number">10</span>:
+            self.<span class="func">_compress</span>()
+
+    <span class="keyword">def</span> <span class="func">get_context</span>(<span class="param">self</span>, <span class="param">current_query</span>: <span class="param">str</span>) -> <span class="param">str</span>:
+        <span class="comment"># 1. Retrieve relevant past memories</span>
+        retrieved = self.vector_store.<span class="func">query</span>(
+            <span class="param">query_texts</span>=[current_query], <span class="param">n_results</span>=<span class="number">5</span>
+        )
+        relevant = <span class="string">"\n"</span>.join(retrieved[<span class="string">"documents"</span>][<span class="number">0</span>])
+
+        <span class="comment"># 2. Assemble hierarchical context</span>
+        <span class="keyword">return</span> (
+            <span class="string">f"## Conversation Summary\n{self.summary}\n\n"</span>
+            <span class="string">f"## Relevant Past Context\n{relevant}\n\n"</span>
+            <span class="string">f"## Recent Messages\n{self.recent}"</span>
+        )
+
+    <span class="keyword">def</span> <span class="func">_compress</span>(<span class="param">self</span>):
+        old = self.recent[:<span class="number">6</span>]
+        self.recent = self.recent[<span class="number">6</span>:]
+        resp = self.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-haiku-4-5-20251001"</span>,
+            <span class="param">max_tokens</span>=<span class="number">300</span>,
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"Current summary:\n{self.summary}\n\n"</span>
+                           <span class="string">f"New messages:\n{old}\n\n"</span>
+                           <span class="string">"Update the summary concisely."</span>
+            }]
+        )
+        self.summary = resp.content[<span class="number">0</span>].text</pre>
+    </div>
+
+    <div class="concept-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+      <div class="concept-card">
+        <div class="icon">🏷️</div>
+        <h4>Entity Memory</h4>
+        <p>Track facts about specific entities — users, projects, files. Update structured records over time.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🪞</div>
+        <h4>Reflection</h4>
+        <p>Agent periodically reflects on its memories, synthesizing higher-level insights from raw experiences.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🕳️</div>
+        <h4>Forgetting</h4>
+        <p>Decay old or low-importance memories. Not everything is worth remembering — controlled forgetting prevents noise.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Implementation Best Practices</h2>
+    </div>
+    <p>
+      Building memory systems is where theory meets production. These are the lessons that matter most:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📈</div>
+        <h4>Start with Buffer, Scale to Vector</h4>
+        <p>Simple buffer memory works for short conversations. Don't over-engineer — add vector memory only when you actually need to handle long histories or cross-session recall.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧱</div>
+        <h4>Separate Memory Concerns</h4>
+        <p>Keep short-term, long-term, and working memory as distinct systems. Mixing them creates tangled code that's hard to debug and tune.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>Always Set Token Budgets</h4>
+        <p>Allocate fixed token budgets for each memory component — e.g., 500 tokens for summary, 1000 for retrieved context, 2000 for recent messages.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧪</div>
+        <h4>Test Memory Retrieval</h4>
+        <p>Bad retrieval is worse than no memory — irrelevant context confuses the model. Test that your vector search actually returns useful results.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 3 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Why can't LLMs remember previous conversations by default?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They have a bad memory system</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Each API call is stateless — the model has no built-in persistence</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They choose not to remember</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The context window is too small</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. When would you choose summary memory over buffer memory?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When you need exact recall of all messages</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">When conversations are long and you need to stay within the context window</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When the conversation is very short</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When you don't care about context at all</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What's the main advantage of vector memory?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's the fastest type</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">It retrieves only semantically relevant memories instead of everything</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It stores the most data</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's the easiest to implement</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 17 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      LLMs are <strong>stateless</strong> — memory must be explicitly managed. The four core memory types are
+      <strong>buffer</strong> (full history), <strong>window</strong> (last N turns), <strong>summary</strong>
+      (compressed history), and <strong>vector</strong> (embedding-based retrieval). Production systems use
+      <strong>hierarchical memory</strong> that combines all three. Always set <strong>token budgets</strong>
+      for each memory component and leave at least 25% of the context window for the model's response.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 18: Agent Frameworks</strong><br>
+      <span style="color: var(--text-dim);">You'll learn about LangChain, LangGraph, CrewAI, and other frameworks that provide memory, tool use, and orchestration out of the box.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-13-agent-architecture.html">← Previous</a>
+  <span class="nav-info">Topic 17 of 23</span>
+  <a class="nav-btn primary" href="topic-14-agent-frameworks.html">Next: Agent Frameworks →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

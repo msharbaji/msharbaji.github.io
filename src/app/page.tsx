@@ -9,6 +9,7 @@ import AnimateIn from "@/components/AnimateIn";
 import Link from "next/link";
 import { summary } from "@/lib/resume-data";
 import { projects } from "@/lib/projects-data";
+import { courses } from "@/lib/courses-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
@@ -42,6 +43,55 @@ export default function Home() {
       <div className="section-divider" />
       <SkillsSection />
 
+      {/* Featured Course */}
+      <div className="section-divider" />
+      <section className="py-10 sm:py-16">
+        <AnimateIn>
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+              {t.nav.courses}
+            </h2>
+            <Link
+              href="/courses"
+              className="group flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-background focus:rounded-md"
+            >
+              {t.home.viewAll}
+              <svg
+                className="size-3 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+        </AnimateIn>
+        <AnimateIn delay={0.1}>
+          <Link
+            href={`/courses/${courses[0].slug}`}
+            className="group mt-8 block rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_0_40px_-12px] hover:shadow-accent/15 sm:p-8"
+          >
+            <h3 className="font-display text-lg font-700 tracking-tight text-foreground sm:text-xl">
+              {courses[0].title[locale]}
+            </h3>
+            <p className="mt-2 text-sm text-muted">
+              {courses[0].description[locale]}
+            </p>
+            <div className="mt-4 flex gap-6 text-xs uppercase tracking-wider text-muted">
+              <span>
+                <span className="font-bold text-foreground">{courses[0].topics.length}</span>{" "}
+                {t.courses.topics}
+              </span>
+              <span>
+                <span className="font-bold text-foreground">3</span> Phases
+              </span>
+            </div>
+          </Link>
+        </AnimateIn>
+      </section>
+
       {/* Featured Projects */}
       <div className="section-divider" />
       <section className="py-10 sm:py-16">
@@ -67,7 +117,7 @@ export default function Home() {
             </Link>
           </div>
         </AnimateIn>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.map((project, i) => (
             <AnimateIn key={project.slug} delay={i * 0.1}>
               <ProjectCard project={project} />
@@ -79,9 +129,9 @@ export default function Home() {
       {/* Contact CTA */}
       <div className="section-divider" />
       <AnimateIn>
-        <section className="relative py-16 text-center sm:py-24">
+        <section className="relative rounded-2xl border border-accent-warm/10 bg-accent-warm/[0.03] py-16 text-center sm:py-24">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="h-64 w-64 rounded-full bg-accent/[0.04] blur-[80px]" />
+            <div className="h-64 w-64 rounded-full bg-accent-warm/[0.04] blur-[80px]" />
           </div>
           <div className="relative">
             <h2 className="font-display text-2xl font-700 tracking-tight sm:text-4xl">
@@ -92,7 +142,7 @@ export default function Home() {
             </p>
             <Link
               href="/contact"
-              className="group mt-8 inline-flex items-center gap-2.5 rounded-lg border border-accent bg-accent px-7 py-3.5 font-mono text-xs font-medium uppercase tracking-widest text-background transition-all duration-200 hover:border-accent-hover hover:bg-accent-hover hover:shadow-[0_0_30px_-5px] hover:shadow-accent/30 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background"
+              className="group mt-8 inline-flex items-center gap-2.5 rounded-lg border border-accent-warm bg-accent-warm px-7 py-3.5 font-mono text-xs font-medium uppercase tracking-widest text-background transition-all duration-200 hover:border-accent-warm-hover hover:bg-accent-warm-hover hover:shadow-[0_0_30px_-5px] hover:shadow-accent-warm/30 focus:outline-none focus:ring-2 focus:ring-accent-warm focus:ring-offset-2 focus:ring-offset-background"
             >
               {t.home.getInTouch}
               <svg

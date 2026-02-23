@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 15 — Building a Simple Agent from Scratch | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 83%"></div></div>
+    <span class="progress-label">19 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔨</div>
+    <h1>Building a Simple Agent from Scratch</h1>
+    <p>No frameworks needed — build a complete, production-ready agent in pure Python to truly understand how they work from the ground up.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What We're Building</h2>
+    </div>
+    <p>
+      A <strong>research agent</strong> that can autonomously:
+    </p>
+    <ul style="margin-left: 24px;">
+      <li>Search the web for current information</li>
+      <li>Read and extract key data from pages</li>
+      <li>Synthesize findings into a coherent report</li>
+      <li>Write the final output to a file</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Agent Architecture Overview</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>┌────────────────────────────────────────────┐
+│  INPUT: "Research quantum computing 2025"  │
+└────────────────────┬───────────────────────┘
+                     │
+        ┌────────────▼────────────┐
+        │  LLM DECIDES NEXT STEP  │
+        │  (ReAct: Thought/Action)│
+        └────────────┬────────────┘
+                     │
+    ┌────────────────┼────────────────┐
+    │                │                │
+    ▼                ▼                ▼
+  SEARCH          READ_PAGE        WRITE_FILE
+  web search      read URL           save output
+    │                │                │
+    └────────────────┼────────────────┘
+                     │
+         ┌───────────▼───────────┐
+         │  FEEDBACK TO LLM      │
+         │  (Add to messages)    │
+         └───────────┬───────────┘
+                     │
+            Has goal been reached?
+            ├─ Yes → Return answer
+            └─ No → Loop back to LLM decision</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>The Agent Loop — Core Structure</h2>
+    </div>
+    <p>
+      The foundation is simple: a while loop that reads model output, parses tool calls, executes them,
+      and feeds results back to the model. Everything else is implementation details.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Minimal Agent Loop</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+TOOLS = {}  <span class="comment"># Will populate this</span>
+
+<span class="keyword">def</span> <span class="func">run_agent</span>(user_goal: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Run the agent loop until goal is reached."""</span>
+    messages = [
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_goal}
+    ]
+
+    iteration = <span class="number">0</span>
+    <span class="keyword">while</span> iteration &lt; <span class="number">10</span>:
+        iteration += <span class="number">1</span>
+
+        <span class="comment"># 1. Ask the model what to do next</span>
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">tools</span>=list(TOOLS.values()),
+            <span class="param">messages</span>=messages
+        )
+
+        <span class="comment"># 2. Parse response</span>
+        <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+            <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+                <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                    <span class="comment"># 3. Execute the tool</span>
+                    result = <span class="func">execute_tool</span>(block.name, block.input)
+
+                    <span class="comment"># 4. Add result back to messages</span>
+                    messages.<span class="func">append</span>({
+                        <span class="string">"role"</span>: <span class="string">"assistant"</span>,
+                        <span class="string">"content"</span>: response.content
+                    })
+                    messages.<span class="func">append</span>({
+                        <span class="string">"role"</span>: <span class="string">"user"</span>,
+                        <span class="string">"content"</span>: [
+                            {
+                                <span class="string">"type"</span>: <span class="string">"tool_result"</span>,
+                                <span class="string">"tool_use_id"</span>: block.id,
+                                <span class="string">"content"</span>: result
+                            }
+                        ]
+                    })
+        <span class="keyword">else</span>:
+            <span class="comment"># Model finished, return final answer</span>
+            <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> <span class="string">"Max iterations reached"</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Key Pattern: Tool Use Protocol</h4>
+        <p>
+          The agent doesn't directly call tools. It thinks in prose, Claude's tool_use feature identifies
+          which tool to call, and we parse and execute it. The result goes back as a tool_result block.
+          This keeps the LLM's reasoning readable and auditable.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Defining Tools — JSON Schemas and Implementations</h2>
+    </div>
+    <p>
+      Each tool has two parts: a JSON schema (tells the model what the tool does) and an implementation (does the work).
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Definitions</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>TOOLS = {
+    <span class="string">"web_search"</span>: {
+        <span class="string">"name"</span>: <span class="string">"web_search"</span>,
+        <span class="string">"description"</span>: <span class="string">"Search the internet for current information"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"query"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"Search query (e.g., 'AI agents 2025')"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"query"</span>]
+        }
+    },
+    <span class="string">"read_page"</span>: {
+        <span class="string">"name"</span>: <span class="string">"read_page"</span>,
+        <span class="string">"description"</span>: <span class="string">"Read the text content of a web page"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"url"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"URL to read (must start with http)"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"url"</span>]
+        }
+    },
+    <span class="string">"write_file"</span>: {
+        <span class="string">"name"</span>: <span class="string">"write_file"</span>,
+        <span class="string">"description"</span>: <span class="string">"Save text content to a file"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"filename"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>},
+                <span class="string">"content"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"filename"</span>, <span class="string">"content"</span>]
+        }
+    }
+}</pre>
+    </div>
+
+    <h3>Implementations</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Implementations</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> requests
+<span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup
+
+<span class="keyword">def</span> <span class="func">web_search</span>(query: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Search Google and return top results."""</span>
+    <span class="keyword">try</span>:
+        headers = {<span class="string">"User-Agent"</span>: <span class="string">"Research Agent"</span>}
+        <span class="comment"># Use a free search API or implement custom</span>
+        url = <span class="func">f</span><span class="string">"https://api.duckduckgo.com/?q={query}&format=json"</span>
+        resp = requests.<span class="func">get</span>(url, headers=headers, timeout=<span class="number">5</span>)
+        results = resp.<span class="func">json</span>()
+
+        formatted = <span class="string">"Top results:\n"</span>
+        <span class="keyword">for</span> i, r <span class="keyword">in</span> <span class="func">enumerate</span>(results.<span class="func">get</span>(<span class="string">"Results"</span>, [])[:<span class="number">3</span>]):
+            formatted += <span class="func">f</span><span class="string">"{i+1}. {r.get('Title', 'N/A')}\n"</span>
+            formatted += <span class="func">f</span><span class="string">"   URL: {r.get('FirstURL', 'N/A')}\n"</span>
+        <span class="keyword">return</span> formatted
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Search failed: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">read_page</span>(url: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Read and extract text from a web page."""</span>
+    <span class="keyword">try</span>:
+        resp = requests.<span class="func">get</span>(url, timeout=<span class="number">10</span>)
+        soup = BeautifulSoup(resp.content, <span class="string">"html.parser"</span>)
+
+        <span class="comment"># Remove script and style tags</span>
+        <span class="keyword">for</span> tag <span class="keyword">in</span> soup([<span class="string">"script"</span>, <span class="string">"style"</span>]):
+            tag.<span class="func">decompose</span>()
+
+        text = soup.<span class="func">get_text</span>(separator=<span class="string">"\n"</span>)
+        <span class="keyword">return</span> text[:<span class="number">2000</span>]  <span class="comment"># Limit to 2000 chars</span>
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Failed to read page: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">write_file</span>(filename: <span class="string">str</span>, content: <span class="string">str</span>) -> <span class="string">str</span>:
+    <span class="string">"""Write content to a file."""</span>
+    <span class="keyword">try</span>:
+        <span class="keyword">with</span> <span class="func">open</span>(filename, <span class="string">"w"</span>) <span class="keyword">as</span> f:
+            f.<span class="func">write</span>(content)
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Successfully wrote {len(content)} chars to {filename}"</span>
+    <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"Write failed: {str(e)}"</span>
+
+<span class="keyword">def</span> <span class="func">execute_tool</span>(name: <span class="string">str</span>, args: <span class="keyword">dict</span>) -> <span class="string">str</span>:
+    <span class="string">"""Execute a tool by name."""</span>
+    <span class="keyword">if</span> name == <span class="string">"web_search"</span>:
+        <span class="keyword">return</span> <span class="func">web_search</span>(args[<span class="string">"query"</span>])
+    <span class="keyword">elif</span> name == <span class="string">"read_page"</span>:
+        <span class="keyword">return</span> <span class="func">read_page</span>(args[<span class="string">"url"</span>])
+    <span class="keyword">elif</span> name == <span class="string">"write_file"</span>:
+        <span class="keyword">return</span> <span class="func">write_file</span>(args[<span class="string">"filename"</span>], args[<span class="string">"content"</span>])
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="string">"Unknown tool"</span></pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>The System Prompt — Agent Behavior</h2>
+    </div>
+    <p>
+      The system prompt shapes how the agent thinks and acts. Include instructions for goal-oriented behavior,
+      tool use guidelines, and error handling.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Agent System Prompt</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>You are a Research Agent. Your goal is to gather current
+information and synthesize it into a comprehensive report.
+
+INSTRUCTIONS:
+1. For any research topic, systematically search for
+   current information using web_search
+2. Read the most promising pages using read_page
+3. Synthesize findings into a structured report
+4. Save the final report using write_file
+
+GUIDELINES:
+- Search multiple sources to get diverse perspectives
+- Prioritize recent information (2025 is current)
+- When you have enough information, synthesize
+  and write the report. Do not over-research.
+- Be concise but thorough. Reports should be 800-1200 words.
+- If a page fails to read, try another source
+
+SUCCESS CRITERIA:
+Your task is complete when you have:
+1. Searched for relevant information
+2. Read at least 2-3 quality sources
+3. Written a comprehensive report and saved it
+
+Always work towards completing the task efficiently.</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>System Prompt Best Practices for Agents</h4>
+        <p>
+          Be explicit about the goal, tool usage guidelines, and success criteria.
+          Tell the agent when to stop (avoid infinite loops).
+          Provide constraints (e.g., "max 3 searches per topic").
+          Guide quality (e.g., "prioritize recent information").
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Adding Guardrails — Safeguards for Production</h2>
+    </div>
+    <p>
+      A production agent needs safeguards: iteration limits, token budgets, tool approval, and error recovery.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Agent with Guardrails</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">GuardedAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.max_iterations = <span class="number">10</span>
+        <span class="param">self</span>.token_budget = <span class="number">10000</span>
+        <span class="param">self</span>.tokens_used = <span class="number">0</span>
+        <span class="param">self</span>.failed_tools = []
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, goal: <span class="string">str</span>) -> <span class="string">str</span>:
+        messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: goal}]
+
+        <span class="keyword">for</span> iteration <span class="keyword">in</span> <span class="func">range</span>(<span class="param">self</span>.max_iterations):
+            <span class="comment"># Check token budget</span>
+            <span class="keyword">if</span> <span class="param">self</span>.tokens_used &gt; <span class="param">self</span>.token_budget:
+                <span class="keyword">return</span> <span class="string">"Token budget exceeded"</span>
+
+            <span class="comment"># Call model</span>
+            response = client.messages.<span class="func">create</span>(..., messages=messages)
+
+            <span class="comment"># Track token usage</span>
+            <span class="param">self</span>.tokens_used += response.usage.input_tokens
+            <span class="param">self</span>.tokens_used += response.usage.output_tokens
+
+            <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+                <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+                    <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                        <span class="comment"># Check if tool is disabled</span>
+                        <span class="keyword">if</span> block.name <span class="keyword">in</span> <span class="param">self</span>.failed_tools:
+                            result = <span class="string">"Tool disabled due to repeated failures"</span>
+                        <span class="keyword">else</span>:
+                            <span class="keyword">try</span>:
+                                result = <span class="func">execute_tool</span>(block.name, block.input)
+                            <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+                                result = <span class="func">f</span><span class="string">"Tool error: {str(e)}"</span>
+                                <span class="param">self</span>.failed_tools.<span class="func">append</span>(block.name)
+
+                        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: ...})
+                        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: ...})
+            <span class="keyword">else</span>:
+                <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+        <span class="keyword">return</span> <span class="string">"Max iterations reached"</span></pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Common Pitfalls</h4>
+        <p>
+          <strong>Infinite loops:</strong> Always set max_iterations. <strong>Cost explosions:</strong> Track token usage.
+          <strong>Tool cascades:</strong> One failing tool causes a chain of failures. Add circuit breakers.
+          <strong>Silent failures:</strong> Log everything. You'll debug with logs, not hunches.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Running the Complete Agent</h2>
+    </div>
+    <p>
+      Here's how to run the agent on a real task:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Running the Agent</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    agent = GuardedAgent()
+
+    goal = <span class="string">"""Research AI agents in 2025.
+Search for:
+1. Latest agent frameworks and libraries
+2. New agent applications in production
+3. Recent breakthroughs or challenges
+
+Synthesize findings into a comprehensive report
+and save to 'ai_agents_report_2025.md'."""</span>
+
+    result = agent.<span class="func">run</span>(goal)
+    <span class="func">print</span>(<span class="string">f"Agent completed. Tokens used: {agent.tokens_used}"</span>)
+    <span class="func">print</span>(<span class="string">f"\nFinal output:\n{result}"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>Expected Output</h4>
+        <p>
+          The agent will search for "AI agents 2025", read pages, synthesize findings,
+          and save a markdown report. On subsequent iterations, it adds depth by searching
+          for specific frameworks, production use cases, and recent papers. It stops when
+          confident it has answered the research question.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Testing & Debugging Tips</h2>
+    </div>
+    <p>
+      Agents are notoriously hard to debug because behavior emerges from the LLM.
+      Here are practical strategies:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>Log Everything</h4>
+        <p>Print every tool call, result, and message exchange. You'll understand agent behavior through logs.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Single Tool First</h4>
+        <p>Test each tool independently before integrating. Verify web_search works, then read_page, then write.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>Use Smaller Models</h4>
+        <p>Start with smaller, faster models (Claude 3.5 Sonnet) to iterate quickly. Switch to Opus for final runs.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>Measure Success</h4>
+        <p>Define explicit success criteria. Did it search? Did it read pages? Did it save the file? Check each.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Logging Agent Execution</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> logging
+
+logging.<span class="func">basicConfig</span>(<span class="param">level</span>=logging.DEBUG)
+logger = logging.<span class="func">getLogger</span>(__name__)
+
+<span class="keyword">def</span> <span class="func">run_agent_with_logging</span>(goal):
+    messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: goal}]
+    logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Agent goal: {goal}"</span>)
+
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="number">10</span>):
+        logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Iteration {i}: {len(messages)} messages in context"</span>)
+
+        response = client.messages.<span class="func">create</span>(...)
+        logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Response stop_reason: {response.stop_reason}"</span>)
+
+        <span class="keyword">for</span> block <span class="keyword">in</span> response.content:
+            <span class="keyword">if</span> block.<span class="param">type</span> == <span class="string">"tool_use"</span>:
+                logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Tool call: {block.name} with {block.input}"</span>)
+                result = <span class="func">execute_tool</span>(block.name, block.input)
+                logger.<span class="func">info</span>(<span class="func">f</span><span class="string">"Tool result: {result[:200]}..."</span>)
+
+            <span class="keyword">elif</span> block.<span class="param">type</span> == <span class="string">"text"</span>:
+                logger.<span class="func">debug</span>(<span class="func">f</span><span class="string">"Text response: {block.text[:100]}..."</span>)
+
+    logger.<span class="func">info</span>(<span class="string">"Agent completed"</span>)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What does the agent loop do each iteration?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Ask the user for input</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Ask LLM what to do, execute tool, add result to messages, repeat</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Search the web and save results</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Count tokens and check budget</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Why do tools need both a JSON schema and an implementation?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The schema is backup if implementation fails</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Schema tells LLM what tool does; implementation actually does it</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">For documentation only</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They're the same thing, just written differently</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What's the purpose of max_iterations guardrail?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Make the agent faster</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Prevent infinite loops and control cost/latency</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Improve accuracy</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Track progress for logging</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. How does the agent know when to stop?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When it runs out of tools</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When max_iterations is reached</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">When LLM returns text instead of tool_use (stop_reason != "tool_use")</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">When a tool fails</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 15 Summary</h2>
+    </div>
+    <p>
+      You've now built a production-quality agent from scratch. Key takeaways:
+      <strong>The agent loop</strong> is simple: ask LLM what to do → execute tool → feed result back → repeat.
+      <strong>Tools need two parts:</strong> a JSON schema (for the LLM) and an implementation (to do the work).
+      <strong>System prompts</strong> guide agent behavior — be explicit about goals, tool use, and success criteria.
+      <strong>Guardrails are essential:</strong> max_iterations, token budgets, circuit breakers, error logging.
+      <strong>Debugging agents</strong> requires logging everything. You understand agent behavior through its trace.
+      This foundation lets you use frameworks like LangChain or CrewAI with deep understanding.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 16: Multi-Agent Systems</strong><br>
+      <span style="color: var(--text-dim);">Now you'll orchestrate multiple specialized agents working together on complex problems.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-14-agent-frameworks.html">← Topic 14</a>
+  <span class="nav-info">Topic 19 of 23</span>
+  <a class="nav-btn primary" href="topic-16-multi-agent.html">Topic 16 →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 9 — Prompt Templates & Chaining | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 43%"></div></div>
+    <span class="progress-label">10 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⛓️</div>
+    <h1>Prompt Templates & Chaining</h1>
+    <p>Build reusable prompt components and chain them into powerful multi-step workflows.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Why Templates?</h2>
+    </div>
+    <p>
+      As your AI system grows, you'll write the same prompts over and over with different inputs.
+      <strong>Prompt templates</strong> solve this problem — they're reusable, consistent, and easier to maintain.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">The DRY Principle</p>
+    <p>
+      DRY = "Don't Repeat Yourself." Hardcoding prompts violates this. If you decide to change your system prompt,
+      you have to find and update every file. With templates, you change one place and it propagates everywhere.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Hardcoded</div>
+<pre><span class="keyword">def</span> <span class="func">analyze_code</span>(code):
+    response = client.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        system=<span class="string">"You are a code reviewer..."</span>,
+        messages=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: f<span class="string">"Review this: {code}"</span>
+        }]
+    )
+
+<span class="keyword">def</span> <span class="func">test_code</span>(code):
+    response = client.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        system=<span class="string">"You are a code reviewer..."</span>,
+        messages=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: f<span class="string">"Test: {code}"</span>
+        }]
+    )</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Templated</div>
+<pre>SYSTEM_PROMPT = <span class="string">"You are a code reviewer..."</span>
+
+CODE_REVIEW_TEMPLATE = <span class="string">"""
+Review this code for bugs and
+quality issues:
+
+{code}
+"""</span>
+
+CODE_TEST_TEMPLATE = <span class="string">"""
+Write test cases for this code:
+
+{code}
+"""</span>
+
+<span class="keyword">def</span> <span class="func">call_claude</span>(
+    template, **kwargs
+):
+    content = template.<span class="func">format</span>(**kwargs)
+    <span class="keyword">return</span> client.<span class="func">create</span>(...)</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Benefits of Templates</h4>
+        <p>
+          Reusability across your codebase. Consistency in system prompts. Easy testing and versioning.
+          Reduced bugs from copy-paste errors. Clear separation of prompt logic from application logic.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Building Prompt Templates</h2>
+    </div>
+    <p>
+      There are several ways to build templates. Each has trade-offs. Let's compare three common approaches.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Option 1: Python f-strings</p>
+    <p>
+      Simple, no dependencies, but limited for complex logic.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — f-string Template</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="string">TEMPLATE = """
+You are a data analyst.
+
+Analyze this dataset:
+
+{data}
+
+Focus on: {focus_areas}
+"""</span>
+
+result = TEMPLATE.<span class="func">format</span>(
+    data=<span class="string">"10,20,30,40,50"</span>,
+    focus_areas=<span class="string">"trends and outliers"</span>
+)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Option 2: Jinja2</p>
+    <p>
+      More powerful. Supports loops, conditionals, filters. Industry standard for templating.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Jinja2 Template</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> jinja2 <span class="keyword">import</span> Template
+
+template_str = <span class="string">"""
+You are a data analyst.
+
+Analyze this dataset:
+{% for item in data %}
+- {{ item }}
+{% endfor %}
+
+{% if include_summary %}
+Include a summary.
+{% endif %}
+"""</span>
+
+template = <span class="func">Template</span>(template_str)
+result = template.<span class="func">render</span>(
+    data=[<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>],
+    include_summary=<span class="keyword">True</span>
+)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Option 3: LangChain PromptTemplate</p>
+    <p>
+      Built for LLM workflows. Integrates with LangChain chains and tools. Good for production systems.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LangChain PromptTemplate</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> langchain.prompts <span class="keyword">import</span> PromptTemplate
+
+template = <span class="func">PromptTemplate</span>(
+    input_variables=[<span class="string">"data"</span>, <span class="string">"focus"</span>],
+    template=<span class="string">"""
+You are a data analyst.
+
+Analyze this dataset:
+{data}
+
+Focus on: {focus}
+"""</span>
+)
+
+prompt = template.<span class="func">format</span>(
+    data=<span class="string">"10,20,30,40,50"</span>,
+    focus=<span class="string">"trends"</span>
+)</pre>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>f-strings</h4>
+        <p><strong>Best for:</strong> Simple one-off prompts. <strong>Cons:</strong> No validation, limited power.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Jinja2</h4>
+        <p><strong>Best for:</strong> Complex templates with loops and conditionals. <strong>Cons:</strong> Extra dependency.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>LangChain</h4>
+        <p><strong>Best for:</strong> Chains and production systems. <strong>Cons:</strong> Heavier framework.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>Custom</h4>
+        <p><strong>Best for:</strong> Full control. <strong>Cons:</strong> You maintain it yourself.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Template Variables & Validation</h2>
+    </div>
+    <p>
+      When templates have variables, you need to validate inputs. Missing or invalid data causes bad prompts.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Validated Template</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+<span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+
+<span class="keyword">@</span>dataclass
+<span class="keyword">class</span> <span class="func">AnalysisRequest</span>:
+    <span class="string">"""Request with validation"""</span>
+    dataset: str
+    focus_areas: <span class="keyword">list</span>[str]
+    max_length: <span class="number">500</span> = <span class="number">500</span>
+
+    <span class="keyword">def</span> <span class="func">validate</span>(self):
+        <span class="keyword">if</span> <span class="keyword">not</span> self.dataset:
+            <span class="keyword">raise</span> <span class="func">ValueError</span>(
+                <span class="string">"dataset required"</span>
+            )
+        <span class="keyword">if</span> <span class="func">len</span>(self.dataset) > <span class="number">5000</span>:
+            <span class="keyword">raise</span> <span class="func">ValueError</span>(
+                <span class="string">"dataset too large"</span>
+            )
+        <span class="keyword">if</span> <span class="keyword">not</span> self.focus_areas:
+            self.focus_areas = [<span class="string">"general trends"</span>]
+
+TEMPLATE = <span class="string">"""You are a data analyst.
+
+Analyze:
+{dataset}
+
+Focus: {focus}"""</span>
+
+<span class="keyword">def</span> <span class="func">analyze</span>(request: AnalysisRequest):
+    request.<span class="func">validate</span>()
+    prompt = TEMPLATE.<span class="func">format</span>(
+        dataset=request.dataset,
+        focus=<span class="string">", "</span>.<span class="func">join</span>(request.focus_areas)
+    )
+    <span class="keyword">return</span> client.<span class="func">create</span>(...)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Production Pattern</h4>
+        <p>
+          Use dataclasses or Pydantic models for request objects. Validate before creating the prompt.
+          Set reasonable defaults for optional fields. This prevents malformed prompts from reaching Claude.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Prompt Chaining Patterns</h2>
+    </div>
+    <p>
+      Prompt chains connect multiple prompts in sequences. The output of one becomes the input to the next.
+      This enables complex workflows that would be hard for a single prompt.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">→</div>
+        <h4>Sequential Chain</h4>
+        <p>Step 1 → Step 2 → Step 3. Each step uses the output of the previous. Best for multi-step workflows.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⤴️</div>
+        <h4>Parallel Chain</h4>
+        <p>Run multiple prompts simultaneously, then combine. Great for analyzing from multiple perspectives.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔀</div>
+        <h4>Conditional Chain</h4>
+        <p>Route to different chains based on model output. E.g., "Is this positive or negative?" → different handling.</p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">🚦</div>
+        <h4>Router Chain</h4>
+        <p>Model chooses which chain to use based on input. "This is about X, so use the X-handler."</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Sequential Chain Example</p>
+    <p>
+      Extract key points → Organize by theme → Generate summary → Quality check.
+      Each step refines the previous output.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">Router Chain Example</p>
+    <p>
+      User input → Router decides topic → If "technical", use technical handler; if "general", use general handler.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Building a Chain: Document Summarizer</h2>
+    </div>
+    <p>
+      Let's build a complete 4-step sequential chain to summarize long documents.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Extract Key Points</h4>
+          <p>Read document, identify 5-10 main ideas. Focus on substance, not style.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Organize by Theme</h4>
+          <p>Group key points into logical themes. E.g., "Introduction", "Methods", "Results".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Generate Summary</h4>
+          <p>Write concise summary from organized points. 1-2 paragraphs, 200 words max.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Quality Check</h4>
+          <p>Verify summary is accurate, covers main ideas, no fabrications. Rate quality 1-5.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Document Summarization Chain</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">summarize_document</span>(doc_text: str):
+    <span class="string">"""4-step document summarization chain"""</span>
+
+    <span class="comment"># Step 1: Extract key points</span>
+    extract_prompt = f<span class="string">"""
+Extract 5-10 key points from this document:
+
+{doc_text}
+
+Return only the key points, one per line."""</span>
+
+    response1 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">500</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: extract_prompt}]
+    )
+    key_points = response1.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 2: Organize by theme</span>
+    organize_prompt = f<span class="string">"""
+Organize these key points into logical themes:
+
+{key_points}
+
+Output format:
+[Theme Name]
+- point 1
+- point 2
+"""</span>
+
+    response2 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">500</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: organize_prompt}]
+    )
+    organized = response2.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 3: Generate summary</span>
+    summary_prompt = f<span class="string">"""
+Write a 200-word summary from these organized points:
+
+{organized}
+
+Be concise and accurate. No more than 200 words."""</span>
+
+    response3 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">300</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: summary_prompt}]
+    )
+    summary = response3.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 4: Quality check</span>
+    quality_prompt = f<span class="string">"""
+Rate this summary on:
+1. Accuracy (no fabrications)
+2. Completeness (covers main ideas)
+3. Clarity (easy to understand)
+4. Conciseness (under 200 words)
+
+Summary:
+{summary}
+
+Rate each 1-5 and explain any issues."""</span>
+
+    response4 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">200</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: quality_prompt}]
+    )
+    quality = response4.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"summary"</span>: summary,
+        <span class="string">"quality_check"</span>: quality
+    }</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Orchestration Libraries</h2>
+    </div>
+    <p>
+      For complex chains, specialized libraries handle the complexity. Here's a quick overview.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>LangChain</h4>
+        <p>Most popular. Chains, memory, agents, RAG integration. Good documentation. Heavier but feature-rich.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🦙</div>
+        <h4>LlamaIndex</h4>
+        <p>Focused on data indexing and RAG. Great for document processing. Lighter weight than LangChain.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>Haystack</h4>
+        <p>Search and RAG focused. Components-based architecture. Good for production pipelines.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🏗️</div>
+        <h4>Build Your Own</h4>
+        <p>Simple chains don't need a framework. Custom code gives you full control, reduces dependencies.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>When to Use Each</h4>
+        <p>
+          <strong>LangChain:</strong> Complex multi-tool agents, memory management, many integrations.
+          <strong>LlamaIndex:</strong> Document-heavy RAG systems.
+          <strong>Custom:</strong> Simple 2-3 step chains, maximum control and minimal dependencies.
+          Start simple, add a framework when you need it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. What is the main benefit of using prompt templates instead of hardcoding prompts?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They generate better responses</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">They're reusable, consistent, and easy to maintain across your codebase</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They reduce the cost of API calls</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They enable multi-step reasoning</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Which templating approach is most powerful and supports loops and conditionals?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Python f-strings</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Jinja2</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">LangChain PromptTemplate</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">String concatenation</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. In a prompt chain, what happens at each step?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The model generates random variations of the output</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">The output of one prompt becomes the input to the next prompt</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">All steps run in parallel and results are merged</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">The model asks for user confirmation before proceeding</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. When should you use orchestration libraries like LangChain?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Always, they should be used for every AI project</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">For complex chains, memory management, and multi-tool agents</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Never, custom code is always better</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Only for RAG applications</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 9 Summary</h2>
+    </div>
+    <p>
+      <strong>Prompt templates</strong> follow the DRY principle — write once, use everywhere.
+      You can build them with f-strings (simple), Jinja2 (powerful), LangChain (framework), or custom code.
+      Always validate template variables before using them. <strong>Prompt chains</strong> connect multiple prompts
+      in sequences: Sequential (step-by-step), Parallel (multiple perspectives), Conditional (branching),
+      or Router (model selects). Chains enable complex workflows that would be impossible with a single prompt.
+      For simple chains, write custom code. For complex multi-tool systems, use LangChain or similar libraries.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 10: Evaluating Prompt Quality</strong><br>
+      <span style="color: var(--text-dim);">Measure, score, and systematically improve your prompts — because you can't improve what you can't measure.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-08-tool-use.html">← Topic 8</a>
+  <span class="nav-info">Topic 10 of 23</span>
+  <a class="nav-btn primary" href="topic-structured-output.html">Next: Structured Output →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

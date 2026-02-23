@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 6 — Hands-On: Building with LLM APIs | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 30%"></div></div>
+    <span class="progress-label">7 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🛠️</div>
+    <h1>Hands-On: Building with LLM APIs</h1>
+    <p>Write real Python code to call Claude and OpenAI APIs — streaming, error handling, and practical patterns.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Setting Up Your Environment</h2>
+    </div>
+    <p>
+      Before you can use Claude or OpenAI APIs, you need to set up your local environment.
+      This is a one-time setup that takes 5 minutes.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Step 1: Install the SDKs</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash — Install SDKs</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Install Anthropic SDK (Claude)</span>
+pip install anthropic
+
+<span class="comment"># Install OpenAI SDK</span>
+pip install openai</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Step 2: Get API Keys</p>
+    <ul style="margin-left: 20px;">
+      <li><strong>Claude:</strong> Visit <code>console.anthropic.com</code>, sign up, create an API key</li>
+      <li><strong>OpenAI:</strong> Visit <code>platform.openai.com</code>, sign up, create an API key</li>
+    </ul>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Step 3: Set Environment Variables</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash — Environment Setup</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># On macOS/Linux: Add to ~/.bashrc or ~/.zshrc</span>
+<span class="keyword">export</span> ANTHROPIC_API_KEY=<span class="string">"your-key-here"</span>
+<span class="keyword">export</span> OPENAI_API_KEY=<span class="string">"your-key-here"</span>
+
+<span class="comment"># On Windows: Use System Variables or:</span>
+<span class="keyword">set</span> ANTHROPIC_API_KEY=<span class="string">"your-key-here"</span>
+<span class="keyword">set</span> OPENAI_API_KEY=<span class="string">"your-key-here"</span>
+
+<span class="comment"># Then reload your shell</span>
+<span class="keyword">source</span> ~/.bashrc</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Never Hardcode API Keys</h4>
+        <p>
+          Always use environment variables. If you hardcode a key and push to GitHub,
+          attackers can use your key before you realize it's exposed. Use environment variables,
+          .env files, or secrets managers.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Anthropic SDK Deep Dive</h2>
+    </div>
+    <p>
+      The Anthropic SDK makes calling Claude APIs simple and intuitive.
+      Let's cover the core methods and patterns you'll use every day.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Basic API Call</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Basic Call</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()  <span class="comment"># Uses ANTHROPIC_API_KEY env var</span>
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=<span class="string">"You are a helpful assistant."</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Hello!"</span>}
+    ]
+)
+
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Multi-Turn Conversation</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Multi-Turn Conversation</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+conversation_history = []
+
+<span class="keyword">def</span> <span class="func">chat</span>(user_message):
+    <span class="string">"""Add user message and get response."""</span>
+    conversation_history.<span class="func">append</span>({
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: user_message
+    })
+
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1024</span>,
+        <span class="param">system</span>=<span class="string">"You are a helpful code assistant."</span>,
+        <span class="param">messages</span>=conversation_history
+    )
+
+    assistant_message = response.content[<span class="number">0</span>].text
+    conversation_history.<span class="func">append</span>({
+        <span class="string">"role"</span>: <span class="string">"assistant"</span>,
+        <span class="string">"content"</span>: assistant_message
+    })
+
+    <span class="keyword">return</span> assistant_message
+
+<span class="comment"># Conversation</span>
+<span class="func">print</span>(<span class="func">chat</span>(<span class="string">"What's a closure in Python?"</span>))
+<span class="func">print</span>(<span class="func">chat</span>(<span class="string">"Can you give me an example?"</span>))
+<span class="func">print</span>(<span class="func">chat</span>(<span class="string">"How is that different from a class?"</span>))</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Key Parameters:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>model</h4>
+        <p>Which Claude version to use. Current best: "claude-sonnet-4-5-20250929"</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>max_tokens</h4>
+        <p>Maximum tokens in the response. Higher = longer responses, higher cost</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎭</div>
+        <h4>system</h4>
+        <p>System prompt that defines the model's behavior</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💬</div>
+        <h4>messages</h4>
+        <p>List of user/assistant messages, the conversation history</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Temperature & Other Parameters</h4>
+        <p>
+          <code>temperature</code> (0-1): Controls randomness. 0 = deterministic, 1 = creative.
+          <code>top_p</code>: Nucleus sampling. <code>top_k</code>: Limits vocabulary.
+          For most tasks: temperature=0 (deterministic). For creative tasks: temperature=0.7 (balanced).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>OpenAI SDK Comparison</h2>
+    </div>
+    <p>
+      The OpenAI SDK has a similar structure to Anthropic's. Learn both to understand the patterns.
+      They map directly to each other.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">OpenAI Basic Call</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — OpenAI Basic Call</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+client = OpenAI()  <span class="comment"># Uses OPENAI_API_KEY env var</span>
+
+response = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">system</span>=<span class="string">"You are a helpful assistant."</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Hello!"</span>}
+    ]
+)
+
+<span class="func">print</span>(response.choices[<span class="number">0</span>].message.content)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Side-by-Side Comparison</p>
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label" style="color: var(--blue);">Anthropic (Claude)</div>
+<pre>client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-sonnet-4-5...",
+    max_tokens=1024,
+    system="...",
+    messages=[...]
+)
+
+text = response.content[0].text</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: var(--blue);">OpenAI (GPT-4)</div>
+<pre>from openai import OpenAI
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    max_tokens=1024,
+    system="...",
+    messages=[...]
+)
+
+text = response.choices[0].message.content</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>When to Use Each</h4>
+        <p>
+          <strong>Claude:</strong> Best for long-context tasks, reasoning, code analysis.
+          <strong>GPT-4:</strong> Best for creative writing, multimodal (image) tasks, speed.
+          Most teams use both — Claude for heavy thinking, GPT-4 for quick tasks.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Streaming Responses</h2>
+    </div>
+    <p>
+      Streaming is crucial for UX. Instead of waiting for the full response, you get tokens as they arrive.
+      Users see text appearing in real-time.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Streaming with Anthropic</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Anthropic Streaming</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">with</span> client.messages.<span class="func">stream</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Write a haiku"</span>}
+    ]
+) <span class="keyword">as</span> stream:
+    <span class="keyword">for</span> text <span class="keyword">in</span> stream.<span class="func">text_stream</span>:
+        <span class="func">print</span>(text, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)  <span class="comment"># Print without newline</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Streaming with OpenAI</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — OpenAI Streaming</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">from</span> openai <span class="keyword">import</span> OpenAI
+
+client = OpenAI()
+
+stream = client.chat.completions.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"gpt-4o"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">stream</span>=<span class="keyword">True</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Write a haiku"</span>}
+    ]
+)
+
+<span class="keyword">for</span> chunk <span class="keyword">in</span> stream:
+    <span class="keyword">if</span> chunk.choices[<span class="number">0</span>].delta.content:
+        <span class="func">print</span>(chunk.choices[<span class="number">0</span>].delta.content, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>When to Stream</h4>
+        <p>
+          Use streaming for: chat interfaces, real-time UIs, long responses (code generation).
+          Don't stream for: batch processing, APIs where you need the full response at once.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Error Handling & Retries</h2>
+    </div>
+    <p>
+      APIs fail. Rate limits, timeouts, network errors. Production code must handle these gracefully.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Production-Grade Error Handling</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Error Handling with Retries</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> time
+<span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">call_claude_with_retry</span>(prompt, max_retries=<span class="number">3</span>):
+    <span class="string">"""Call Claude with exponential backoff on failure."""</span>
+    <span class="keyword">for</span> attempt <span class="keyword">in</span> <span class="func">range</span>(max_retries):
+        <span class="keyword">try</span>:
+            response = client.messages.<span class="func">create</span>(
+                <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+                <span class="param">max_tokens</span>=<span class="number">1024</span>,
+                <span class="param">messages</span>=[{
+                    <span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: prompt
+                }]
+            )
+            <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+        <span class="keyword">except</span> anthropic.<span class="func">RateLimitError</span> <span class="keyword">as</span> e:
+            <span class="func">print</span>(<span class="string">f"Rate limited on attempt {attempt + 1}"</span>)
+            <span class="keyword">if</span> attempt < max_retries - <span class="number">1</span>:
+                wait_time = <span class="number">2</span> ** attempt  <span class="comment"># Exponential backoff</span>
+                <span class="func">print</span>(<span class="string">f"Waiting {wait_time}s before retry..."</span>)
+                time.<span class="func">sleep</span>(wait_time)
+            <span class="keyword">else</span>:
+                <span class="keyword">raise</span>
+
+        <span class="keyword">except</span> anthropic.<span class="func">APIError</span> <span class="keyword">as</span> e:
+            <span class="func">print</span>(<span class="string">f"API error: {e.status_code} {e.message}"</span>)
+            <span class="keyword">if</span> attempt < max_retries - <span class="number">1</span>:
+                wait_time = <span class="number">2</span> ** attempt
+                time.<span class="func">sleep</span>(wait_time)
+            <span class="keyword">else</span>:
+                <span class="keyword">raise</span>
+
+        <span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+            <span class="func">print</span>(<span class="string">f"Unexpected error: {e}"</span>)
+            <span class="keyword">raise</span>
+
+    <span class="keyword">return</span> <span class="keyword">None</span>
+
+<span class="comment"># Usage</span>
+<span class="keyword">try</span>:
+    result = <span class="func">call_claude_with_retry</span>(<span class="string">"Hello Claude"</span>)
+    <span class="func">print</span>(result)
+<span class="keyword">except</span> <span class="func">Exception</span> <span class="keyword">as</span> e:
+    <span class="func">print</span>(<span class="string">f"Failed after retries: {e}"</span>)</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Exponential Backoff is Critical</h4>
+        <p>
+          Don't retry immediately. Use exponential backoff: wait 1s, then 2s, then 4s.
+          This gives the API time to recover and prevents cascading failures.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Cost Optimization</h2>
+    </div>
+    <p>
+      LLM APIs charge by tokens. Track usage to manage costs. A million tokens might cost $0.50 (Claude)
+      or $2.00 (GPT-4). Small optimizations add up.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Tracking Token Usage</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Cost Tracking</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"Hello"</span>
+    }]
+)
+
+<span class="comment"># Token usage</span>
+input_tokens = response.usage.input_tokens
+output_tokens = response.usage.output_tokens
+total_tokens = input_tokens + output_tokens
+
+<span class="comment"># Cost estimation (Claude Sonnet pricing)</span>
+input_cost = (input_tokens / <span class="number">1_000_000</span>) * <span class="number">3</span>      <span class="comment"># $3 per 1M input tokens</span>
+output_cost = (output_tokens / <span class="number">1_000_000</span>) * <span class="number">15</span>     <span class="comment"># $15 per 1M output tokens</span>
+total_cost = input_cost + output_cost
+
+<span class="func">print</span>(<span class="string">f"Input: {input_tokens}, Output: {output_tokens}"</span>)
+<span class="func">print</span>(<span class="string">f"Cost: ${total_cost:.6f}"</span>)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Cost Optimization Strategies:</p>
+    <ul style="margin-left: 20px;">
+      <li><strong>Use cheaper models:</strong> Claude 3 Haiku is 10x cheaper than Sonnet for simple tasks</li>
+      <li><strong>Shorter system prompts:</strong> Every token costs money. Be concise.</li>
+      <li><strong>Batch processing:</strong> For non-urgent tasks, use batch APIs (cheaper per token)</li>
+      <li><strong>Cache context:</strong> Cache long documents to avoid re-processing</li>
+      <li><strong>Monitor usage:</strong> Track API costs like you track cloud infrastructure</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Batch API</h4>
+        <p>
+          For tasks that don't need immediate results (overnight processing), Anthropic offers batch API
+          at 50% discount. Great for data processing pipelines.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Mini Project: Terminal Chat App</h2>
+    </div>
+    <p>
+      Let's build a complete terminal chat application with conversation history, streaming, and error handling.
+      This is production-grade code you can use as a template.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Chat App</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> os
+<span class="keyword">import</span> json
+<span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>(api_key=os.<span class="func">getenv</span>(<span class="string">"ANTHROPIC_API_KEY"</span>))
+
+HISTORY_FILE = <span class="string">"chat_history.json"</span>
+
+<span class="keyword">def</span> <span class="func">load_history</span>():
+    <span class="string">"""Load conversation history from file."""</span>
+    <span class="keyword">if</span> os.<span class="func">path</span>.<span class="func">exists</span>(HISTORY_FILE):
+        <span class="keyword">with</span> <span class="func">open</span>(HISTORY_FILE, <span class="string">"r"</span>) <span class="keyword">as</span> f:
+            <span class="keyword">return</span> json.<span class="func">load</span>(f)
+    <span class="keyword">return</span> []
+
+<span class="keyword">def</span> <span class="func">save_history</span>(history):
+    <span class="string">"""Save conversation history to file."""</span>
+    <span class="keyword">with</span> <span class="func">open</span>(HISTORY_FILE, <span class="string">"w"</span>) <span class="keyword">as</span> f:
+        json.<span class="func">dump</span>(history, f, indent=<span class="number">2</span>)
+
+<span class="keyword">def</span> <span class="func">chat</span>(user_input, history):
+    <span class="string">"""Send message and stream response."""</span>
+    history.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_input})
+
+    <span class="func">print</span>(<span class="string">"\nAssistant: "</span>, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)
+    full_response = <span class="string">""</span>
+
+    <span class="keyword">try</span>:
+        <span class="keyword">with</span> client.messages.<span class="func">stream</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">1024</span>,
+            <span class="param">system</span>=<span class="string">"You are a helpful AI assistant."</span>,
+            <span class="param">messages</span>=history
+        ) <span class="keyword">as</span> stream:
+            <span class="keyword">for</span> text <span class="keyword">in</span> stream.<span class="func">text_stream</span>:
+                <span class="func">print</span>(text, end=<span class="string">""</span>, flush=<span class="keyword">True</span>)
+                full_response += text
+    <span class="keyword">except</span> anthropic.<span class="func">APIError</span> <span class="keyword">as</span> e:
+        <span class="func">print</span>(<span class="string">f"\nError: {e}"</span>)
+        <span class="keyword">return</span> history
+
+    <span class="func">print</span>(<span class="string">"\n"</span>)
+    history.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: full_response})
+    <span class="keyword">return</span> history
+
+<span class="keyword">def</span> <span class="func">main</span>():
+    <span class="string">"""Main chat loop."""</span>
+    history = <span class="func">load_history</span>()
+
+    <span class="func">print</span>(<span class="string">"✨ Claude Terminal Chat (type 'quit' to exit, 'clear' to reset)"</span>)
+    <span class="func">print</span>(<span class="string">"━" * <span class="number">50</span></span>)
+
+    <span class="keyword">while</span> <span class="keyword">True</span>:
+        user_input = <span class="func">input</span>(<span class="string">"\nYou: "</span>).<span class="func">strip</span>()
+
+        <span class="keyword">if</span> <span class="keyword">not</span> user_input:
+            <span class="keyword">continue</span>
+        <span class="keyword">if</span> user_input.<span class="func">lower</span>() == <span class="string">"quit"</span>:
+            <span class="func">print</span>(<span class="string">"Goodbye!"</span>)
+            <span class="keyword">break</span>
+        <span class="keyword">if</span> user_input.<span class="func">lower</span>() == <span class="string">"clear"</span>:
+            history = []
+            <span class="func">print</span>(<span class="string">"History cleared."</span>)
+            <span class="keyword">continue</span>
+
+        history = <span class="func">chat</span>(user_input, history)
+        <span class="func">save_history</span>(history)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    <span class="func">main</span>()</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">To Run:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># Set your API key</span>
+<span class="keyword">export</span> ANTHROPIC_API_KEY=<span class="string">"your-key"</span>
+
+<span class="comment"># Run the app</span>
+python chat_app.py</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>What You've Built</h4>
+        <p>
+          This chat app has: conversation persistence (saves to disk), streaming for real-time UX,
+          error handling for API failures, and a clean CLI interface. This is a foundation you can
+          extend for production use.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Where should you store API keys?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Environment variables (never hardcode them)</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Directly in your Python code</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">In a config.txt file in your repo</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">In a comment in your code</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. Why use streaming for chat interfaces?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It makes responses longer</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It reduces token usage</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">It provides real-time UX by showing text as it arrives</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's cheaper than non-streaming</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What's the best strategy for handling API rate limits?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Immediately retry without waiting</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Use exponential backoff (wait 1s, 2s, 4s, etc.) before retrying</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Give up and show an error immediately</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Retry once after a fixed 10-second delay</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. How can you reduce LLM API costs?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Use cheaper models for simple tasks, optimize prompts, use batch API</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Switch to a different API provider every month</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Never use streaming to save on tokens</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Always use the most expensive model for quality</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY & CELEBRATION ────────────────────────────── -->
+  <div class="celebration">
+    <h3>🎉 Phase 1 Complete!</h3>
+    <p>You've mastered the foundations of Prompt Engineering & AI Agents.</p>
+    <p>You've learned structure, techniques, advanced patterns, iteration, and hands-on coding.</p>
+    <p>You're ready to build production AI applications.</p>
+  </div>
+
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 6 & Phase 1 Summary</h2>
+    </div>
+    <p>
+      <strong>Topic 6 covered:</strong> Environment setup, Anthropic SDK patterns, OpenAI SDK for comparison,
+      streaming for UX, production-grade error handling with exponential backoff, cost optimization via token tracking,
+      and a complete mini-project (terminal chat app).
+    </p>
+    <p style="margin-top: 16px;">
+      <strong>Phase 1 Completed:</strong> You've journeyed from "How do LLMs work?" through structure, techniques, advanced patterns,
+      iteration & debugging, and real hands-on API coding. You can now:
+    </p>
+    <ul style="margin-left: 20px; margin-top: 14px;">
+      <li>Write prompts that get consistent, high-quality results</li>
+      <li>Use advanced techniques (few-shot, CoT, self-consistency) strategically</li>
+      <li>Structure prompts with XML, JSON, and proper formatting</li>
+      <li>Iterate and debug prompts systematically</li>
+      <li>Call Claude and OpenAI APIs with streaming, error handling, and cost awareness</li>
+      <li>Build production-grade AI applications</li>
+    </ul>
+    <p style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next Phase (Topics 7-20):</strong> Build AI Agents, RAG systems, multi-agent architectures, and domain-specific applications.<br>
+      <span style="color: var(--text-dim);">You've unlocked the ability to go beyond simple prompts into autonomous systems.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-05-prompt-iteration.html">← Topic 5</a>
+  <span class="nav-info">Topic 7 of 23 — Phase 1 Complete!</span>
+  <a class="nav-btn primary" href="topic-07-rag-concepts.html">Next: RAG Concepts →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

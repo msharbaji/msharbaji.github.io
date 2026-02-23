@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 8 — استخدام الأدوات واستدعاء الدوال | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 39%"></div></div>
+    <span class="progress-label">9 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔧</div>
+    <h1>استخدام الأدوات واستدعاء الدوال</h1>
+    <p>اجعل النموذج اللغوي يتخذ إجراءات في العالم الحقيقي — استدعاء واجهات برمجية، وتشغيل أكواد، والوصول لبيانات حية.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>ما هو استخدام الأدوات؟</h2>
+    </div>
+    <p>
+      بشكل افتراضي، النماذج اللغوية الكبيرة يمكنها فقط توليد نصوص. استخدام الأدوات (المعروف أيضاً باستدعاء الدوال) يتيح للنموذج أن يفعل شيئاً
+      <strong>يقرر هو فعله</strong> — وليس شيئاً تطلب منه فعله أنت. النموذج يختار متى وكيف يستخدم الأدوات بناءً على طلب المستخدم.
+    </p>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>فكرة جوهرية: النموذج يقرر</h4>
+        <p>
+          الفرق الجوهري عن RAG: في RAG، أنت تسترجع المستندات وتمررها. أما في استخدام الأدوات،
+          النموذج يحلل طلب المستخدم ويقرر ما إذا كانت هناك حاجة لأداة، وأي أداة يستدعيها وبأي معاملات.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🤔</div>
+        <h4>اتخاذ القرار</h4>
+        <p>النموذج يحلل الطلب ويقرر إذا كان استدعاء أداة ضرورياً. يمكنه رفض استخدام الأدوات حتى لو كانت متاحة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>اختيار المعاملات</h4>
+        <p>النموذج يختار المعاملات للأداة. "ابحث عن X" والنموذج يملأ X بناءً على السياق.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>استدلال متعدد الخطوات</h4>
+        <p>النموذج يمكنه استدعاء عدة أدوات بالتتابع، مستخدماً مخرجات أداة كمدخلات للأداة التالية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🌍</div>
+        <h4>تأثير حقيقي</h4>
+        <p>استدعاءات الأدوات يمكن أن يكون لها آثار جانبية: إجراء عمليات شراء، إرسال بريد إلكتروني، تحديث قواعد بيانات. يتطلب اعتبارات أمان.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: مساعد ذكي</h4>
+        <p>
+          بدون استخدام الأدوات: تسأل سؤالاً وتحصل على إجابة من الذاكرة. مع استخدام الأدوات: تسأل مساعداً
+          يمكنه التقاط الهاتف (استدعاء API)، والتحقق من خزانة الملفات (استعلام قاعدة البيانات)، أو إجراء حساب
+          (تشغيل كود) ليعطيك إجابة دقيقة. المساعد يقرر أي أدوات يستخدم.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>كيف يعمل استدعاء الدوال</h2>
+    </div>
+    <p>
+      استخدام الأدوات يتبع حلقة منظمة. فهم كل خطوة ضروري لبناء أنظمة موثوقة.
+    </p>
+
+    <div class="pipeline">
+      <div class="pipeline-step">1. Define Tools</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">2. Model Selects</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">3. You Execute</div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step">4. Model Responds</div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الخطوة 1: تعريف الأدوات</p>
+    <p>
+      تصف الأدوات المتاحة بصيغة JSON schema. تخبر النموذج بما تفعله كل أداة، وما المعاملات التي تقبلها،
+      وما الذي تُرجعه. النموذج يقرأ هذه التعريفات ويستخدمها ليقرر متى يستدعي كل أداة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 2: النموذج يختار</p>
+    <p>
+      عندما ترسل رسالة المستخدم، يحللها Claude مقابل تعريفات الأدوات. إذا رأى أن أداة ما ستساعد،
+      يُرجع استجابة استخدام أداة بدلاً من نص. يحدد: أي أداة، وبأي معاملات.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 3: أنت تنفذ</p>
+    <p>
+      الكود الخاص بك يستقبل استدعاء الأداة، يتحقق من المعاملات، ينفذها (يستدعي API، يستعلم قاعدة البيانات، يشغّل الدالة)،
+      ويحصل على نتيجة. أنت المسؤول عن التنفيذ الفعلي.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">الخطوة 4: النموذج يستجيب</p>
+    <p>
+      تمرر نتيجة الأداة مرة أخرى إلى Claude في المحادثة. الآن لدى Claude بيانات حقيقية ويمكنه توليد استجابة مدروسة.
+      قد يؤدي هذا إلى استدعاءات أدوات إضافية، أو يمكن لـ Claude الإجابة مباشرة على المستخدم.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>حاسم: النموذج لا ينفذ الأدوات</h4>
+        <p>
+          النموذج <strong>لا يستدعي أبداً</strong> أدواتك فعلياً. هو فقط <strong>يطلب</strong> منك استدعاءها.
+          يجب عليك أنت التعامل مع التنفيذ، والتحقق من الأخطاء، والتحقق الأمني. هذه ميزة وليست عيباً — تبقي
+          النموذج آمناً وتبقيك أنت في موضع السيطرة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>تعريف الأدوات (صيغة Anthropic)</h2>
+    </div>
+    <p>
+      أدوات Anthropic تستخدم JSON schema واضح. إليك كيفية تعريفها.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON — Tool Definition</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">{
+  "name": "get_weather",
+  "description": "Get current weather for a city",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string",
+        "description": "City name (e.g., 'San Francisco')"
+      },
+      "unit": {
+        "type": "string",
+        "enum": ["celsius", "fahrenheit"],
+        "description": "Temperature unit"
+      }
+    },
+    "required": ["city"]
+  }
+}</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال كامل: عدة أدوات</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Define and Use Tools</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># Define available tools</span>
+tools = [
+    {
+        <span class="string">"name"</span>: <span class="string">"get_weather"</span>,
+        <span class="string">"description"</span>: <span class="string">"Get current weather for a location"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"city"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                            <span class="string">"description"</span>: <span class="string">"City name"</span>},
+                <span class="string">"unit"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                          <span class="string">"enum"</span>: [<span class="string">"celsius"</span>, <span class="string">"fahrenheit"</span>]}
+            },
+            <span class="string">"required"</span>: [<span class="string">"city"</span>]
+        }
+    },
+    {
+        <span class="string">"name"</span>: <span class="string">"calculate"</span>,
+        <span class="string">"description"</span>: <span class="string">"Perform a calculation"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"expression"</span>: {<span class="string">"type"</span>: <span class="string">"string"</span>,
+                                  <span class="string">"description"</span>: <span class="string">"Math expression (e.g., '2+2*3')"</span>}
+            },
+            <span class="string">"required"</span>: [<span class="string">"expression"</span>]
+        }
+    }
+]
+
+<span class="comment"># Make API call with tools</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">tools</span>=tools,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What's the weather in Paris and what is 15 * 3?"</span>}
+    ]
+)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>تعريف الأدوات (صيغة OpenAI)</h2>
+    </div>
+    <p>
+      استدعاء الدوال في OpenAI يستخدم صيغة مشابهة لكن مختلفة قليلاً. إليك المقارنة.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ Anthropic Format</div>
+<pre>{
+  "name": "get_weather",
+  "description": "...",
+  "input_schema": {
+    "type": "object",
+    "properties": { ... },
+    "required": [ ... ]
+  }
+}</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ OpenAI Format</div>
+<pre>{
+  "type": "function",
+  "function": {
+    "name": "get_weather",
+    "description": "...",
+    "parameters": {
+      "type": "object",
+      "properties": { ... },
+      "required": [ ... ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">متى تستخدم كل صيغة</p>
+    <p>
+      <strong>أدوات Anthropic:</strong> صيغة نظيفة وبسيطة. دعم ممتاز للتوثيق.
+      <strong>صيغة OpenAI:</strong> مدعومة على نطاق أوسع. استخدمها إذا كنت تستخدم نماذج OpenAI أو تحتاج توافقية أوسع.
+      للمشاريع الجديدة، صيغة Anthropic أبسط وأقل عرضة للأخطاء.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>حلقة استخدام الأدوات</h2>
+    </div>
+    <p>
+      التعامل مع استجابات الأدوات يتطلب حلقة. النموذج قد يستدعي أدوات، يحصل على نتائج، ويستدعي أدوات أخرى.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Tool Loop</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">process_tool_call</span>(tool_name, tool_input):
+    <span class="string">"""Execute a tool and return result"""</span>
+    <span class="keyword">if</span> tool_name == <span class="string">"get_weather"</span>:
+        <span class="keyword">return</span> f<span class="string">"Weather in {tool_input['city']}: Sunny, 72°F"</span>
+    <span class="keyword">elif</span> tool_name == <span class="string">"calculate"</span>:
+        <span class="keyword">return</span> f<span class="string">"Result: {eval(tool_input['expression'])}"</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="string">"Unknown tool"</span>
+
+<span class="comment"># Main loop</span>
+messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What's weather in NYC and compute 10+5?"</span>}]
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    <span class="comment"># Call Claude with tools</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1024</span>,
+        <span class="param">tools</span>=tools,
+        <span class="param">messages</span>=messages
+    )
+
+    <span class="comment"># Check if we need to handle tool calls</span>
+    <span class="keyword">if</span> response.stop_reason == <span class="string">"tool_use"</span>:
+        <span class="comment"># Process each tool call</span>
+        tool_calls = [block <span class="keyword">for</span> block <span class="keyword">in</span> response.content
+                      <span class="keyword">if</span> block.type == <span class="string">"tool_use"</span>]
+
+        <span class="comment"># Add assistant response to messages</span>
+        messages.<span class="func">append</span>({<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: response.content})
+
+        <span class="comment"># Execute tools and collect results</span>
+        <span class="keyword">for</span> tool_call <span class="keyword">in</span> tool_calls:
+            result = <span class="func">process_tool_call</span>(tool_call.name, tool_call.input)
+
+            <span class="comment"># Add tool result to messages</span>
+            messages.<span class="func">append</span>({
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: [{
+                    <span class="string">"type"</span>: <span class="string">"tool_result"</span>,
+                    <span class="string">"tool_use_id"</span>: tool_call.id,
+                    <span class="string">"content"</span>: result
+                }]
+            })
+    <span class="keyword">else</span>:
+        <span class="comment"># Model generated final response (no more tool calls)</span>
+        final_response = response.content[<span class="number">0</span>].text
+        <span class="keyword">print</span>(final_response)
+        <span class="keyword">break</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>نمط الحلقة</h4>
+        <p>
+          1. استدعِ Claude مع الأدوات في قائمة الرسائل. 2. إذا كانت الاستجابة "tool_use"، عالج استدعاءات الأدوات.
+          3. أضف استجابة المساعد ونتائج الأدوات مرة أخرى إلى الرسائل. 4. عُد للخطوة 1.
+          5. عندما تكون الاستجابة "end_turn" (أو لا توجد استدعاءات أدوات)، لديك الإجابة النهائية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>أمثلة واقعية لاستخدام الأدوات</h2>
+    </div>
+    <p>
+      استخدام الأدوات يتيح تطبيقات واقعية لا حصر لها. إليك أشهر الأنماط:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>البحث في الويب</h4>
+        <p>استعلام محرك بحث عبر API (مثل Google أو Tavily أو Serper) للعثور على معلومات حالية. مثالي لتجاوز حدود المعرفة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧮</div>
+        <h4>الآلة الحاسبة</h4>
+        <p>إرسال تعبيرات رياضية معقدة إلى Python أو WolframAlpha. يمنع الهلوسة الرياضية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗄️</div>
+        <h4>استعلام قاعدة البيانات</h4>
+        <p>النموذج يولّد SQL، وأنت تنفذه بأمان باستخدام استعلامات معلّمة. يتيح استجابات مبنية على البيانات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📡</div>
+        <h4>استدعاءات API</h4>
+        <p>استدعاء أي REST API. الطقس، أسعار الأسهم، المواصلات، أنظمة الدفع — أي شيء متاح عبر HTTP.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📁</div>
+        <h4>عمليات الملفات</h4>
+        <p>قراءة ومعالجة وكتابة الملفات. النموذج يقرر أي تحليل يجريه بناءً على محتوى الملف.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>تنفيذ الأكواد</h4>
+        <p>تشغيل كود Python في بيئة معزولة. النموذج يحلل البيانات، وينشئ رسومات بيانية، ويدرّب نماذج.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>معالجة الأخطاء والأمان</h2>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">ماذا يحدث عندما تفشل الأدوات؟</p>
+    <p>
+      الأدوات ستفشل. انقطاع الشبكة، مدخلات غير صالحة، تجاوز حدود API، أخطاء الصلاحيات. يجب عليك:
+    </p>
+    <ul>
+      <li><strong>التعامل مع الأخطاء بسلاسة:</strong> لا تتوقف. أرجع رسالة خطأ إلى Claude.</li>
+      <li><strong>التحقق من المدخلات:</strong> تحقق من معاملات الأداة قبل التنفيذ. أخبر Claude إذا كان معامل غير صالح.</li>
+      <li><strong>تحديد مهلة زمنية:</strong> يجب أن تنتهي مهلة الأدوات بعد فترة معقولة، لا أن تعلق للأبد.</li>
+      <li><strong>تسجيل كل شيء:</strong> لأغراض التصحيح، سجّل ما طلبه النموذج وما حدث.</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Error Handling</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">process_tool_call</span>(tool_name, tool_input):
+    <span class="keyword">try</span>:
+        <span class="keyword">if</span> tool_name == <span class="string">"web_search"</span>:
+            <span class="comment"># Validate input</span>
+            query = tool_input.<span class="func">get</span>(<span class="string">"query"</span>, <span class="string">""</span>)
+            <span class="keyword">if</span> <span class="keyword">not</span> query <span class="keyword">or</span> <span class="func">len</span>(query) > <span class="number">500</span>:
+                <span class="keyword">return</span> <span class="string">"Error: query required, max 500 chars"</span>
+
+            <span class="comment"># Execute with timeout</span>
+            result = search_api.<span class="func">search</span>(query, timeout=<span class="number">5</span>)
+            <span class="keyword">return</span> result
+
+    <span class="keyword">except</span> TimeoutError:
+        <span class="keyword">return</span> <span class="string">"Error: search timed out. Try a simpler query."</span>
+    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:
+        <span class="keyword">return</span> f<span class="string">"Error: {str(e)}"</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الأمان وحواجز الحماية</p>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>الأدوات يمكن أن يكون لها تأثير حقيقي</h4>
+        <p>
+          أداة تحذف ملفات، أو تحوّل أموالاً، أو ترسل بريداً إلكترونياً يمكن أن تسبب ضرراً حقيقياً إذا أُسيء استخدامها.
+          نفّذ دائماً حواجز حماية: تدفقات الموافقة للإجراءات الحساسة، تحديد المعدل، سجلات التدقيق،
+          وفحوصات الصلاحيات بناءً على هوية المستخدم.
+        </p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>تدفقات الموافقة</h4>
+        <p>
+          للإجراءات الحساسة (المدفوعات، الحذف، استدعاءات API ذات الآثار الجانبية)، فكّر في طلب موافقة بشرية.
+          النموذج يمكنه طلب إجراء، لكن الكود الخاص بك يسأل المستخدم عن التأكيد قبل التنفيذ.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما الفرق الجوهري بين استخدام الأدوات وRAG؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">RAG يستخدم واجهات برمجية بينما استخدام الأدوات يستخدم قواعد بيانات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">في RAG أنت تسترجع المستندات؛ في استخدام الأدوات النموذج يقرر أي أدوات يستدعي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخدام الأدوات أسرع لكن أقل دقة من RAG</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">هما نفس الشيء بأسماء مختلفة</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. من ينفذ الأداة الفعلية (استدعاء API، استعلام قاعدة البيانات، إلخ)؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النموذج ينفذ الأدوات مباشرة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">الكود الخاص بك ينفذ الأدوات؛ النموذج فقط يطلبها</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">خدمة تنفيذ الأدوات في السحابة تتعامل معها</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">كلاهما النموذج والكود الخاص بك ينفذان بالتوازي</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما هي الخطوة الثانية في خط أنابيب استدعاء الدوال؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أنت تنفذ الأداة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">النموذج يختار أي أداة يستدعي وبأي معاملات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أنت تعرّف الأدوات بصيغة JSON schema</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النموذج يولّد الاستجابة النهائية</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. عندما يطلب النموذج استدعاء أداة، ما الذي يجب أن يفعله الكود أولاً؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تنفيذ الأداة فوراً دون أي فحوصات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">التحقق من معاملات الإدخال قبل التنفيذ</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">سؤال النموذج إذا كان استدعاء الأداة صحيحاً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تسجيل الطلب وتجاهل استدعاء الأداة</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 8</h2>
+    </div>
+    <p>
+      <strong>استخدام الأدوات (استدعاء الدوال)</strong> يتيح للنماذج اتخاذ إجراءات في العالم الحقيقي عبر استدعاء واجهات برمجية، وتشغيل أكواد، والوصول لبيانات حية.
+      النموذج <strong>يقرر متى وكيف</strong> يستخدم الأدوات بناءً على طلبات المستخدم.
+      خط الأنابيب هو: تعريف الأدوات ← النموذج يختار ← أنت تنفذ ← النموذج يستجيب.
+      يجب عليك تنفيذ الحلقة: استدعِ Claude، تحقق من طلبات الأدوات، نفّذ الأدوات، أرجع النتائج، كرر حتى الانتهاء.
+      الأدوات يمكنها دمج البحث في الويب، والآلات الحاسبة، وقواعد البيانات، وواجهات API، وعمليات الملفات، وتنفيذ الأكواد.
+      <strong>حاسم:</strong> أنت تنفذ الأدوات، وليس النموذج. أنت المسؤول عن التحقق ومعالجة الأخطاء والأمان.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 9: قوالب البرومبت والتسلسل</strong><br>
+      <span style="color: var(--text-dim);">ابنِ مكونات برومبت قابلة لإعادة الاستخدام ونسّقها في سير عمل متعدد الخطوات.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-07-rag-concepts.html">السابق →</a>
+  <span class="nav-info">الموضوع 9 من 23</span>
+  <a class="nav-btn primary" href="topic-09-prompt-chains.html">← التالي: قوالب البرومبت والتسلسل</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

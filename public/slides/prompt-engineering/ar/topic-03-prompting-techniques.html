@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 3 — تقنيات البرومبت | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 17%"></div></div>
+    <span class="progress-label">4 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🎯</div>
+    <h1>تقنيات البرومبت</h1>
+    <p>أتقن تقنيات Zero-Shot وFew-Shot وChain-of-Thought وغيرها من الأساليب التي تحسّن جودة المخرجات بشكل جذري.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>البرومبت بدون أمثلة (Zero-Shot)</h2>
+    </div>
+    <p>
+      البرومبت بدون أمثلة (Zero-Shot) يعني سؤال النموذج مباشرة <strong>دون تقديم أي أمثلة</strong>.
+      تصف ما تريده، والنموذج يولّد استجابة بناءً على تدريبه.
+      هذا الأسلوب يعمل جيداً مع المهام البسيطة لكنه قد يعاني مع الطلبات المعقدة أو المتخصصة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">متى يعمل Zero-Shot بشكل جيد:</p>
+    <ul style="margin-right: 20px;">
+      <li>التصنيف البسيط ("هل هذا البريد الإلكتروني رسالة مزعجة؟")</li>
+      <li>أسئلة المعرفة العامة ("ما هو التمثيل الضوئي؟")</li>
+      <li>التنسيق القياسي ("حوّل هذا الـ Markdown إلى HTML")</li>
+      <li>المهام الإبداعية حيث المرونة مقبولة</li>
+    </ul>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">متى يفشل Zero-Shot:</p>
+    <ul style="margin-right: 20px;">
+      <li>تنسيقات المخرجات المحددة جداً التي لم يرها النموذج بكثرة</li>
+      <li>المعرفة المتخصصة أو المصطلحات التقنية</li>
+      <li>الاستدلال المعقد أو المنطق متعدد الخطوات</li>
+      <li>المهام التي تتطلب أسلوباً أو نبرة متسقة جداً</li>
+    </ul>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Zero-Shot (غالباً يفشل)</div>
+<pre>Extract the product name and
+price from this text:
+
+"Buy the TechPro X5 at $299.99!"</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ أفضل: Few-Shot (سنتعلمها لاحقاً)</div>
+<pre>Extract product name and price.
+Format: JSON
+
+Example:
+"Get the UltraBook 3000 for $1299"
+→ {"name": "UltraBook 3000",
+   "price": 1299}
+
+Now extract from:
+"Buy the TechPro X5 at $299.99!"</pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Zero-Shot هو خط الأساس</h4>
+        <p>
+          جرّب دائماً Zero-Shot أولاً. إذا لم تكن النتائج جيدة بما فيه الكفاية، أضف أمثلة.
+          هذا يساعدك على فهم ما يمكن للنموذج فعله تلقائياً مقابل ما يحتاج إلى توجيه.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>البرومبت بأمثلة قليلة (Few-Shot)</h2>
+    </div>
+    <p>
+      البرومبت بأمثلة قليلة (Few-Shot) يعني تقديم <strong>مثال واحد أو أكثر</strong> للمهمة التي تريد إنجازها.
+      يتعلم النموذج النمط من أمثلتك ويطبقه على مدخلات جديدة.
+      هذا أسلوب قوي لتعليم النموذج أسلوبك المحدد أو التنسيق أو المنطق المطلوب.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">1️⃣</div>
+        <h4>مثال واحد (1-Shot)</h4>
+        <p>مناسب للمهام البسيطة حيث مثال واحد كافٍ لإظهار النمط. يستهلك حداً أدنى من التوكنات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">3️⃣</div>
+        <h4>ثلاثة أمثلة (3-Shot)</h4>
+        <p>النقطة المثالية لمعظم الاستخدامات. تُظهر التنوع وتعلّم النمط بقوة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">5️⃣</div>
+        <h4>خمسة أمثلة أو أكثر (5-Shot)</h4>
+        <p>استخدمها عندما تكون المهمة معقدة، أو تحتاج مخرجات متسقة جداً عبر الحالات الحدية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚠️</div>
+        <h4>عوائد متناقصة</h4>
+        <p>بعد 5-10 أمثلة، تتباطأ التحسينات وترتفع تكلفة التوكنات. أمثلة أكثر ≠ مخرجات أفضل.</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال Few-Shot: تصنيف المشاعر</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Few-Shot Sentiment</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># System: You are a sentiment classifier.</span>
+
+Classify sentiment as: Positive, Negative, or Neutral.
+
+<span class="comment"># Examples (few-shot):</span>
+Text: "I love this product!"
+Sentiment: Positive
+
+Text: "This is okay, nothing special."
+Sentiment: Neutral
+
+Text: "Terrible experience, never again."
+Sentiment: Negative
+
+<span class="comment"># Now classify:</span>
+Text: "The movie was pretty good actually."
+Sentiment: <span class="string">?</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Few-Shot في استدعاءات API بايثون</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Few-Shot API</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+messages = [
+    {
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: <span class="string">"""Classify sentiment: Positive, Negative, Neutral.
+
+Example:
+"Love it!" → Positive
+"It's fine" → Neutral
+"Awful" → Negative
+
+Now classify: "Pretty good!"
+Answer in one word only."""</span>
+    }
+]
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">100</span>,
+    <span class="param">messages</span>=messages
+)
+
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>أفضل ممارسة لـ Few-Shot</h4>
+        <p>
+          <strong>التنوع مهم.</strong> يجب أن تغطي أمثلتك الحالات الحدية والتنوعات.
+          لا تعطِ 3 أمثلة متشابهة تقريباً — أظهر للنموذج نطاق المدخلات التي قد يراها.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>سلسلة التفكير (Chain-of-Thought)</h2>
+    </div>
+    <p>
+      سلسلة التفكير (CoT) هي العبارة السحرية: <strong>"Let's think step by step."</strong>
+      هذه التعليمة البسيطة تخبر النموذج أن يُظهر استدلاله قبل تقديم الإجابة النهائية.
+      وهي تحسّن الأداء بشكل كبير في مهام الرياضيات والمنطق والاستدلال.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ بدون CoT</div>
+<pre>Q: If a train travels at 60 mph
+for 2.5 hours, how far does it go?
+
+A: 150 miles</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ مع CoT</div>
+<pre>Q: If a train travels at 60 mph
+for 2.5 hours, how far does it go?
+
+Let's think step by step:
+1. Distance = Speed × Time
+2. Speed = 60 mph
+3. Time = 2.5 hours
+4. 60 × 2.5 = 150 miles
+
+A: 150 miles</pre>
+      </div>
+    </div>
+
+    <p>
+      بدون CoT، قد يرتكب النموذج أخطاء حسابية بسبب التسرع. مع CoT، يُجبر النموذج على
+      <strong>تفكيك</strong> المشكلة وإظهار كل خطوة، مما يجعل الأخطاء أسهل في الاكتشاف.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">لماذا تعمل CoT:</p>
+    <ul style="margin-right: 20px;">
+      <li><strong>التفكيك:</strong> تقسيم المهام المعقدة إلى خطوات</li>
+      <li><strong>اكتشاف الأخطاء:</strong> الأخطاء تصبح مرئية في الاستدلال</li>
+      <li><strong>التمثيلات الوسيطة:</strong> كل خطوة تصقل الفهم</li>
+      <li><strong>منع الاختصارات:</strong> تفرض استدلالاً فعلياً بدلاً من مطابقة الأنماط</li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Chain-of-Thought</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>Q: Alice has 5 apples. She buys 3 more.
+Then she gives half to Bob. How many
+does Alice have left?
+
+Let's solve this step by step:
+Step 1: ...
+Step 2: ...
+Step 3: Final answer: ...</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>CoT ليست سحراً لكل شيء</h4>
+        <p>
+          CoT مثالية للاستدلال والرياضيات والمنطق. لكن للاسترجاع البسيط أو التصنيف، تضيف توكنات غير ضرورية.
+          استخدمها عندما تتطلب المهمة تفكيراً، وليس لكل مهمة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>الاتساق الذاتي (Self-Consistency)</h2>
+    </div>
+    <p>
+      الاتساق الذاتي هو تقنية تقوم فيها <strong>بتشغيل نفس البرومبت عدة مرات</strong> بمسارات CoT مختلفة،
+      ثم <strong>اختيار الإجابة الأكثر شيوعاً</strong>. إنها مثل سؤال النموذج نفس السؤال بعدة طرق
+      وترك التصويت بالأغلبية يقرر. هذا يحسّن دقة الاستدلال بشكل كبير.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: تصويت هيئة المحلفين</h4>
+        <p>
+          محلّف واحد قد يخطئ. لكن إذا صوّت 10 محلفين بشكل مستقل، فقرار الأغلبية
+          يكون صحيحاً عادةً. الاتساق الذاتي يطبق نفس المبدأ — شغّل عدة تمريرات استدلالية
+          وثق بالإجماع.
+        </p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">كيف يعمل الاتساق الذاتي:</p>
+    <ol style="margin-right: 20px;">
+      <li>شغّل النموذج 5-10 مرات (أو أكثر) على نفس السؤال مع حرارة أعلى من 0 (للتنوع)</li>
+      <li>كل تشغيل يولّد سلسلة استدلال CoT وإجابة نهائية</li>
+      <li>استخرج الإجابة النهائية من كل تشغيل</li>
+      <li>احسب أي إجابة تظهر أكثر (تصويت الأغلبية)</li>
+      <li>أعد الإجابة الأكثر شيوعاً</li>
+    </ol>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Self-Consistency Implementation</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> collections <span class="keyword">import</span> Counter
+<span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">self_consistency_reasoning</span>(question, num_runs=<span class="number">5</span>):
+    <span class="string">"""Run reasoning multiple times and pick majority answer."""</span>
+    answers = []
+
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="func">range</span>(num_runs):
+        response = client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            <span class="param">max_tokens</span>=<span class="number">500</span>,
+            <span class="param">temperature</span>=<span class="number">1.0</span>,  <span class="comment"># Higher temp = more variation</span>
+            <span class="param">messages</span>=[{
+                <span class="string">"role"</span>: <span class="string">"user"</span>,
+                <span class="string">"content"</span>: <span class="string">f"{question}\nLet's think step by step, then give final answer."</span>
+            }]
+        )
+        text = response.content[<span class="number">0</span>].text
+        <span class="comment"># Extract final answer (simple approach; in production, parse more carefully)</span>
+        answers.<span class="func">append</span>(text)
+
+    <span class="comment"># Majority voting on answers</span>
+    most_common = <span class="func">Counter</span>(answers).<span class="func">most_common</span>(<span class="number">1</span>)[<span class="number">0</span>][<span class="number">0</span>]
+    <span class="keyword">return</span> most_common
+
+answer = <span class="func">self_consistency_reasoning</span>(<span class="string">"5 + 3 * 2 = ?"</span>, num_runs=<span class="number">5</span>)
+<span class="func">print</span>(<span class="string">f"Most consistent answer: {answer}"</span>)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>متى تستخدم الاتساق الذاتي</h4>
+        <p>
+          استخدم الاتساق الذاتي لمهام الاستدلال عالية الأهمية حيث الدقة مهمة:
+          مسائل الرياضيات، الألغاز المنطقية، توليد الكود، التحليل المعقد.
+          تخطّها للمهام البسيطة أو عندما تكون مقيداً بحد الطلبات.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>البرومبت بالأدوار (Role Prompting)</h2>
+    </div>
+    <p>
+      البرومبت بالأدوار يعني <strong>تعيين هوية أو خبرة معينة للنموذج</strong> قبل طرح سؤالك.
+      "أنت جراح أقدم" ينتج إجابات مختلفة عن "أنت طالب طب."
+      الدور يشكّل عمق المعرفة والمصطلحات وأسلوب الاستدلال.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">عرض تفاعلي: نفس السؤال، أدوار مختلفة</p>
+    <div class="demo-box">
+      <h4>🧪 عرض تأثير الدور</h4>
+      <div class="demo-label">السؤال:</div>
+      <div class="demo-textarea" id="roleQuestion" rows="2">A patient complains of persistent chest pain. What should we do?</div>
+
+      <div class="demo-label" style="margin-top: 16px;">اختر دوراً:</div>
+      <div class="demo-row">
+        <button class="demo-btn-secondary active" onclick="setRole(this, 'cardiologist')">طبيب قلب</button>
+        <button class="demo-btn-secondary" onclick="setRole(this, 'paramedic')">مسعف</button>
+        <button class="demo-btn-secondary" onclick="setRole(this, 'scientist')">عالم</button>
+      </div>
+
+      <button class="demo-btn" onclick="demonstrateRolePrompting()">شاهد كيف يغيّر الدور أسلوب الإجابة</button>
+      <div class="demo-output" id="roleOutput"></div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال: نفس المحتوى، خبرات مختلفة</p>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-label" style="color: var(--blue);">مطوّر مبتدئ</div>
+<pre>"You are a junior Python developer
+with 1 year of experience."
+
+Q: How do I make my code faster?
+A: Use for loops instead of while
+loops. Or maybe try list
+comprehensions?</pre>
+      </div>
+      <div class="compare-card">
+        <div class="compare-label" style="color: var(--green);">مهندس معماري أقدم</div>
+<pre>"You are a senior Python architect
+at a Fortune 500 company."
+
+Q: How do I make my code faster?
+A: Profile with cProfile to identify
+bottlenecks. Consider algorithmic
+complexity. Evaluate caching,
+vectorization, or compiled
+extensions (Cython, numba).</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>الأدوار تشكّل جودة المخرجات</h4>
+        <p>
+          الأدوار الأكثر خبرة تنتج استدلالاً أعمق ومصطلحات أفضل ومخرجات أعلى جودة.
+          لا تقل فقط "مطوّر" — قل "مهندس خلفية أقدم بخبرة 10 سنوات في AWS وKubernetes."
+          الدقة في الدور تحسّن الدقة في الاستجابة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>دمج التقنيات</h2>
+    </div>
+    <p>
+      القوة الحقيقية تأتي من <strong>دمج التقنيات معاً</strong>. قد تستخدم
+      البرومبت بالأدوار + أمثلة قليلة + سلسلة التفكير معاً. المفتاح هو معرفة متى تساعد كل تقنية.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">دليل اتخاذ القرار: أي تقنيات تستخدم؟</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>تصنيف بسيط</h4>
+        <p>Zero-Shot يعمل عادةً. أضف Few-Shot إذا لزم الأمر للحالات الحدية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💭</div>
+        <h4>استدلال معقد</h4>
+        <p>استخدم دائماً CoT. أضف الاتساق الذاتي للمهام عالية الأهمية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💼</div>
+        <h4>مخرجات احترافية</h4>
+        <p>استخدم بروبمت دور قوي + أمثلة قليلة لضبط النبرة والأسلوب.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>مهمة متخصصة</h4>
+        <p>دور + أمثلة قليلة + تنسيق منظم (من الموضوع 4) = أفضل النتائج.</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال حقيقي: دمج التقنيات</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — All Techniques Combined</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># 1. ROLE PROMPTING</span>
+You are a senior data scientist evaluating
+business proposals.
+
+<span class="comment"># 2. FEW-SHOT EXAMPLES</span>
+Example proposal:
+"Social media app for dog lovers"
+Assessment: High market saturation,
+unclear monetization. RISK: High
+
+Example proposal:
+"AI tool for invoice processing"
+Assessment: Growing demand, B2B SaaS
+model proven. RISK: Medium
+
+<span class="comment"># 3. CHAIN-OF-THOUGHT INSTRUCTION</span>
+Now evaluate this proposal. Think through:
+1. Market size and competition
+2. Technical feasibility
+3. Monetization clarity
+4. Top 3 risks
+
+Proposal: "Healthcare AI startup for
+automated diagnosis"
+
+<span class="comment"># 4. OUTPUT FORMAT</span>
+Provide your assessment in JSON:
+{
+  "summary": "...",
+  "feasibility": "High/Medium/Low",
+  "risks": ["risk1", "risk2", "risk3"]
+}</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>تكديس التقنيات</h4>
+        <p>
+          ابدأ بالبسيط (Zero-Shot)، ثم أضف طبقات حسب الحاجة: أضف أمثلة، أضف CoT، أضف دوراً.
+          كل طبقة تضيف توكنات وتعقيداً، لذا استخدم فقط ما هو ضروري. قس النتائج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما هو البرومبت بدون أمثلة (Zero-Shot)؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">سؤال النموذج مباشرة دون تقديم أمثلة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تشغيل النموذج عدة مرات والتصويت على الإجابة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تقديم خمسة أمثلة أو أكثر للنموذج</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جعل النموذج يشرح استدلاله خطوة بخطوة</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. متى تكون سلسلة التفكير (CoT) أكثر قيمة؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لمهام التصنيف البسيطة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">لمهام الرياضيات والمنطق والاستدلال التي تستفيد من التفكير خطوة بخطوة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط عندما يكون لديك أمثلة متعددة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما يكون البرومبت أطول من 1000 كلمة</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ماذا يفعل الاتساق الذاتي (Self-Consistency)؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يصحح تلقائياً أخطاء القواعد والإملاء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">يشغّل النموذج عدة مرات ويختار الإجابة الأكثر شيوعاً عبر تصويت الأغلبية</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يتأكد أن المخرجات تطابق قالب تنسيق محدد</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يقارن مخرجات نموذجين مختلفين</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. كيف يؤثر البرومبت بالأدوار على استجابات النموذج؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يجعل الاستجابات أقصر وأسرع</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">يشكّل عمق المعرفة والمصطلحات وأسلوب الاستدلال بناءً على الخبرة المُعيّنة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">يتطلب من النموذج ذكر المصادر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">ينتج دائماً إجابات صحيحة واقعياً</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 3</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      <strong>Zero-Shot</strong> هو خط الأساس — اسأل مباشرة بدون أمثلة.
+      <strong>Few-Shot</strong> يعلّم النموذج بالأمثلة (1-5 عادةً الأفضل).
+      <strong>سلسلة التفكير</strong> تفرض استدلالاً خطوة بخطوة، قوية خاصةً للرياضيات والمنطق.
+      <strong>الاتساق الذاتي</strong> يشغّل عدة مرات ويصوّت على الإجابة، مما يحسّن الدقة بشكل كبير.
+      <strong>البرومبت بالأدوار</strong> يعيّن خبرة تشكّل عمق وأسلوب المخرجات.
+      <strong>دمج التقنيات</strong> يضاعف قوتها — لكن أبقِ الأمور بسيطة.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 4: البرومبت المتقدم</strong><br>
+      <span style="color: var(--text-dim);">تعلّم وسوم XML، والمخرجات المنظمة، والبرومبت السلبي، وأنماط الإنتاج الاحترافية.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-02-prompt-structure-basics.html">السابق →</a>
+  <span class="nav-info">الموضوع 4 من 23</span>
+  <a class="nav-btn primary" href="topic-04-advanced-prompting.html">← التالي: البرومبت المتقدم</a>
+</div>
+
+<script>
+// ── Role Prompting Demo ──
+let currentRole = 'cardiologist';
+
+const roleResponses = {
+  cardiologist: "As a cardiologist, I would: 1) Conduct an EKG to check for arrhythmias or ischemia. 2) Order troponin levels to rule out MI. 3) Assess risk factors (age, family history, smoking). 4) Consider stress testing if initial workup is negative. 5) Refer for cardiac catheterization if needed.",
+  paramedic: "As a paramedic, I would: 1) Get vital signs immediately (BP, HR, O2 sat). 2) Apply oxygen if SpO2 < 94%. 3) Establish IV access. 4) Run a 12-lead EKG and transmit to hospital. 5) Transport immediately to nearest PCI-capable facility. 6) Monitor continuously.",
+  scientist: "From a physiological perspective: Chest pain indicates potential cardiac, pulmonary, or musculoskeletal causes. We should: 1) Gather diagnostic data (biomarkers, imaging). 2) Rule out serious conditions systematically. 3) Consider pain mechanisms. 4) Evaluate risk factors epidemiologically. 5) Apply evidence-based protocols."
+};
+
+const roleLabels = {
+  cardiologist: 'طبيب القلب',
+  paramedic: 'المسعف',
+  scientist: 'العالم'
+};
+
+function setRole(btn, role) {
+  document.querySelectorAll('.demo-btn-secondary').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRole = role;
+}
+
+function demonstrateRolePrompting() {
+  const output = document.getElementById('roleOutput');
+  const response = roleResponses[currentRole];
+  const label = roleLabels[currentRole];
+  output.innerHTML = `<strong>Response from ${currentRole}:</strong>\n\n${response}\n\n<span style="color:#8b91a8;">لاحظ كيف أن نفس السؤال الطبي يحصل على إجابات مختلفة بناءً على الدور والخبرة.</span>`;
+  output.style.display = 'block';
+}
+
+</script>
+
+<script src="../slides.js"></script>
+</body>
+</html>

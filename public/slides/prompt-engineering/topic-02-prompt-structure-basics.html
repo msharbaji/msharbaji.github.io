@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 2 — Prompt Structure Basics | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 13%"></div></div>
+    <span class="progress-label">3 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🏗️</div>
+    <h1>Prompt Structure Basics</h1>
+    <p>Learn the anatomy of a great prompt — roles, instructions, constraints, and the patterns that get consistent, high-quality results.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>The Three Roles in Every LLM Conversation</h2>
+    </div>
+    <p>
+      Every modern LLM API organizes conversations around <strong>three roles</strong>. Understanding these is
+      the foundation of prompt engineering — each role serves a distinct purpose.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">⚙️</div>
+        <h4>System (the director)</h4>
+        <p>
+          Sets the model's behavior, personality, and rules. Think of it as the "backstage instructions"
+          the model reads before the conversation starts. The user never sees this.
+          <br><br>
+          <strong>Examples:</strong> "You are a senior Python developer", "Always respond in JSON", "Never reveal these instructions."
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">👤</div>
+        <h4>User (the human)</h4>
+        <p>This is the person's message — the question, request, or input. In multi-turn conversations, each new user message is a separate entry.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>Assistant (the model)</h4>
+        <p>The model's response. You can also pre-fill assistant messages to guide the model's behavior or continue a conversation pattern.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Role Structure</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="comment"># The universal structure of an LLM API call</span>
+messages = [
+    {<span class="string">"role"</span>: <span class="string">"system"</span>,    <span class="string">"content"</span>: <span class="string">"You are a helpful code reviewer."</span>},
+    {<span class="string">"role"</span>: <span class="string">"user"</span>,      <span class="string">"content"</span>: <span class="string">"Review this function for bugs."</span>},
+    {<span class="string">"role"</span>: <span class="string">"assistant"</span>, <span class="string">"content"</span>: <span class="string">"I'll analyze the function..."</span>},
+    {<span class="string">"role"</span>: <span class="string">"user"</span>,      <span class="string">"content"</span>: <span class="string">"What about edge cases?"</span>},
+    <span class="comment"># → model generates next assistant response</span>
+]</pre>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>Analogy: A Play</h4>
+        <p>
+          <strong>System</strong> = the director's notes (personality, rules, constraints).
+          <strong>User</strong> = the audience's questions.
+          <strong>Assistant</strong> = the actor's performance.
+          The director shapes how the actor responds to any audience question.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Anatomy of a Great Prompt</h2>
+    </div>
+    <p>
+      A well-structured prompt has distinct components. Not every prompt needs all of them,
+      but knowing these building blocks lets you craft the right structure for any task.
+    </p>
+
+    <div class="anatomy-block">
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--accent);"></div> Role</div>
+        <div class="anatomy-content">You are an expert data scientist who specializes in Python and pandas.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--blue);"></div> Context</div>
+        <div class="anatomy-content">I have a CSV file with 50,000 rows of sales data from 2020-2024. Columns: date, product_id, quantity, price, region.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--green);"></div> Task</div>
+        <div class="anatomy-content">Write a Python script that identifies the top 10 products by revenue for each region, with month-over-month growth rates.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--orange);"></div> Format</div>
+        <div class="anatomy-content">Return clean, commented Python code. Use pandas. Include a summary table printed to console.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-label"><div class="dot" style="background: var(--red);"></div> Constraints</div>
+        <div class="anatomy-content">Do not use any external libraries beyond pandas and numpy. Handle missing values gracefully.</div>
+      </div>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag-pill"><span class="dot" style="background: var(--accent);"></span> Role</span>
+      <span class="tag-pill"><span class="dot" style="background: var(--blue);"></span> Context</span>
+      <span class="tag-pill"><span class="dot" style="background: var(--green);"></span> Task</span>
+      <span class="tag-pill"><span class="dot" style="background: var(--orange);"></span> Format</span>
+      <span class="tag-pill"><span class="dot" style="background: var(--red);"></span> Constraints</span>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>The Golden Rule</h4>
+        <p>
+          Be <strong>specific about what you want</strong>, not just what you're asking about.
+          "Write Python code" is vague. "Write a pandas script with comments, error handling,
+          and a printed summary table" gives the model a clear target to hit.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>The Power of System Prompts</h2>
+    </div>
+    <p>
+      The system prompt is your <strong>most powerful tool</strong>. It shapes every response the model gives,
+      setting its personality, expertise, rules, and output style before the conversation even begins.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Weak System Prompt</div>
+<pre>You are a helpful assistant.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Strong System Prompt</div>
+<pre>You are a senior backend engineer
+at a fintech startup. You write
+clean, production-ready Python 3.12
+code. You always:
+- Include type hints
+- Add docstrings (Google style)
+- Handle errors with specific
+  exception types
+- Suggest tests for critical paths
+
+When reviewing code, be direct and
+concise. Flag security issues first.</pre>
+      </div>
+    </div>
+
+    <p>Here are the key ingredients of a powerful system prompt:</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎭</div>
+        <h4>Identity & Expertise</h4>
+        <p>Define WHO the model is. "You are a senior DevOps engineer with 10 years of AWS experience" focuses its knowledge.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📐</div>
+        <h4>Behavioral Rules</h4>
+        <p>Set HOW it should respond. "Always ask clarifying questions before writing code" or "Never apologize, just fix the issue."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>Output Format</h4>
+        <p>Define WHAT the output looks like. "Respond in JSON", "Use markdown headers", "Keep responses under 200 words."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>Guardrails</h4>
+        <p>Set LIMITS on behavior. "Never generate SQL without a WHERE clause", "Decline requests outside your domain."</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Pro Tip: Use XML Tags for Structure</h4>
+        <p>
+          Claude (Anthropic) responds especially well to XML-tagged prompts. Wrapping sections in tags like
+          <code>&lt;context&gt;</code>, <code>&lt;instructions&gt;</code>, and <code>&lt;rules&gt;</code>
+          helps the model parse complex prompts more accurately. We'll cover this in depth in Topic 4.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Good vs. Bad Prompts — Side by Side</h2>
+    </div>
+    <p>
+      The difference between a mediocre and an excellent prompt often comes down to <strong>specificity</strong>.
+      Let's look at real examples across different use cases.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example 1: Code Generation</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Vague</div>
+<pre>Write a function to process data.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Specific</div>
+<pre>Write a Python function called
+`clean_sales_data` that:
+- Takes a pandas DataFrame
+- Removes rows where 'price' &lt; 0
+- Fills missing 'region' with
+  "Unknown"
+- Returns the cleaned DataFrame
+- Include type hints and a docstring</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example 2: Writing / Content</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Vague</div>
+<pre>Write an email about the meeting.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Specific</div>
+<pre>Write a professional email to the
+engineering team summarizing today's
+sprint retrospective.
+
+Tone: Friendly but concise.
+Include: 3 things that went well,
+2 action items, next sprint date.
+Length: Under 150 words.</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">Example 3: Analysis / Reasoning</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Vague</div>
+<pre>What do you think about this idea?</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ Specific</div>
+<pre>Evaluate this startup idea as a
+skeptical VC partner:
+
+Idea: AI-powered meal planning app
+Target: Busy professionals, age 25-40
+
+Analyze:
+1. Market size & competition
+2. Technical feasibility
+3. Monetization strategy
+4. Top 3 risks
+
+Be brutally honest. Use data.</pre>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Common Mistake: Assuming the Model Reads Your Mind</h4>
+        <p>
+          The #1 beginner error is writing prompts that assume context you haven't provided.
+          The model doesn't know your project, your preferences, or your deadline.
+          If it matters, <strong>say it explicitly</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The Instruction Hierarchy</h2>
+    </div>
+    <p>
+      When the model receives conflicting instructions, it follows a priority order.
+      Understanding this helps you write prompts that work reliably in production.
+    </p>
+
+    <div style="margin: 24px 0;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 100%; background: linear-gradient(90deg, var(--accent), rgba(45, 212, 191,0.3)); border-radius: 8px; padding: 14px 18px; font-size: 14px; font-weight: 600; color: #fff;">
+          1. System Prompt — Highest priority. Sets foundational rules.
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 92%; margin-left: 4%; background: linear-gradient(90deg, var(--blue), rgba(96,165,250,0.3)); border-radius: 8px; padding: 14px 18px; font-size: 14px; font-weight: 600; color: #fff;">
+          2. User Messages — The person's requests and inputs.
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 84%; margin-left: 8%; background: linear-gradient(90deg, var(--green), rgba(52,211,153,0.3)); border-radius: 8px; padding: 14px 18px; font-size: 14px; font-weight: 600; color: #fff;">
+          3. Assistant Pre-fills — Guided continuations.
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 76%; margin-left: 12%; background: linear-gradient(90deg, var(--orange), rgba(245,158,11,0.3)); border-radius: 8px; padding: 14px 18px; font-size: 14px; font-weight: 600; color: #fff;">
+          4. Injected Context (RAG docs, tool outputs) — Lowest.
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>Why This Matters</h4>
+        <p>
+          In production apps, you put safety rules and output format in the <strong>system prompt</strong>
+          so they can't be overridden by user input. This is the basis of
+          <strong>prompt injection defense</strong> — a critical skill we'll cover later.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Interactive: Build Your Own Prompt</h2>
+    </div>
+    <p>
+      Practice structuring a prompt using the building blocks you've learned.
+      Select a task type, then build a prompt piece by piece.
+    </p>
+
+    <div class="demo-box">
+      <h4>🧪 Prompt Builder</h4>
+
+      <div class="demo-label">1. Choose a task type:</div>
+      <div class="demo-row" style="margin-top: 6px; margin-bottom: 16px;">
+        <button class="demo-btn-secondary active" onclick="selectTask(this, 'code')">Code Generation</button>
+        <button class="demo-btn-secondary" onclick="selectTask(this, 'writing')">Writing / Content</button>
+        <button class="demo-btn-secondary" onclick="selectTask(this, 'analysis')">Analysis</button>
+      </div>
+
+      <div class="demo-label">2. Fill in each component (or use the pre-filled example):</div>
+
+      <div style="margin: 10px 0;">
+        <div class="demo-label" style="color: var(--accent-light); font-weight: 700;">Role:</div>
+        <textarea class="demo-textarea" id="buildRole" rows="1">You are a senior Python developer specializing in clean, production-ready code.</textarea>
+      </div>
+
+      <div style="margin: 10px 0;">
+        <div class="demo-label" style="color: var(--blue); font-weight: 700;">Context:</div>
+        <textarea class="demo-textarea" id="buildContext" rows="2">I'm building a REST API with FastAPI for a todo app. The database is PostgreSQL using SQLAlchemy ORM.</textarea>
+      </div>
+
+      <div style="margin: 10px 0;">
+        <div class="demo-label" style="color: var(--green); font-weight: 700;">Task:</div>
+        <textarea class="demo-textarea" id="buildTask" rows="2">Create a CRUD endpoint for managing todo items (create, read, update, delete).</textarea>
+      </div>
+
+      <div style="margin: 10px 0;">
+        <div class="demo-label" style="color: var(--orange); font-weight: 700;">Format:</div>
+        <textarea class="demo-textarea" id="buildFormat" rows="1">Return complete, runnable Python code with type hints, docstrings, and inline comments.</textarea>
+      </div>
+
+      <div style="margin: 10px 0;">
+        <div class="demo-label" style="color: var(--red); font-weight: 700;">Constraints:</div>
+        <textarea class="demo-textarea" id="buildConstraints" rows="1">Use async/await. Include proper error handling with HTTPException. No raw SQL.</textarea>
+      </div>
+
+      <button class="demo-btn" onclick="buildPrompt()">Assemble Prompt</button>
+      <div class="demo-output" id="buildOutput"></div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Real API Example: Putting It All Together</h2>
+    </div>
+    <p>
+      Let's see a complete, production-style API call that uses everything from this lesson:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Example</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="comment"># A well-structured system prompt</span>
+SYSTEM_PROMPT = <span class="string">"""You are a senior code reviewer at a tech company.
+
+Your review style:
+- Be direct and constructive
+- Flag bugs and security issues first
+- Suggest improvements with code examples
+- Rate code quality: Excellent / Good / Needs Work / Critical Issues
+
+Output format:
+## Summary
+[1-2 sentence overview]
+
+## Issues Found
+[Numbered list, severity: 🔴 Critical, 🟡 Warning, 🔵 Info]
+
+## Suggested Improvements
+[Concrete code suggestions]
+
+## Rating
+[One of: Excellent / Good / Needs Work / Critical Issues]
+"""</span>
+
+<span class="comment"># The user's request with context</span>
+user_message = <span class="string">"""Review this Python function:
+
+```python
+def get_user(id):
+    conn = sqlite3.connect('users.db')
+    result = conn.execute(f"SELECT * FROM users WHERE id = {id}")
+    return result.fetchone()
+```
+"""</span>
+
+<span class="comment"># Make the API call</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">1024</span>,
+    <span class="param">temperature</span>=<span class="number">0</span>,        <span class="comment"># deterministic for code review</span>
+    <span class="param">system</span>=SYSTEM_PROMPT,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: user_message}]
+)
+
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Try This Yourself</h4>
+        <p>
+          Copy this code, get a free API key from <code>console.anthropic.com</code>, set it as
+          <code>ANTHROPIC_API_KEY</code> in your environment, and run it. You'll see the model
+          catch the SQL injection vulnerability and suggest parameterized queries. This is prompt engineering in action.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. Which role has the highest priority and sets foundational rules for the model?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">User</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">System</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Assistant</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They all have equal priority</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. What are the 5 building blocks of a well-structured prompt?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Role, Context, Task, Format, Constraints</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">System, User, Assistant, Temperature, Tokens</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Input, Processing, Output, Feedback, Loop</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Question, Answer, Example, Validation, Result</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. Why is "Write a function to process data" a weak prompt?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It's too short — prompts need to be long</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It doesn't specify a programming language</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">It lacks specificity — no context about what data, what processing, or what output is expected</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">It doesn't include a system prompt</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. In a production app, where should you put safety rules and output format?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">In the system prompt — so they can't be overridden by user input</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">In the user message — so they're most visible</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">In the assistant pre-fill — so they're applied last</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">In external documentation — the model will find them</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 2 Summary</h2>
+    </div>
+    <p>Here's what you've learned:</p>
+    <p>
+      LLM conversations are built on <strong>three roles</strong>: system (director), user (human), assistant (model).
+      Great prompts have five components: <strong>Role, Context, Task, Format, and Constraints</strong>.
+      The <strong>system prompt</strong> is your most powerful tool — it shapes every response.
+      <strong>Specificity</strong> is the single biggest lever for getting better outputs. And instructions follow
+      a <strong>priority hierarchy</strong> that matters for production apps.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 3: Prompting Techniques</strong><br>
+      <span style="color: var(--text-dim);">You'll master zero-shot, few-shot, chain-of-thought, and other techniques that dramatically improve output quality.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-model-selection.html">← Model Selection</a>
+  <span class="nav-info">Topic 3 of 23</span>
+  <a class="nav-btn primary" href="topic-03-prompting-techniques.html">Next: Prompting Techniques →</a>
+</div>
+
+<script>
+// ── Task Selector ──
+const taskTemplates = {
+  code: {
+    role: "You are a senior Python developer specializing in clean, production-ready code.",
+    context: "I'm building a REST API with FastAPI for a todo app. The database is PostgreSQL using SQLAlchemy ORM.",
+    task: "Create a CRUD endpoint for managing todo items (create, read, update, delete).",
+    format: "Return complete, runnable Python code with type hints, docstrings, and inline comments.",
+    constraints: "Use async/await. Include proper error handling with HTTPException. No raw SQL."
+  },
+  writing: {
+    role: "You are a tech blog writer who explains complex topics in a friendly, accessible way.",
+    context: "Target audience: junior developers with 1-2 years of experience. Blog platform: Medium.",
+    task: "Write a blog post explaining the difference between REST and GraphQL APIs.",
+    format: "Use markdown with headers. Include 1-2 code snippets. Length: 800-1000 words.",
+    constraints: "Avoid jargon without explanation. Don't be biased — present both fairly. Include a 'When to use which' section."
+  },
+  analysis: {
+    role: "You are a data-driven product strategist with experience at FAANG companies.",
+    context: "We're a B2B SaaS startup with 500 customers, $2M ARR, 15% monthly churn rate.",
+    task: "Analyze our churn rate and propose 3 data-driven strategies to reduce it below 5%.",
+    format: "Structure as: Executive Summary → Analysis → 3 Strategies (each with expected impact, timeline, cost) → Recommended Priority.",
+    constraints: "Base recommendations on common SaaS metrics. Cite industry benchmarks. Be realistic about timelines."
+  }
+};
+
+function selectTask(btn, type) {
+  document.querySelectorAll('.demo-btn-secondary').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = taskTemplates[type];
+  document.getElementById('buildRole').value = t.role;
+  document.getElementById('buildContext').value = t.context;
+  document.getElementById('buildTask').value = t.task;
+  document.getElementById('buildFormat').value = t.format;
+  document.getElementById('buildConstraints').value = t.constraints;
+  document.getElementById('buildOutput').style.display = 'none';
+}
+
+function buildPrompt() {
+  const role = document.getElementById('buildRole').value.trim();
+  const context = document.getElementById('buildContext').value.trim();
+  const task = document.getElementById('buildTask').value.trim();
+  const format = document.getElementById('buildFormat').value.trim();
+  const constraints = document.getElementById('buildConstraints').value.trim();
+
+  let prompt = '';
+  if (role) prompt += `<span style="color:#c792ea;font-weight:600;">[SYSTEM PROMPT]</span>\n${role}\n\n`;
+  if (context) prompt += `<span style="color:#60a5fa;font-weight:600;">[CONTEXT]</span>\n${context}\n\n`;
+  if (task) prompt += `<span style="color:#34d399;font-weight:600;">[TASK]</span>\n${task}\n\n`;
+  if (format) prompt += `<span style="color:#f59e0b;font-weight:600;">[FORMAT]</span>\n${format}\n\n`;
+  if (constraints) prompt += `<span style="color:#f87171;font-weight:600;">[CONSTRAINTS]</span>\n${constraints}`;
+
+  const tokenEst = Math.round((role + context + task + format + constraints).length / 4);
+
+  const output = document.getElementById('buildOutput');
+  output.innerHTML = prompt + `\n\n<span style="color:#8b91a8;">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>\n<span style="color:#8b91a8;">Estimated tokens: ~${tokenEst} input tokens</span>`;
+  output.style.display = 'block';
+}
+
+</script>
+
+<script src="slides.js"></script>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 9 — قوالب البرومبت والتسلسل | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 43%"></div></div>
+    <span class="progress-label">10 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⛓️</div>
+    <h1>قوالب البرومبت والتسلسل</h1>
+    <p>ابنِ مكونات برومبت قابلة لإعادة الاستخدام وسلسلها في سير عمل متعدد الخطوات وقوي.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>لماذا القوالب؟</h2>
+    </div>
+    <p>
+      مع نمو نظام الذكاء الاصطناعي الخاص بك، ستكتب نفس البرومبتات مراراً وتكراراً بمدخلات مختلفة.
+      <strong>قوالب البرومبت</strong> تحل هذه المشكلة — فهي قابلة لإعادة الاستخدام ومتسقة وأسهل في الصيانة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مبدأ DRY</p>
+    <p>
+      DRY = "Don't Repeat Yourself" (لا تكرر نفسك). كتابة البرومبتات مباشرة في الكود تنتهك هذا المبدأ.
+      إذا قررت تغيير برومبت النظام، يجب أن تجد وتحدّث كل ملف. مع القوالب، تغيّر مكاناً واحداً وينتشر التغيير في كل مكان.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ مكتوب مباشرة</div>
+<pre><span class="keyword">def</span> <span class="func">analyze_code</span>(code):
+    response = client.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        system=<span class="string">"You are a code reviewer..."</span>,
+        messages=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: f<span class="string">"Review this: {code}"</span>
+        }]
+    )
+
+<span class="keyword">def</span> <span class="func">test_code</span>(code):
+    response = client.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        system=<span class="string">"You are a code reviewer..."</span>,
+        messages=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: f<span class="string">"Test: {code}"</span>
+        }]
+    )</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ باستخدام قالب</div>
+<pre>SYSTEM_PROMPT = <span class="string">"You are a code reviewer..."</span>
+
+CODE_REVIEW_TEMPLATE = <span class="string">"""
+Review this code for bugs and
+quality issues:
+
+{code}
+"""</span>
+
+CODE_TEST_TEMPLATE = <span class="string">"""
+Write test cases for this code:
+
+{code}
+"""</span>
+
+<span class="keyword">def</span> <span class="func">call_claude</span>(
+    template, **kwargs
+):
+    content = template.<span class="func">format</span>(**kwargs)
+    <span class="keyword">return</span> client.<span class="func">create</span>(...)</pre>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>فوائد القوالب</h4>
+        <p>
+          إعادة الاستخدام عبر قاعدة الكود بالكامل. اتساق في برومبتات النظام. سهولة الاختبار وإدارة الإصدارات.
+          تقليل الأخطاء الناتجة عن النسخ واللصق. فصل واضح بين منطق البرومبت ومنطق التطبيق.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>بناء قوالب البرومبت</h2>
+    </div>
+    <p>
+      هناك عدة طرق لبناء القوالب. لكل منها مزايا وعيوب. دعنا نقارن ثلاث طرق شائعة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الخيار 1: f-strings في بايثون</p>
+    <p>
+      بسيطة، بدون تبعيات، لكنها محدودة للمنطق المعقد.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — f-string Template</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">TEMPLATE = """
+You are a data analyst.
+
+Analyze this dataset:
+
+{data}
+
+Focus on: {focus_areas}
+"""</span>
+
+result = TEMPLATE.<span class="func">format</span>(
+    data=<span class="string">"10,20,30,40,50"</span>,
+    focus_areas=<span class="string">"trends and outliers"</span>
+)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الخيار 2: Jinja2</p>
+    <p>
+      أقوى بكثير. تدعم الحلقات والشروط والمرشحات. المعيار الصناعي للقوالب.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Jinja2 Template</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> jinja2 <span class="keyword">import</span> Template
+
+template_str = <span class="string">"""
+You are a data analyst.
+
+Analyze this dataset:
+{% for item in data %}
+- {{ item }}
+{% endfor %}
+
+{% if include_summary %}
+Include a summary.
+{% endif %}
+"""</span>
+
+template = <span class="func">Template</span>(template_str)
+result = template.<span class="func">render</span>(
+    data=[<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>],
+    include_summary=<span class="keyword">True</span>
+)</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الخيار 3: LangChain PromptTemplate</p>
+    <p>
+      مصممة لسير عمل النماذج اللغوية. تتكامل مع سلاسل وأدوات LangChain. مناسبة لأنظمة الإنتاج.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — LangChain PromptTemplate</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> langchain.prompts <span class="keyword">import</span> PromptTemplate
+
+template = <span class="func">PromptTemplate</span>(
+    input_variables=[<span class="string">"data"</span>, <span class="string">"focus"</span>],
+    template=<span class="string">"""
+You are a data analyst.
+
+Analyze this dataset:
+{data}
+
+Focus on: {focus}
+"""</span>
+)
+
+prompt = template.<span class="func">format</span>(
+    data=<span class="string">"10,20,30,40,50"</span>,
+    focus=<span class="string">"trends"</span>
+)</pre>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>f-strings</h4>
+        <p><strong>الأفضل لـ:</strong> البرومبتات البسيطة لمرة واحدة. <strong>العيوب:</strong> لا تحقق من المدخلات، قدرات محدودة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚙️</div>
+        <h4>Jinja2</h4>
+        <p><strong>الأفضل لـ:</strong> القوالب المعقدة مع الحلقات والشروط. <strong>العيوب:</strong> تبعية إضافية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>LangChain</h4>
+        <p><strong>الأفضل لـ:</strong> السلاسل وأنظمة الإنتاج. <strong>العيوب:</strong> إطار عمل أثقل.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📝</div>
+        <h4>مخصص</h4>
+        <p><strong>الأفضل لـ:</strong> التحكم الكامل. <strong>العيوب:</strong> أنت تصونه بنفسك.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>متغيرات القالب والتحقق</h2>
+    </div>
+    <p>
+      عندما تحتوي القوالب على متغيرات، تحتاج إلى التحقق من المدخلات. البيانات المفقودة أو غير الصالحة تسبب برومبتات سيئة.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Validated Template</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+<span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+
+<span class="keyword">@</span>dataclass
+<span class="keyword">class</span> <span class="func">AnalysisRequest</span>:
+    <span class="string">"""Request with validation"""</span>
+    dataset: str
+    focus_areas: <span class="keyword">list</span>[str]
+    max_length: <span class="number">500</span> = <span class="number">500</span>
+
+    <span class="keyword">def</span> <span class="func">validate</span>(self):
+        <span class="keyword">if</span> <span class="keyword">not</span> self.dataset:
+            <span class="keyword">raise</span> <span class="func">ValueError</span>(
+                <span class="string">"dataset required"</span>
+            )
+        <span class="keyword">if</span> <span class="func">len</span>(self.dataset) > <span class="number">5000</span>:
+            <span class="keyword">raise</span> <span class="func">ValueError</span>(
+                <span class="string">"dataset too large"</span>
+            )
+        <span class="keyword">if</span> <span class="keyword">not</span> self.focus_areas:
+            self.focus_areas = [<span class="string">"general trends"</span>]
+
+TEMPLATE = <span class="string">"""You are a data analyst.
+
+Analyze:
+{dataset}
+
+Focus: {focus}"""</span>
+
+<span class="keyword">def</span> <span class="func">analyze</span>(request: AnalysisRequest):
+    request.<span class="func">validate</span>()
+    prompt = TEMPLATE.<span class="func">format</span>(
+        dataset=request.dataset,
+        focus=<span class="string">", "</span>.<span class="func">join</span>(request.focus_areas)
+    )
+    <span class="keyword">return</span> client.<span class="func">create</span>(...)</pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>نمط الإنتاج</h4>
+        <p>
+          استخدم dataclasses أو نماذج Pydantic لكائنات الطلب. تحقق من المدخلات قبل إنشاء البرومبت.
+          ضع قيماً افتراضية معقولة للحقول الاختيارية. هذا يمنع وصول برومبتات مشوهة إلى Claude.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>أنماط تسلسل البرومبت</h2>
+    </div>
+    <p>
+      سلاسل البرومبت تربط عدة برومبتات في تسلسلات. مخرجات أحدها تصبح مدخلات للتالي.
+      هذا يمكّن من سير عمل معقد يصعب تحقيقه ببرومبت واحد.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">→</div>
+        <h4>السلسلة التتابعية</h4>
+        <p>الخطوة 1 → الخطوة 2 → الخطوة 3. كل خطوة تستخدم مخرجات الخطوة السابقة. الأفضل لسير العمل متعدد الخطوات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⤴️</div>
+        <h4>السلسلة المتوازية</h4>
+        <p>تشغيل عدة برومبتات في نفس الوقت ثم الدمج. ممتازة للتحليل من عدة وجهات نظر.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔀</div>
+        <h4>السلسلة الشرطية</h4>
+        <p>التوجيه إلى سلاسل مختلفة بناءً على مخرجات النموذج. مثلاً: "هل هذا إيجابي أم سلبي؟" → معالجة مختلفة.</p>
+      </div>
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="icon">🚦</div>
+        <h4>سلسلة التوجيه</h4>
+        <p>النموذج يختار أي سلسلة يستخدم بناءً على المدخلات. "هذا يتعلق بـ X، لذا استخدم معالج X."</p>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال: السلسلة التتابعية</p>
+    <p>
+      استخراج النقاط الرئيسية → التنظيم حسب الموضوع → توليد الملخص → فحص الجودة.
+      كل خطوة تحسّن مخرجات الخطوة السابقة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 16px;">مثال: سلسلة التوجيه</p>
+    <p>
+      مدخلات المستخدم → الموجّه يحدد الموضوع → إذا "تقني"، استخدم المعالج التقني؛ إذا "عام"، استخدم المعالج العام.
+    </p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>بناء سلسلة: ملخص المستندات</h2>
+    </div>
+    <p>
+      لنبنِ سلسلة تتابعية كاملة من 4 خطوات لتلخيص المستندات الطويلة.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>استخراج النقاط الرئيسية</h4>
+          <p>قراءة المستند وتحديد 5-10 أفكار رئيسية. التركيز على المضمون لا الأسلوب.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>التنظيم حسب الموضوع</h4>
+          <p>تجميع النقاط الرئيسية في محاور منطقية. مثلاً: "المقدمة"، "الأساليب"، "النتائج".</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>توليد الملخص</h4>
+          <p>كتابة ملخص موجز من النقاط المنظمة. فقرة أو فقرتان، بحد أقصى 200 كلمة.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>فحص الجودة</h4>
+          <p>التحقق من دقة الملخص وتغطيته للأفكار الرئيسية وعدم وجود معلومات ملفقة. تقييم الجودة من 1-5.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Document Summarization Chain</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">def</span> <span class="func">summarize_document</span>(doc_text: str):
+    <span class="string">"""4-step document summarization chain"""</span>
+
+    <span class="comment"># Step 1: Extract key points</span>
+    extract_prompt = f<span class="string">"""
+Extract 5-10 key points from this document:
+
+{doc_text}
+
+Return only the key points, one per line."""</span>
+
+    response1 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">500</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: extract_prompt}]
+    )
+    key_points = response1.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 2: Organize by theme</span>
+    organize_prompt = f<span class="string">"""
+Organize these key points into logical themes:
+
+{key_points}
+
+Output format:
+[Theme Name]
+- point 1
+- point 2
+"""</span>
+
+    response2 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">500</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: organize_prompt}]
+    )
+    organized = response2.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 3: Generate summary</span>
+    summary_prompt = f<span class="string">"""
+Write a 200-word summary from these organized points:
+
+{organized}
+
+Be concise and accurate. No more than 200 words."""</span>
+
+    response3 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">300</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: summary_prompt}]
+    )
+    summary = response3.content[<span class="number">0</span>].text
+
+    <span class="comment"># Step 4: Quality check</span>
+    quality_prompt = f<span class="string">"""
+Rate this summary on:
+1. Accuracy (no fabrications)
+2. Completeness (covers main ideas)
+3. Clarity (easy to understand)
+4. Conciseness (under 200 words)
+
+Summary:
+{summary}
+
+Rate each 1-5 and explain any issues."""</span>
+
+    response4 = client.messages.<span class="func">create</span>(
+        model=<span class="string">"claude-opus-4-6"</span>,
+        max_tokens=<span class="number">200</span>,
+        messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>,
+                    <span class="string">"content"</span>: quality_prompt}]
+    )
+    quality = response4.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"summary"</span>: summary,
+        <span class="string">"quality_check"</span>: quality
+    }</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>مكتبات التنسيق</h2>
+    </div>
+    <p>
+      للسلاسل المعقدة، توجد مكتبات متخصصة تتعامل مع التعقيد. إليك نظرة سريعة.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>LangChain</h4>
+        <p>الأكثر شعبية. سلاسل وذاكرة ووكلاء وتكامل RAG. توثيق جيد. أثقل لكن غنية بالميزات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🦙</div>
+        <h4>LlamaIndex</h4>
+        <p>تركز على فهرسة البيانات وRAG. ممتازة لمعالجة المستندات. أخف وزناً من LangChain.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧠</div>
+        <h4>Haystack</h4>
+        <p>تركز على البحث وRAG. بنية قائمة على المكونات. جيدة لخطوط أنابيب الإنتاج.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🏗️</div>
+        <h4>ابنِ بنفسك</h4>
+        <p>السلاسل البسيطة لا تحتاج إطار عمل. الكود المخصص يمنحك تحكماً كاملاً ويقلل التبعيات.</p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>متى تستخدم كل واحدة</h4>
+        <p>
+          <strong>LangChain:</strong> وكلاء معقدون متعددو الأدوات، إدارة الذاكرة، تكاملات متعددة.
+          <strong>LlamaIndex:</strong> أنظمة RAG ثقيلة المستندات.
+          <strong>مخصص:</strong> سلاسل بسيطة من 2-3 خطوات، أقصى تحكم وأقل تبعيات.
+          ابدأ بالبسيط، وأضف إطار عمل عند الحاجة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. ما الفائدة الرئيسية من استخدام قوالب البرومبت بدلاً من كتابة البرومبتات مباشرة في الكود؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تولّد ردوداً أفضل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">قابلة لإعادة الاستخدام ومتسقة وسهلة الصيانة عبر قاعدة الكود</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تقلل تكلفة استدعاءات API</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تمكّن الاستدلال متعدد الخطوات</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. أي طريقة قوالب هي الأقوى وتدعم الحلقات والشروط؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">f-strings في بايثون</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">Jinja2</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">LangChain PromptTemplate</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">دمج النصوص</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. في سلسلة البرومبت، ماذا يحدث في كل خطوة؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النموذج يولّد تنويعات عشوائية من المخرجات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">مخرجات برومبت واحد تصبح مدخلات للبرومبت التالي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">جميع الخطوات تعمل بالتوازي ويتم دمج النتائج</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النموذج يطلب تأكيد المستخدم قبل المتابعة</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. متى يجب استخدام مكتبات التنسيق مثل LangChain؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">دائماً، يجب استخدامها لكل مشروع ذكاء اصطناعي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">للسلاسل المعقدة وإدارة الذاكرة والوكلاء متعددي الأدوات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أبداً، الكود المخصص دائماً أفضل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط لتطبيقات RAG</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 9</h2>
+    </div>
+    <p>
+      <strong>قوالب البرومبت</strong> تتبع مبدأ DRY — اكتب مرة واحدة واستخدم في كل مكان.
+      يمكنك بناؤها باستخدام f-strings (بسيطة)، أو Jinja2 (قوية)، أو LangChain (إطار عمل)، أو كود مخصص.
+      تحقق دائماً من متغيرات القالب قبل استخدامها. <strong>سلاسل البرومبت</strong> تربط عدة برومبتات
+      في تسلسلات: تتابعية (خطوة بخطوة)، أو متوازية (عدة وجهات نظر)، أو شرطية (تفرّع)،
+      أو توجيهية (النموذج يختار). السلاسل تمكّن سير عمل معقد يستحيل بأحد البرومبتات الواحدة.
+      للسلاسل البسيطة، اكتب كوداً مخصصاً. للأنظمة المعقدة متعددة الأدوات، استخدم LangChain أو مكتبات مشابهة.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 10: تقييم جودة البرومبت</strong><br>
+      <span style="color: var(--text-dim);">قِس وقيّم وحسّن برومبتاتك بشكل منهجي — لأنك لا تستطيع تحسين ما لا تستطيع قياسه.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-08-tool-use.html">السابق →</a>
+  <span class="nav-info">الموضوع 10 من 23</span>
+  <a class="nav-btn primary" href="topic-structured-output.html">← التالي: المخرجات المنظمة والتحليل</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

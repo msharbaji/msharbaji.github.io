@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 14 — مشروع: أداة مراجعة الكود بالذكاء الاصطناعي | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 61%"></div></div>
+    <span class="progress-label">14 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🚀</div>
+    <h1>مشروع: أداة مراجعة الكود بالذكاء الاصطناعي</h1>
+    <p>طبّق كل ما تعلمته في المرحلة 2 — ابنِ تطبيقاً كاملاً يعمل بالبرومبتات من الصفر.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>نظرة عامة على المشروع</h2>
+    </div>
+    <p>
+      ستبني أداة سطر أوامر (CLI) تراجع كود بايثون باستخدام Claude. ستستخدم الأداة:
+    </p>
+    <ul>
+      <li><strong>RAG:</strong> تضمين معايير البرمجة الخاصة بفريقك واستخدامها كسياق.</li>
+      <li><strong>استخدام الأدوات:</strong> قراءة الملفات واسترجاع التعديلات من نظام الملفات.</li>
+      <li><strong>قوالب البرومبت:</strong> برومبت نظام قابل لإعادة الاستخدام وتنسيق المخرجات.</li>
+      <li><strong>التقييم:</strong> تسجيل جودة مراجعة الكود وتتبع التحسينات.</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>ما ستتعلمه</h4>
+        <p>
+          كيفية دمج RAG واستخدام الأدوات والقوالب في تطبيق حقيقي.
+          كيفية بناء نظام يشبه الإنتاج وليس مجرد استدعاء API واحد.
+          كيف تعمل جميع مفاهيم المرحلة 2 معاً في الممارسة العملية.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>الهندسة المعمارية</h2>
+    </div>
+    <p>
+      إليك كيف يتدفق النظام:
+    </p>
+
+    <div style="background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 20px 0; direction: ltr;">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <strong style="color: var(--cyan);">User Input (file path)</strong>
+      </div>
+      <div style="text-align: center; color: var(--text-dim); margin-bottom: 16px;">&#8595;</div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <strong style="color: var(--blue);">1. File Reader Tool</strong><br>
+        <span style="font-size: 13px; color: var(--text-dim);">Read code from filesystem</span>
+      </div>
+      <div style="text-align: center; color: var(--text-dim); margin-bottom: 16px;">&#8595;</div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <strong style="color: var(--blue);">2. RAG Context Retrieval</strong><br>
+        <span style="font-size: 13px; color: var(--text-dim);">Fetch relevant coding standards</span>
+      </div>
+      <div style="text-align: center; color: var(--text-dim); margin-bottom: 16px;">&#8595;</div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <strong style="color: var(--blue);">3. Prompt Builder</strong><br>
+        <span style="font-size: 13px; color: var(--text-dim);">Assemble system prompt + code + standards</span>
+      </div>
+      <div style="text-align: center; color: var(--text-dim); margin-bottom: 16px;">&#8595;</div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <strong style="color: var(--blue);">4. Claude API Call</strong><br>
+        <span style="font-size: 13px; color: var(--text-dim);">Get code review response</span>
+      </div>
+      <div style="text-align: center; color: var(--text-dim); margin-bottom: 16px;">&#8595;</div>
+
+      <div style="text-align: center;">
+        <strong style="color: var(--cyan);">Output (formatted review)</strong>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>المكونات الرئيسية</h4>
+        <p>
+          <strong>الأدوات:</strong> قارئ الملفات، قارئ تعديلات git. <strong>RAG:</strong> مخزن تضمينات لمعايير البرمجة.
+          <strong>القوالب:</strong> برومبت النظام، تنسيق المخرجات. <strong>الحلقة الرئيسية:</strong> تنسيق جميع المكونات.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>برومبت النظام — التطوير التكراري</h2>
+    </div>
+    <p>
+      لنوضح كيف يتطور برومبت النظام عبر التكرار.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الإصدار 1: أساسي</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a code reviewer.
+Review the provided Python code and give feedback.</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الإصدار 2: أكثر تحديداً</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a senior Python code reviewer.
+Review code for:
+1. Correctness (bugs, edge cases)
+2. Style (PEP 8 compliance)
+3. Performance (inefficiencies)
+4. Security (vulnerabilities)
+5. Documentation (clarity, completeness)
+
+Format: ## [Category] header for each, list issues with severity.</span></pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الإصدار 3: مستوى الإنتاج (النهائي)</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="string">You are a senior Python developer at a tech company.
+Your job is to review code for quality, correctness, and adherence to standards.
+
+REVIEW CRITERIA:
+1. **Correctness**: Does it work? Handle edge cases? Any bugs?
+2. **Style**: PEP 8, naming conventions, readability
+3. **Performance**: Inefficient algorithms, unnecessary loops
+4. **Security**: SQL injection, unvalidated input, hardcoded secrets
+5. **Testing**: Are there tests? Are they sufficient?
+6. **Documentation**: Docstrings, comments, clarity
+
+STANDARDS TO APPLY (provided below):
+{standards_context}
+
+OUTPUT FORMAT:
+## Summary
+[1-2 sentence overview of code quality]
+
+## Issues Found
+[Numbered list with severity level (🔴 Critical, 🟡 Warning, 🔵 Info)]
+
+## Positive Notes
+[What the code does well]
+
+## Recommendations
+[Top 3 actionable improvements]
+
+## Overall Rating
+[One of: Excellent / Good / Needs Review / Critical Issues]
+
+Be constructive, specific, and cite the standards where applicable.
+If code is correct but could be improved, suggest alternatives with examples.</span></pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>نمط التطور</h4>
+        <p>
+          لاحظ كيف يضيف كل تكرار: التحديد (ماذا تراجع)، والتنسيق (كيف تُخرج النتائج)، والمعايير (ماذا تطبق عليها)،
+          والنبرة (بنّاءة وليست انتقادية). ابدأ ببساطة، ثم كرّر بناءً على جودة المخرجات الفعلية.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>بناء تعريفات الأدوات</h2>
+    </div>
+    <p>
+      عرّف الأدوات التي يمكن لـ Claude استخدامها للوصول إلى الملفات والحصول على السياق.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Tool Definitions</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>tools = [
+    {
+        <span class="string">"name"</span>: <span class="string">"read_file"</span>,
+        <span class="string">"description"</span>: <span class="string">"Read a Python file from disk"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"path"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"File path (absolute or relative)"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"path"</span>]
+        }
+    },
+    {
+        <span class="string">"name"</span>: <span class="string">"get_coding_standards"</span>,
+        <span class="string">"description"</span>: <span class="string">"Retrieve relevant coding standards via RAG"</span>,
+        <span class="string">"input_schema"</span>: {
+            <span class="string">"type"</span>: <span class="string">"object"</span>,
+            <span class="string">"properties"</span>: {
+                <span class="string">"topic"</span>: {
+                    <span class="string">"type"</span>: <span class="string">"string"</span>,
+                    <span class="string">"description"</span>: <span class="string">"Topic (error handling, testing, security, etc)"</span>
+                }
+            },
+            <span class="string">"required"</span>: [<span class="string">"topic"</span>]
+        }
+    }
+]</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>خط أنابيب المراجعة</h2>
+    </div>
+    <p>
+      إليك المنطق الأساسي الذي ينسّق كل شيء.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Complete Review Pipeline</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> os
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">read_file_tool</span>(path: str) -> str:
+    <span class="string">"""Read file from filesystem"""</span>
+    <span class="keyword">with</span> <span class="func">open</span>(path, <span class="string">"r"</span>) <span class="keyword">as</span> f:
+        <span class="keyword">return</span> f.<span class="func">read</span>()
+
+<span class="keyword">def</span> <span class="func">get_standards_tool</span>(topic: str) -> str:
+    <span class="string">"""Mock RAG retrieval of coding standards"""</span>
+    standards = {
+        <span class="string">"error_handling"</span>: <span class="string">"Always use specific exceptions. Never bare except."</span>,
+        <span class="string">"testing"</span>: <span class="string">"Every function should have at least one test case."</span>,
+        <span class="string">"naming"</span>: <span class="string">"Use descriptive names. Avoid abbreviations."</span>,
+        <span class="string">"security"</span>: <span class="string">"Validate all user input. Use parameterized queries."</span>
+    }
+    <span class="keyword">return</span> standards.<span class="func">get</span>(topic, <span class="string">"No standards found"</span>)
+
+<span class="keyword">def</span> <span class="func">execute_tool</span>(name: str, input_dict: dict) -> str:
+    <span class="string">"""Execute tool and return result"""</span>
+    <span class="keyword">if</span> name == <span class="string">"read_file"</span>:
+        <span class="keyword">return</span> <span class="func">read_file_tool</span>(input_dict[<span class="string">"path"</span>])
+    <span class="keyword">elif</span> name == <span class="string">"get_coding_standards"</span>:
+        <span class="keyword">return</span> <span class="func">get_standards_tool</span>(input_dict[<span class="string">"topic"</span>])
+    <span class="keyword">return</span> <span class="string">"Unknown tool"</span>
+
+<span class="keyword">def</span> <span class="func">review_code</span>(file_path: str) -> str:
+    <span class="string">"""Main review pipeline"""</span>
+
+    <span class="comment"># Step 1: Read the code</span>
+    code = <span class="func">read_file_tool</span>(file_path)
+
+    <span class="comment"># Step 2: Get standards</span>
+    standards = <span class="func">get_standards_tool</span>(<span class="string">"general"</span>)
+
+    <span class="comment"># Step 3: Build augmented prompt</span>
+    system_prompt = <span class="string">"""You are a senior Python code reviewer..."""</span>
+
+    user_message = f<span class="string">"""
+<span class="tag">&lt;standards&gt;</span>
+{standards}
+<span class="tag">&lt;/standards&gt;</span>
+
+<span class="tag">&lt;code&gt;</span>
+{code}
+<span class="tag">&lt;/code&gt;</span>
+
+Please review this code."""</span>
+
+    <span class="comment"># Step 4: Call Claude</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1024</span>,
+        <span class="param">system</span>=system_prompt,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: user_message
+        }]
+    )
+
+    <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+<span class="comment"># Usage:</span>
+review = <span class="func">review_code</span>(<span class="string">"example.py"</span>)
+<span class="keyword">print</span>(review)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>إضافة RAG لمعايير البرمجة</h2>
+    </div>
+    <p>
+      بدلاً من تثبيت المعايير في الكود، قم بتضمينها واستخدم الاسترجاع.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — RAG Setup</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> chromadb
+
+<span class="comment"># Initialize Chroma for vector storage</span>
+chroma_client = chromadb.<span class="func">Client</span>()
+standards_collection = chroma_client.<span class="func">create_collection</span>(
+    name=<span class="string">"coding_standards"</span>
+)
+
+<span class="comment"># Embed company coding standards</span>
+standards_docs = [
+    <span class="string">"Always validate user input to prevent injection attacks."</span>,
+    <span class="string">"Use type hints for all function signatures."</span>,
+    <span class="string">"Write tests for all public functions."</span>,
+    <span class="string">"Avoid nested loops; optimize with built-ins like map/filter."</span>,
+    <span class="string">"Use descriptive variable names, avoid single letters except loop counters."</span>,
+]
+
+standards_collection.<span class="func">add</span>(
+    documents=standards_docs,
+    ids=[f<span class="string">"std_{i}"</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="func">len</span>(standards_docs))]
+)
+
+<span class="keyword">def</span> <span class="func">retrieve_standards</span>(code: str) -> str:
+    <span class="string">"""RAG: Retrieve relevant standards for code"""</span>
+    results = standards_collection.<span class="func">query</span>(
+        query_texts=[code],  <span class="comment"># Chroma embeds automatically</span>
+        n_results=<span class="number">3</span>  <span class="comment"># Top 3 most relevant standards</span>
+    )
+    <span class="keyword">return</span> <span class="string">"\n"</span>.<span class="func">join</span>(results[<span class="string">"documents"</span>][<span class="number">0</span>])</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>لماذا RAG هنا؟</h4>
+        <p>
+          بدلاً من تضمين جميع المعايير في كل مراجعة (مما يزيد التوكنات والتشويش)،
+          استرجع فقط المعايير ذات الصلة. إذا كان الكود يحتوي على استعلامات قواعد بيانات، استرجع معايير الأمان.
+          إذا كان الكود يفتقر إلى الاختبارات، استرجع معايير الاختبار.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>التطبيق الكامل</h2>
+    </div>
+    <p>
+      إليك الكود الكامل العامل (~100 سطر) الذي يربط كل شيء معاً.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Full Code Review Tool</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">#!/usr/bin/env python3</span>
+<span class="string">"""AI-Powered Code Review Tool"""</span>
+<span class="keyword">import</span> anthropic
+<span class="keyword">import</span> sys
+<span class="keyword">import</span> chromadb
+
+client = anthropic.<span class="func">Anthropic</span>()
+chroma_client = chromadb.<span class="func">Client</span>()
+
+<span class="comment"># Setup RAG</span>
+collection = chroma_client.<span class="func">create_collection</span>(
+    name=<span class="string">"standards"</span>
+)
+collection.<span class="func">add</span>(
+    documents=[
+        <span class="string">"Use type hints for all functions"</span>,
+        <span class="string">"Validate all user input"</span>,
+        <span class="string">"Write tests for critical paths"</span>,
+        <span class="string">"Use descriptive variable names"</span>,
+    ],
+    ids=[<span class="string">"std_1"</span>, <span class="string">"std_2"</span>, <span class="string">"std_3"</span>, <span class="string">"std_4"</span>]
+)
+
+SYSTEM_PROMPT = <span class="string">"""You are a senior Python code reviewer.
+Review for: correctness, style, performance, security, testing.
+
+Standards:
+{standards}
+
+Format:
+## Summary
+[1 sentence overview]
+
+## Issues Found
+[List with severity: 🔴 Critical, 🟡 Warning, 🔵 Info]
+
+## Rating
+[Excellent/Good/Needs Review/Critical]"""</span>
+
+<span class="keyword">def</span> <span class="func">review</span>(file_path: str):
+    <span class="string">"""Review a Python file"""</span>
+    <span class="comment"># Read code</span>
+    <span class="keyword">with</span> <span class="func">open</span>(file_path) <span class="keyword">as</span> f:
+        code = f.<span class="func">read</span>()
+
+    <span class="comment"># Retrieve relevant standards via RAG</span>
+    results = collection.<span class="func">query</span>(
+        query_texts=[code],
+        n_results=<span class="number">2</span>
+    )
+    standards = <span class="string">"\n"</span>.<span class="func">join</span>(
+        results[<span class="string">"documents"</span>][<span class="number">0</span>]
+    )
+
+    <span class="comment"># Call Claude</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+        <span class="param">max_tokens</span>=<span class="number">800</span>,
+        <span class="param">system</span>=SYSTEM_PROMPT.<span class="func">format</span>(
+            standards=standards
+        ),
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: f<span class="string">"""Review this code:
+
+<span class="tag">&lt;code&gt;</span>
+{code}
+<span class="tag">&lt;/code&gt;</span>"""</span>
+        }]
+    )
+
+    <span class="keyword">print</span>(response.content[<span class="number">0</span>].text)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    <span class="keyword">if</span> <span class="func">len</span>(sys.argv) < <span class="number">2</span>:
+        <span class="keyword">print</span>(<span class="string">"Usage: python solution.py <file.py>"</span>)
+        sys.<span class="func">exit</span>(<span class="number">1</span>)
+    <span class="func">review</span>(sys.argv[<span class="number">1</span>])</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">طريقة الاستخدام:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre>pip install anthropic chromadb
+<span class="keyword">export</span> ANTHROPIC_API_KEY=<span class="string">"..."</span>
+python solution.py mycode.py</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 8 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>التوسعات والتحديات</h2>
+    </div>
+    <p>
+      إليك طرقاً لتوسيع الأداة وجعلها بمستوى الإنتاج:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔗</div>
+        <h4>التكامل مع GitHub</h4>
+        <p>الاتصال بـ GitHub API. تشغيل المراجعات على طلبات السحب تلقائياً. نشر المراجعات كتعليقات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>اقتراحات الإصلاح التلقائي</h4>
+        <p>اجعل Claude يولّد مقاطع كود مُصلحة، وليس مجرد انتقادات. يمكن للمستخدمين تطبيق التصحيحات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📊</div>
+        <h4>مقاييس المراجعة</h4>
+        <p>تتبع درجات جودة الكود بمرور الوقت. تحديد المشكلات الأكثر شيوعاً. بناء لوحات معلومات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧪</div>
+        <h4>خط أنابيب التقييم</h4>
+        <p>إنشاء حالات اختبار مع مراجعات متوقعة. قياس جودة المراجعة. التكرار على برومبت النظام.</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>أفكار للتحديات</h4>
+        <p>
+          أضف دعماً للغات متعددة (JS، Go، إلخ.) مع معايير خاصة بكل لغة.
+          نفّذ "مدقق امتثال" يضمن توافق الكود مع معايير الأمان/الخصوصية.
+          ابنِ واجهة ويب حيث يمكن للفرق رفع الكود والحصول على مراجعات تفاعلية.
+          أنشئ حلقة تغذية راجعة حيث يمكن للمطورين تقييم المراجعات، لتحسين النظام بمرور الوقت.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 9 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✨</div>
+      <h2>اكتملت المرحلة 2!</h2>
+    </div>
+    <p>
+      تهانينا! لقد أكملت المرحلة 2: هندسة البرومبت التطبيقية. في 5 مواضيع، تعلمت:
+    </p>
+    <ul>
+      <li><strong>الموضوع 7 (RAG):</strong> كيفية تعزيز النماذج اللغوية بالمعرفة الخارجية.</li>
+      <li><strong>الموضوع 8 (الأدوات):</strong> كيفية السماح للنماذج اللغوية باتخاذ إجراءات في العالم الحقيقي.</li>
+      <li><strong>الموضوع 9 (القوالب والسلاسل):</strong> كيفية بناء سير عمل قابلة لإعادة الاستخدام ومنسّقة.</li>
+      <li><strong>الموضوع 10 (التقييم):</strong> كيفية القياس والتحسين بشكل منهجي.</li>
+      <li><strong>الموضوع 11 (المشروع):</strong> كيفية دمج كل ذلك في تطبيق حقيقي.</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>ما التالي؟</h4>
+        <p>
+          المرحلة 3 تغطي مواضيع متقدمة: الوكلاء (اتخاذ القرارات المستقلة)، الذاكرة (إدارة السياق)،
+          متعدد الوسائط (التعامل مع الصور والصوت)، والسلامة (منع سوء الاستخدام). لكن الأساس الذي بنيته
+          في المرحلة 2 ينطبق في كل مكان.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 3 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. في أداة مراجعة الكود، ما الغرض من استخدام RAG؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لتوليد الكود الذي تتم مراجعته</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">لاسترجاع معايير البرمجة ذات الصلة بناءً على الكود</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لتخزين نتائج المراجعة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لتقييم جودة المراجعة</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. لماذا يتطور برومبت النظام عبر إصدارات متعددة؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لأن كل إصدار يستخدم نموذجاً مختلفاً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">لإضافة التحديد ووضوح التنسيق والمعرفة المتخصصة بشكل تدريجي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لأن الأداة تتعطل بين الإصدارات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">لجعله أقصر وأسرع</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. ما المكونات الرئيسية لأداة مراجعة الكود الكاملة؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط Claude API وقراءة الملفات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">قراءة الملفات، RAG للمعايير، قوالب البرومبت، وClaude API</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">فقط قاعدة بيانات وخادم ويب</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عدة نماذج لغوية مختلفة</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--green); background: linear-gradient(135deg, var(--surface) 0%, rgba(52,211,153,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">🎉</div>
+      <h2>ملخص المرحلة 2</h2>
+    </div>
+    <p>
+      لقد تعلمت الأنماط الأساسية لأنظمة الذكاء الاصطناعي الإنتاجية: RAG للمعرفة، واستخدام الأدوات للأفعال،
+      والقوالب لإعادة الاستخدام، والسلاسل للتعقيد، والتقييم للتحسين.
+      طبّقتها في أداة مراجعة كود حقيقية تدمج كل هذه المفاهيم.
+      الأداة تقرأ الملفات، وتسترجع معايير البرمجة، وتبني برومبتاً ديناميكياً، وتستدعي Claude،
+      وتعيد مراجعة منظمة.
+    </p>
+    <p style="margin-top: 16px;">
+      <strong>الفكرة الجوهرية:</strong> أنظمة الذكاء الاصطناعي الإنتاجية نادراً ما تكون مجرد استدعاء API واحد.
+      إنها تنسيقات لأنماط متعددة تعمل معاً — RAG + أدوات + قوالب + تقييم.
+      أتقن هذا المزيج، ويمكنك بناء أي شيء تقريباً.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>مستعد للمرحلة 3؟</strong><br>
+      <span style="color: var(--text-dim);">المواضيع 12-20 تغطي الوكلاء، والبرومبت المتقدم، والذاكرة، ومتعدد الوسائط، والسلامة. لقد بنيت أساساً متيناً.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-safety-guardrails.html">السابق →</a>
+  <span class="nav-info">الموضوع 14 من 23 (اكتملت المرحلة 2)</span>
+  <a class="nav-btn primary" href="topic-12-what-are-agents.html">← التالي: ما هي وكلاء الذكاء الاصطناعي؟</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>

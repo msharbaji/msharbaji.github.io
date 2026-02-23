@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>Topic 16 — Multi-Agent Systems | Mohamad Alsharbaji</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 87%"></div></div>
+    <span class="progress-label">20 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">👥</div>
+    <h1>Multi-Agent Systems</h1>
+    <p>When one agent isn't enough — orchestrate multiple specialized agents to tackle complex tasks. Understand collaboration patterns that solve problems individual agents can't.</p>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Why Multi-Agent? The Power of Specialization</h2>
+    </div>
+    <p>
+      A single agent is jack-of-all-trades, master of none. A <strong>multi-agent system</strong> assigns specific roles:
+      one agent researches, one analyzes, one writes. Like a development team working on a product.
+    </p>
+
+    <div class="analogy">
+      <div class="analogy-icon">👷</div>
+      <div>
+        <h4>Analogy: A Development Team</h4>
+        <p>
+          A single developer can build an app, but a team is better: frontend engineer handles UI,
+          backend engineer handles API, DevOps engineer handles deployment. Each specializes, then they
+          integrate. Multi-agent systems work the same way: each agent is an expert, they coordinate.
+        </p>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>Division of Labor</h4>
+        <p>Complex tasks broken into specialized subtasks. Each agent excels at one thing.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚡</div>
+        <h4>Parallel Work</h4>
+        <p>Agents work in parallel (or pipeline) to speed up overall task completion.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔍</div>
+        <h4>Quality Improvement</h4>
+        <p>One agent's output becomes another's input. Iterative refinement improves quality.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🛡️</div>
+        <h4>Error Detection</h4>
+        <p>A critic agent can verify other agents' work, catching mistakes before delivery.</p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── SECTION 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Multi-Agent Patterns — Four Key Architectures</h2>
+    </div>
+    <p>
+      There are four proven patterns for orchestrating multiple agents. Each suits different task types.
+    </p>
+
+    <h3>Pattern 1: Supervisor (Manager)</h3>
+    <p>
+      One supervisor agent delegates to specialists. The supervisor breaks down the goal,
+      assigns subtasks, gathers results, and synthesizes them. Classic orchestration pattern.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text — Supervisor Pattern Flow</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre>User: "Write a product launch plan"
+       ↓
+Supervisor Agent:
+  - Breaks into: Market Analysis, Budget Planning, Timeline, Risk Mitigation
+  - Assigns to specialists
+       ↓
+Market Analyst: "Competitors, target audience, positioning"
+Budget Planner: "Cost breakdown, revenue projections"
+Timeline Manager: "Phases, milestones, dependencies"
+Risk Analyst: "Risks, mitigation strategies"
+       ↓
+Supervisor: Gathers results, synthesizes into final plan
+       ↓
+User: Complete launch plan</pre>
+    </div>
+
+    <h3>Pattern 2: Peer-to-Peer</h3>
+    <p>
+      Agents work together at the same level. Each can initiate messages to others.
+      Useful for exploratory problems where the solution emerges from discussion.
+    </p>
+
+    <h3>Pattern 3: Pipeline</h3>
+    <p>
+      Output of one agent becomes input to the next. Linear workflow.
+      Researcher → Analyst → Writer → Editor. Clear data flow.
+    </p>
+
+    <h3>Pattern 4: Debate / Critic</h3>
+    <p>
+      Multiple agents argue for different viewpoints, a judge/critic decides.
+      Excellent for improving quality by exposing weaknesses in reasoning.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">👔</div>
+        <h4>Supervisor (Hierarchical)</h4>
+        <p>One orchestrator, many specialists. Best for: well-defined tasks with clear subtasks.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤝</div>
+        <h4>Peer-to-Peer (Flat)</h4>
+        <p>All agents equal, self-coordinating. Best for: exploratory, collaborative work.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⛓️</div>
+        <h4>Pipeline (Sequential)</h4>
+        <p>Output → Input chain. Best for: transform-heavy workflows (research → analysis → writing).</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚖️</div>
+        <h4>Debate/Critic (Adversarial)</h4>
+        <p>Opposing viewpoints, judge decides. Best for: quality improvement, difficult decisions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Communication Protocols — How Agents Talk</h2>
+    </div>
+    <p>
+      Agents need a way to communicate: pass data, request information, coordinate actions.
+      There are several approaches, each with tradeoffs.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💬</div>
+        <h4>Message Passing</h4>
+        <p>Agents send structured messages to each other. Asynchronous, loosely coupled. Good for pipelines.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>Shared State</h4>
+        <p>All agents read/write to a shared state dictionary. Tightly coupled but fast. Risk of conflicts.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">⚫</div>
+        <h4>Blackboard Pattern</h4>
+        <p>Central "blackboard" where agents post findings. Others read, build on ideas. Great for exploratory work.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🗂️</div>
+        <h4>Database/File System</h4>
+        <p>Persistent storage for intermediate results. Survives agent restarts. Best for production.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>The Supervisor Pattern — Complete Implementation</h2>
+    </div>
+    <p>
+      Let's implement the supervisor pattern in Python. This is the most practical pattern for production systems.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Supervisor Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">Agent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>, name: <span class="string">str</span>, role: <span class="string">str</span>):
+        <span class="param">self</span>.name = name
+        <span class="param">self</span>.role = role
+        <span class="param">self</span>.client = anthropic.<span class="func">Anthropic</span>()
+
+    <span class="keyword">def</span> <span class="func">work</span>(<span class="param">self</span>, task: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="string">"""Execute a task and return result."""</span>
+        response = <span class="param">self</span>.client.messages.<span class="func">create</span>(
+            <span class="param">model</span>=<span class="string">"claude-opus-4-6"</span>,
+            <span class="param">max_tokens</span>=<span class="number">2048</span>,
+            <span class="param">system</span>=<span class="func">f</span><span class="string">"You are a {self.role}. Your name is {self.name}. Do excellent work."</span>,
+            <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: task}]
+        )
+        <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+<span class="keyword">class</span> <span class="func">SupervisorAgent</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.supervisor = <span class="func">Agent</span>(<span class="string">"Supervisor"</span>, <span class="string">"Project Manager"</span>)
+        <span class="param">self</span>.specialists = [
+            <span class="func">Agent</span>(<span class="string">"Alice"</span>, <span class="string">"Market Research Analyst"</span>),
+            <span class="func">Agent</span>(<span class="string">"Bob"</span>, <span class="string">"Financial Analyst"</span>),
+            <span class="func">Agent</span>(<span class="string">"Carol"</span>, <span class="string">"Project Manager"</span>)
+        ]
+
+    <span class="keyword">def</span> <span class="func">run</span>(<span class="param">self</span>, goal: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="string">"""Supervisor breaks goal into subtasks, delegates to specialists."""</span>
+
+        <span class="comment"># 1. Supervisor analyzes goal and creates subtasks</span>
+        subtasks_prompt = <span class="func">f</span><span class="string">"""Goal: {goal}
+
+Break this into 3 specific subtasks for different specialists:
+1. For a Market Research Analyst
+2. For a Financial Analyst
+3. For a Project Manager
+
+Format:
+SUBTASK 1: [task for analyst 1]
+SUBTASK 2: [task for analyst 2]
+SUBTASK 3: [task for analyst 3]"""</span>
+
+        subtasks_text = <span class="param">self</span>.supervisor.<span class="func">work</span>(subtasks_prompt)
+
+        <span class="comment"># 2. Parse subtasks (simple regex approach)</span>
+        subtasks = []
+        <span class="keyword">for</span> line <span class="keyword">in</span> subtasks_text.<span class="func">split</span>(<span class="string">"\n"</span>):
+            <span class="keyword">if</span> <span class="string">"SUBTASK"</span> <span class="keyword">in</span> line:
+                subtasks.<span class="func">append</span>(line)
+
+        <span class="comment"># 3. Distribute to specialists</span>
+        results = []
+        <span class="keyword">for</span> i, specialist <span class="keyword">in</span> <span class="func">enumerate</span>(<span class="param">self</span>.specialists):
+            <span class="keyword">if</span> i &lt; <span class="func">len</span>(subtasks):
+                result = specialist.<span class="func">work</span>(subtasks[i])
+                results.<span class="func">append</span>({
+                    <span class="string">"specialist"</span>: specialist.name,
+                    <span class="string">"result"</span>: result
+                })
+
+        <span class="comment"># 4. Supervisor synthesizes results</span>
+        synthesis_prompt = <span class="func">f</span><span class="string">"""You have collected the following results from specialists:
+
+{chr(10).join([f"{r['specialist']}: {r['result'][:300]}" for r in results])}
+
+Synthesize these into a cohesive final deliverable for the goal: {goal}
+
+Provide a comprehensive, well-structured final answer."""</span>
+
+        final_answer = <span class="param">self</span>.supervisor.<span class="func">work</span>(synthesis_prompt)
+        <span class="keyword">return</span> final_answer
+
+<span class="comment"># Usage</span>
+supervisor = <span class="func">SupervisorAgent</span>()
+result = supervisor.<span class="func">run</span>(<span class="string">"Create a launch strategy for a new SaaS product"</span>)
+<span class="func">print</span>(result)</pre>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>The Debate Pattern — Quality Through Adversarial Collaboration</h2>
+    </div>
+    <p>
+      Two agents argue for opposite positions. A judge evaluates both and decides.
+      This improves answer quality by forcing reasoning to surface weaknesses.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Debate Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+<pre><span class="keyword">class</span> <span class="func">DebateAgents</span>:
+    <span class="keyword">def</span> <span class="func">__init__</span>(<span class="param">self</span>):
+        <span class="param">self</span>.pro_agent = <span class="func">Agent</span>(<span class="string">"Pro"</span>, <span class="string">"Advocates FOR the proposal"</span>)
+        <span class="param">self</span>.con_agent = <span class="func">Agent</span>(<span class="string">"Con"</span>, <span class="string">"Advocates AGAINST the proposal"</span>)
+        <span class="param">self</span>.judge = <span class="func">Agent</span>(<span class="string">"Judge"</span>, <span class="string">"Evaluates both sides fairly"</span>)
+
+    <span class="keyword">def</span> <span class="func">debate</span>(<span class="param">self</span>, question: <span class="string">str</span>) -> <span class="string">str</span>:
+        <span class="comment"># Round 1: Pro argues FOR</span>
+        pro_argument = <span class="param">self</span>.pro_agent.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"Argue STRONGLY FOR: {question}\nBe compelling and data-driven."</span>
+        )
+
+        <span class="comment"># Round 2: Con argues AGAINST</span>
+        con_argument = <span class="param">self</span>.con_agent.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"Argue STRONGLY AGAINST: {question}\nAddress Pro's points if possible."</span>
+        )
+
+        <span class="comment"># Round 3: Judge decides</span>
+        judgment = <span class="param">self</span>.judge.<span class="func">work</span>(
+            <span class="func">f</span><span class="string">"""Question: {question}
+
+Pro argument: {pro_argument}
+
+Con argument: {con_argument}
+
+Evaluate both arguments. Which is stronger? Why? What's the best decision?"""</span>
+        )
+
+        <span class="keyword">return</span> <span class="func">f</span><span class="string">"""
+PRO ARGUMENT:
+{pro_argument}
+
+CON ARGUMENT:
+{con_argument}
+
+JUDGE'S DECISION:
+{judgment}"""</span>
+
+<span class="comment"># Usage</span>
+debate = <span class="func">DebateAgents</span>()
+decision = debate.<span class="func">debate</span>(<span class="string">"Should we adopt microservices architecture?"</span>)
+<span class="func">print</span>(decision)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <h4>When Debate Wins</h4>
+        <p>
+          Strategic decisions, architecture choices, hiring decisions.
+          When the answer has legitimate pros and cons, debate surfacing both sides improves quality.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Challenges of Multi-Agent Systems</h2>
+    </div>
+    <p>
+      Multi-agent systems are powerful but introduce new problems. Understanding challenges is critical for success.
+    </p>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Challenge 1: Coordination Overhead</h4>
+        <p>
+          More agents = more communication. Message passing, context sharing, state management.
+          For simple tasks, the overhead outweighs benefits. Single-agent may be faster.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Challenge 2: Infinite Loops</h4>
+        <p>
+          Agent A asks Agent B, who asks Agent C, who asks Agent A. Uncontrolled loops waste tokens and time.
+          Add strict termination conditions and loop detection.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Challenge 3: Conflicting Outputs</h4>
+        <p>
+          Different agents disagree or contradict each other. You need a judge or arbitrator.
+          Build conflict resolution into your system design.
+        </p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Challenge 4: Cost Explosion</h4>
+        <p>
+          Multiple agents = multiple LLM calls. 5 agents × 10 iterations = 50 API calls.
+          Costs add up fast. Monitor and budget carefully.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>When Multi-Agent is Overkill</h2>
+    </div>
+    <p>
+      Not every problem needs multi-agent. Sometimes a single well-engineered agent is better.
+    </p>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label">✅ USE Multi-Agent For:</div>
+        <pre>- Complex, multi-step workflows
+- Tasks needing specialization
+- Quality validation (critic agent)
+- Exploratory/debate scenarios
+- Team-like coordination</pre>
+      </div>
+      <div class="compare-card bad">
+        <div class="compare-label">❌ Skip Multi-Agent For:</div>
+        <pre>- Single-step tasks
+- Simple classification/summarization
+- Latency-critical applications
+- Cost-sensitive deployments
+- Well-defined linear workflows</pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>Start Simple, Scale Gradually</h4>
+        <p>
+          Build a single agent first. If it can't handle the task, add specialists.
+          Add a critic agent if quality is an issue. This incremental approach prevents over-engineering.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>Check Your Understanding</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>Quick Quiz — 4 Questions</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. In the supervisor pattern, what does the supervisor do?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Does all the work itself</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Breaks goal into subtasks, delegates to specialists, synthesizes results</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Monitors agents for errors only</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Randomly assigns tasks</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. The debate pattern is best for what type of problem?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Data extraction</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Strategic decisions where multiple viewpoints matter</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Real-time chat</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Image generation</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. What's a major risk with multi-agent systems?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They're always slower</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">Coordination overhead, infinite loops, and cost explosion</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">They can't handle complex tasks</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Models refuse to collaborate</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. When is a single agent better than multiple agents?</p>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Always</button>
+        <button class="quiz-option" onclick="checkAnswer(this, true)">For simple tasks, when latency or cost is critical, or tasks don't need specialization</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Never</button>
+        <button class="quiz-option" onclick="checkAnswer(this, false)">Only for creative work</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SUMMARY ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>Topic 16 Summary</h2>
+    </div>
+    <p>
+      Multi-agent systems apply specialization to complex problems. <strong>Four patterns dominate:</strong>
+      Supervisor (one orchestrator, many specialists), Peer-to-Peer (flat collaboration),
+      Pipeline (sequential transformation), and Debate (adversarial quality improvement).
+      <strong>Communication protocols</strong> determine how agents coordinate: message passing, shared state, blackboard, or database.
+      <strong>Challenges</strong> include coordination overhead, infinite loops, conflicting outputs, and cost explosions.
+      <strong>Not every problem needs multi-agent</strong> — single agents are simpler and cheaper for straightforward tasks.
+      Use multi-agent for genuinely complex, multi-step problems where specialization adds value.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>Next up → Topic 17: Full-Stack AI Agent Project</strong><br>
+      <span style="color: var(--text-dim);">Capstone project: build a complete, production-ready multi-agent research system.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-15-build-simple-agent.html">← Topic 15</a>
+  <span class="nav-info">Topic 20 of 23</span>
+  <a class="nav-btn primary" href="topic-17-agent-project.html">Topic 17 →</a>
+</div>
+
+<script src="slides.js"></script>
+</body>
+</html>

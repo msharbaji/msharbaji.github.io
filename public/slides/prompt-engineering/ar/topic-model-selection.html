@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 2 — اختيار النماذج ومقارنتها | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 9%"></div></div>
+    <span class="progress-label">2 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⚖️</div>
+    <h1>اختيار النماذج ومقارنتها</h1>
+    <p>تعلّم كيف تقيّم وتختار النموذج اللغوي المناسب لمهمتك — من GPT إلى Claude إلى النماذج مفتوحة المصدر.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>مشهد النماذج اللغوية</h2>
+    </div>
+    <p>
+      تطور نظام النماذج اللغوية الكبيرة إلى مشهد تنافسي يضم عدة لاعبين رئيسيين.
+      كل مزوّد يأتي بنقاط قوة مختلفة، ونماذج تسعير متنوعة، وفلسفات تصميم متباينة.
+      فهم هذا المشهد هو الخطوة الأولى لاتخاذ قرارات مدروسة.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🟢</div>
+        <h4>OpenAI (GPT)</h4>
+        <p><strong>GPT-4o</strong> — سريع ومتعدد الوسائط. <strong>o1 / o3</strong> — نماذج استدلالية مع سلسلة تفكير. قوي في البرمجة والمهام العامة مع نظام أدوات واسع.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🟠</div>
+        <h4>Anthropic (Claude)</h4>
+        <p><strong>Claude 4.5 Sonnet</strong> — توازن بين السرعة والذكاء. <strong>Claude Opus 4</strong> — أعلى مستوى في الاستدلال والتحليل. معروف بالسلامة، والسياق الطويل (200K)، واتباع التعليمات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔵</div>
+        <h4>Google (Gemini)</h4>
+        <p><strong>Gemini 2.5 Pro</strong> — نافذة سياق ضخمة بمليون توكن. <strong>Gemini 2.5 Flash</strong> — سريع وفعّال من حيث التكلفة. دعم أصلي متعدد الوسائط للنص والصور والصوت والفيديو.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🟣</div>
+        <h4>Meta (Llama)</h4>
+        <p><strong>Llama 4</strong> — عائلة مفتوحة المصدر رائدة. مجاني الاستخدام، يمكن تشغيله محلياً أو على بنيتك التحتية. مجتمع قوي، نظام ضبط دقيق، وتحكم كامل بالبيانات.</p>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: اختيار مركبة</h4>
+        <p>
+          اختيار نموذج لغوي يشبه اختيار مركبة. السيارة الرياضية (GPT-4o) سريعة ولافتة.
+          السيدان الفاخرة (Claude Opus 4) مصقولة ومريحة للرحلات الطويلة. السيارة الرباعية (Gemini 2.5 Pro)
+          تتعامل مع حمولات ضخمة. وبناء سيارتك الخاصة (Llama 4) يمنحك تحكماً كاملاً
+          — لكنك تحتاج لتجميعها بنفسك.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>عوامل القرار</h2>
+    </div>
+    <p>
+      اختيار النموذج المناسب ليس عن إيجاد "الأفضل" — بل عن إيجاد الأنسب
+      <em>لمتطلباتك المحددة</em>. إليك العوامل الرئيسية للتقييم:
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>العامل</th><th>الوصف</th><th>مثال</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>الجودة / الذكاء</strong></td>
+          <td>مدى قدرة النموذج على التعامل مع الاستدلال المعقد والدقة والتفاصيل الدقيقة</td>
+          <td>Claude Opus 4 و GPT-4o يتصدران في مهام الاستدلال الصعبة</td>
+        </tr>
+        <tr>
+          <td><strong>السرعة / زمن الاستجابة</strong></td>
+          <td>الوقت حتى أول توكن وسرعة التوليد الإجمالية</td>
+          <td>Gemini Flash و GPT-4o-mini يستجيبان في أقل من 500 ملي ثانية</td>
+        </tr>
+        <tr>
+          <td><strong>التكلفة (لكل توكن)</strong></td>
+          <td>تسعير توكنات الإدخال والإخراج — تتراكم بسرعة على نطاق واسع</td>
+          <td>GPT-4o-mini أرخص بـ ~50 مرة من GPT-4o لكل توكن</td>
+        </tr>
+        <tr>
+          <td><strong>نافذة السياق</strong></td>
+          <td>الحد الأقصى للتوكنات التي يمكن للنموذج معالجتها في طلب واحد</td>
+          <td>Gemini 2.5 Pro: مليون توكن، Claude: 200K، GPT-4o: 128K</td>
+        </tr>
+        <tr>
+          <td><strong>الدعم متعدد الوسائط</strong></td>
+          <td>القدرة على معالجة الصور والصوت والفيديو والملفات</td>
+          <td>Gemini يتعامل مع الفيديو أصلياً؛ GPT-4o و Claude يتعاملان مع الصور</td>
+        </tr>
+        <tr>
+          <td><strong>السلامة / المحاذاة</strong></td>
+          <td>مدى تجنب النموذج للمخرجات الضارة واتباعه للإرشادات</td>
+          <td>Claude معروف بمحاذاة قوية؛ مهم للصناعات المنظمة</td>
+        </tr>
+        <tr>
+          <td><strong>مفتوح المصدر مقابل مملوك</strong></td>
+          <td>هل يمكنك فحص النموذج وتعديله واستضافته بنفسك</td>
+          <td>Llama 4 مفتوح المصدر؛ GPT-4o و Claude واجهات برمجة مملوكة</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>حدد أولوياتك</h4>
+        <p>
+          معظم الفرق لديها فقط 2-3 عوامل مهمة فعلاً. شركة ناشئة تبني روبوت محادثة تهتم أكثر بـ
+          <strong>التكلفة</strong> و<strong>السرعة</strong>. شركة قانونية تعالج عقوداً تهتم بـ
+          <strong>الدقة</strong> و<strong>نافذة السياق</strong>. حدد متطلباتك غير القابلة للتفاوض أولاً.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>المعايير والتقييم</h2>
+    </div>
+    <p>
+      يستخدم مجتمع الذكاء الاصطناعي معايير موحدة لمقارنة النماذج. رغم أنها غير مثالية، إلا أنها توفر
+      نقطة انطلاق مفيدة لفهم قدرات النماذج.
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>المعيار</th><th>ما يقيسه</th><th>لماذا يهم</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MMLU</strong></td>
+          <td>فهم لغوي متعدد المهام — 57 مادة أكاديمية</td>
+          <td>معرفة واسعة عبر مجالات متنوعة (تاريخ، علوم، قانون، إلخ)</td>
+        </tr>
+        <tr>
+          <td><strong>HumanEval</strong></td>
+          <td>توليد الكود — كتابة دوال بايثون من التوثيق</td>
+          <td>حاسم لمساعدي البرمجة وأدوات المطورين</td>
+        </tr>
+        <tr>
+          <td><strong>GPQA</strong></td>
+          <td>أسئلة علمية بمستوى الدراسات العليا (فيزياء، كيمياء، أحياء)</td>
+          <td>يختبر الاستدلال العميق على مستوى الخبراء</td>
+        </tr>
+        <tr>
+          <td><strong>MATH</strong></td>
+          <td>مسائل رياضيات بمستوى المسابقات</td>
+          <td>يختبر الاستدلال الرسمي وحل المسائل خطوة بخطوة</td>
+        </tr>
+        <tr>
+          <td><strong>Arena ELO</strong></td>
+          <td>تصنيفات تفضيل بشري من مقارنات عمياء (Chatbot Arena)</td>
+          <td>أقرب مقياس لـ "ما الذي يفضله المستخدمون الحقيقيون؟"</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>المعايير لا تروي القصة كاملة</h4>
+        <p>
+          المعايير تقيس مهاماً عامة، لكن الأداء الفعلي غالباً يختلف عن درجات المعايير.
+          نموذج يحصل على 92% في MMLU قد يعاني مع مجالك المحدد.
+          يمكن أيضاً تحسين النماذج للمعايير بطرق لا تعمّم.
+          عامل المعايير دائماً كـ <strong>نقطة انطلاق</strong>، وليس كإجابة نهائية.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>قيّم على حالة استخدامك أنت</h4>
+        <p>
+          أفضل تقييم هو اختبار 2-3 نماذج مرشحة على <strong>بياناتك ومهامك الفعلية</strong>.
+          أنشئ مجموعة من 20-50 مثالاً تمثيلياً من عملك الحقيقي، شغّلها عبر كل نموذج،
+          وقارن المخرجات. هذا "الاختبار الميداني" يستحق أكثر من أي ترتيب معياري.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>مفتوح المصدر مقابل مملوك</h2>
+    </div>
+    <p>
+      أحد أكبر القرارات في اختيار النماذج هو استخدام واجهة برمجة مملوكة (OpenAI، Anthropic)
+      أو نموذج مفتوح المصدر (Llama، Mistral) يمكنك استضافته بنفسك. لكل مسار مقايضات مميزة.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">💰</div>
+        <h4>التكلفة</h4>
+        <p><strong>مملوك:</strong> دفع لكل توكن، تسعير يمكن التنبؤ به، بدون عبء بنية تحتية. <strong>مفتوح المصدر:</strong> أوزان النموذج مجانية، لكنك تدفع لحوسبة GPU والعمليات.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>الخصوصية / التحكم</h4>
+        <p><strong>مملوك:</strong> البيانات تذهب لواجهة برمجة طرف ثالث. <strong>مفتوح المصدر:</strong> تحكم كامل — البيانات لا تغادر بنيتك التحتية. حاسم للرعاية الصحية والمالية والحكومة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔧</div>
+        <h4>التخصيص</h4>
+        <p><strong>مملوك:</strong> محدود بواجهات الضبط الدقيق وهندسة البرومبت. <strong>مفتوح المصدر:</strong> ضبط دقيق كامل، محوّلات LoRA، تكميم، وتعديلات على البنية.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🏆</div>
+        <h4>الأداء</h4>
+        <p><strong>مملوك:</strong> عموماً أعلى جودة خام في المهام الصعبة. <strong>مفتوح المصدر:</strong> يلحق بسرعة — غالباً كافٍ لحالات الاستخدام المركّزة والمحددة.</p>
+      </div>
+    </div>
+
+    <p>إليك كيف تبدأ مع نموذج مفتوح المصدر محلي باستخدام Ollama:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Bash</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># Install Ollama</span>
+curl -fsSL https://ollama.com/install.sh | sh
+
+<span class="comment"># Pull and run Llama 4</span>
+ollama pull llama4
+ollama run llama4 <span class="string">"Explain quantum computing in 2 sentences"</span></pre>
+    </div>
+
+    <p>ويمكنك دمجه في تطبيقات بايثون بنفس السهولة:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="comment"># Install: pip install ollama</span>
+<span class="keyword">import</span> ollama
+
+<span class="comment"># Chat with a local model — no API key needed</span>
+response = ollama.<span class="func">chat</span>(
+    <span class="param">model</span>=<span class="string">"llama4"</span>,
+    <span class="param">messages</span>=[
+        {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Explain quantum computing in 2 sentences"</span>}
+    ]
+)
+
+<span class="func">print</span>(response[<span class="string">"message"</span>][<span class="string">"content"</span>])
+
+<span class="comment"># List available local models</span>
+models = ollama.<span class="func">list</span>()
+<span class="keyword">for</span> m <span class="keyword">in</span> models[<span class="string">"models"</span>]:
+    <span class="func">print</span>(<span class="string">f"</span>{m[<span class="string">'name'</span>]}<span class="string"> — </span>{m[<span class="string">'size'</span>] // <span class="number">1_000_000_000</span>}<span class="string">GB"</span>)</pre>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-icon">💡</div>
+      <div>
+        <h4>تشبيه: الإيجار مقابل التملك</h4>
+        <p>
+          استخدام واجهة برمجة مملوكة يشبه استئجار شقة — سهل البدء، شخص آخر يتولى الصيانة،
+          لكنك تتبع قوانينهم. تشغيل نموذج مفتوح المصدر يشبه امتلاك منزل — عمل أكثر في البداية،
+          لكن يمكنك التجديد كما تشاء، ولا أحد يستطيع رفع إيجارك.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>إطار عمل عملي للاختيار</h2>
+    </div>
+    <p>
+      استخدم هذا الإطار خطوة بخطوة لاختيار النموذج المناسب لأي مشروع بشكل منهجي.
+      لا تقفز مباشرة إلى "أي نموذج هو الأفضل" — ابدأ بمتطلباتك.
+    </p>
+
+    <!-- Pipeline diagram -->
+    <div class="diagram">
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="icon">🎯</div>
+          <div class="label">Define Task</div>
+          <div class="desc">What exactly will the model do?</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">📏</div>
+          <div class="label">Set Constraints</div>
+          <div class="desc">Budget, latency, privacy</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">📋</div>
+          <div class="label">Shortlist</div>
+          <div class="desc">Pick 2-3 candidates</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🧪</div>
+          <div class="label">Benchmark</div>
+          <div class="desc">Test on YOUR data</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="icon">🚀</div>
+          <div class="label">Deploy</div>
+          <div class="desc">Ship and monitor</div>
+        </div>
+      </div>
+    </div>
+
+    <p>إليك حالات الاستخدام الشائعة مع النماذج الموصى بها:</p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>حالة الاستخدام</th><th>النماذج الموصى بها</th><th>السبب</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>توليد الكود</strong></td>
+          <td>Claude Sonnet 4.5 / GPT-4o</td>
+          <td>معايير برمجة قوية، جيد في اتباع المواصفات المعقدة</td>
+        </tr>
+        <tr>
+          <td><strong>الكتابة الإبداعية</strong></td>
+          <td>Claude Opus 4 / GPT-4o</td>
+          <td>لغة دقيقة، تحكم أسلوبي قوي، استدلال عميق</td>
+        </tr>
+        <tr>
+          <td><strong>استخراج البيانات</strong></td>
+          <td>GPT-4o-mini / Claude Haiku</td>
+          <td>سريع ورخيص وموثوق للمخرجات المهيكلة بحجم كبير</td>
+        </tr>
+        <tr>
+          <td><strong>تحليل المستندات الطويلة</strong></td>
+          <td>Gemini 2.5 Pro (1M) / Claude (200K)</td>
+          <td>نوافذ سياق ضخمة تتعامل مع كتب كاملة أو قواعد أكواد</td>
+        </tr>
+        <tr>
+          <td><strong>محلي / خصوصية</strong></td>
+          <td>Llama 4 / Mistral</td>
+          <td>أوزان مفتوحة المصدر، تحكم كامل بالبيانات، بدون اعتماد على API</td>
+        </tr>
+        <tr>
+          <td><strong>حساس للتكلفة</strong></td>
+          <td>GPT-4o-mini / Claude Haiku / مفتوح المصدر</td>
+          <td>أصغر النماذج التي تلبي معيار الجودة — أرخص بمراتب عديدة</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <!-- Interactive Model Picker Demo -->
+    <div class="demo-box">
+      <h4>🧪 جرّب: أداة اختيار النموذج</h4>
+      <div class="demo-label">اختر العامل الأهم لمشروعك:</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('quality')">أعلى جودة</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('speed')">أسرع أداء</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('cost')">أقل تكلفة</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('context')">أكبر سياق</button>
+        <button class="demo-btn" style="margin-top:0;" onclick="pickModel('privacy')">خصوصية البيانات</button>
+      </div>
+      <div class="demo-output" id="pickerOutput"></div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>النماذج الذهنية الأساسية</h2>
+    </div>
+    <p>احتفظ بهذه المبادئ في ذهنك عند تقييم أو اختيار نموذج. ستحميك من الأخطاء الشائعة.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>لا يوجد نموذج أفضل</h4>
+        <p>النموذج المناسب يعتمد على مهمتك وميزانيتك وقيودك المحددة. نموذج بـ 20$/شهر قد يتفوق على نموذج بـ 200$/شهر لحالة الاستخدام المناسبة.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🧪</div>
+        <h4>اختبر قبل أن تلتزم</h4>
+        <p>اختبر دائماً 2-3 نماذج على بياناتك الفعلية قبل اتخاذ قرار. ما يعمل لغيرك قد لا يعمل لك.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💡</div>
+        <h4>التكلفة ≠ الجودة</h4>
+        <p>النماذج الأصغر والأرخص غالباً تتفوق على الأكبر في المهام الضيقة والمحددة جيداً. لا تلجأ تلقائياً للخيار الأغلى.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔄</div>
+        <h4>المشهد يتغير بسرعة</h4>
+        <p>أفضل نموذج اليوم قد يُتجاوز الشهر القادم. ابنِ نظامك بحيث يمكنك تبديل النماذج بسهولة — تجنب الربط المحكم بأي مزوّد واحد.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 3 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. أي عامل هو الأهم عند الاختيار بين GPT-4o و Claude Sonnet لأداة مراجعة الكود؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">اسم النموذج</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">أداؤه على مهام مراجعة الكود الخاصة بك</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">أيهما لديه بارامترات أكثر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">سعر سهم الشركة</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. متى تختار نموذجاً مفتوح المصدر بدلاً من مملوك؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تحتاج أعلى جودة مطلقة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">عندما تكون خصوصية البيانات والنشر المحلي أمراً حاسماً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما تريد أسهل إعداد</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عندما لا تهم التكلفة</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. لماذا لا يجب الاعتماد فقط على المعايير لاختيار نموذج؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">المعايير دائماً خاطئة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">المعايير تقيس مهاماً عامة لكن حالة استخدامك قد تكون محددة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">المعايير تقيس السرعة فقط</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">النماذج تغش في المعايير</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 2</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      مشهد النماذج اللغوية يمتد عبر <strong>أربع عائلات رئيسية</strong> — OpenAI و Anthropic و Google ونماذج Meta مفتوحة المصدر.
+      الاختيار بينها يعتمد على <strong>قيودك المحددة</strong>: الجودة، السرعة، التكلفة، نافذة السياق،
+      الخصوصية، والاحتياجات متعددة الوسائط. <strong>المعايير</strong> نقطة انطلاق مفيدة لكنها ليست بديلاً عن الاختبار
+      على بياناتك الخاصة. <strong>النماذج مفتوحة المصدر</strong> تمنحك تحكماً كاملاً على حساب التعقيد التشغيلي.
+      أهم مبدأ: <strong>لا يوجد نموذج "أفضل" عالمياً</strong> — فقط أفضل نموذج لمهمتك.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 3: أساسيات بناء البرومبت</strong><br>
+      <span style="color: var(--text-dim);">ستتعلم عن الأدوار، وبرومبت النظام، وتصميم التعليمات، وكيفية بناء برومبتات تحقق نتائج ممتازة باستمرار.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-01-how-llms-work.html">السابق →</a>
+  <span class="nav-info">الموضوع 2 من 23</span>
+  <a class="nav-btn primary" href="topic-02-prompt-structure-basics.html">← التالي: أساسيات بناء البرومبت</a>
+</div>
+
+<script>
+// ── Model Picker Demo ──
+function pickModel(priority) {
+  const output = document.getElementById('pickerOutput');
+  const recommendations = {
+    quality: {
+      label: 'Highest Quality',
+      color: '#c792ea',
+      result: 'Claude Opus 4 or GPT-4o\n\nThese models lead on complex reasoning, nuanced analysis, and creative tasks. Use them when accuracy and depth matter more than speed or cost.\n\nTip: For reasoning-heavy tasks, also consider OpenAI o3 which excels at multi-step logic.'
+    },
+    speed: {
+      label: 'Fastest Speed',
+      color: '#34d399',
+      result: 'GPT-4o-mini or Gemini 2.5 Flash\n\nSub-second response times, ideal for real-time applications like chatbots and autocomplete. These models sacrifice some quality for dramatic speed improvements.\n\nTip: Claude Haiku is another excellent fast option with strong instruction-following.'
+    },
+    cost: {
+      label: 'Lowest Cost',
+      color: '#f59e0b',
+      result: 'GPT-4o-mini, Claude Haiku, or Llama 4 (self-hosted)\n\nSmall proprietary models are pennies per million tokens. Self-hosted open-source models have zero per-token cost after hardware investment.\n\nTip: Many tasks that seem to need a large model actually work fine with a small model + better prompts.'
+    },
+    context: {
+      label: 'Largest Context Window',
+      color: '#60a5fa',
+      result: 'Gemini 2.5 Pro (1M tokens) or Claude (200K tokens)\n\nGemini\'s 1M token window can process entire codebases or books in a single request. Claude\'s 200K is sufficient for most document analysis tasks.\n\nTip: Larger context doesn\'t always mean better results — models can lose focus in very long inputs. Consider chunking strategies.'
+    },
+    privacy: {
+      label: 'Data Privacy',
+      color: '#f87171',
+      result: 'Llama 4 or Mistral (self-hosted)\n\nOpen-source models running on your own infrastructure mean your data never leaves your servers. Essential for healthcare, finance, legal, and government use cases.\n\nTip: Use Ollama for quick local setup, or vLLM/TGI for production-grade serving.'
+    }
+  };
+
+  const rec = recommendations[priority];
+  output.innerHTML = `<span style="color:${rec.color};font-weight:600;">Priority: ${rec.label}</span>\n\n${rec.result}`;
+  output.style.display = 'block';
+}
+
+</script>
+
+<script src="../slides.js"></script>
+</body>
+</html>

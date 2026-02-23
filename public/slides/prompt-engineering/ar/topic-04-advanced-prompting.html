@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<title>الموضوع 4 — البرومبت المتقدم | محمد الشربجي</title>
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/prompt-engineering" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 22%"></div></div>
+    <span class="progress-label">5 / 23</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button></div>
+
+<!-- ── Main Content ── -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">⚡</div>
+    <h1>البرومبت المتقدم</h1>
+    <p>المخرجات المنظمة، وسوم XML، والفواصل، وأنماط برومبت النظام المتقدمة للحصول على نتائج بجودة الإنتاج.</p>
+  </div>
+
+  <!-- ────────────────────────────── القسم 1 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>وسوم XML للهيكلة</h2>
+    </div>
+    <p>
+      يستجيب Claude (من Anthropic) بشكل استثنائي لـ<strong>البرومبتات الموسومة بـ XML</strong>.
+      تغليف الأقسام في وسوم مثل <code>&lt;context&gt;</code> و<code>&lt;instructions&gt;</code>
+      و<code>&lt;output_format&gt;</code> يساعد النموذج على تحليل الطلبات المعقدة بدقة.
+      وسوم XML هي أفضل ممارسة للبرومبتات الإنتاجية.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">لماذا تعمل وسوم XML بفعالية:</p>
+    <ul style="margin-right: 20px;">
+      <li>بنية دلالية واضحة — يفهم النموذج ما يعنيه كل قسم</li>
+      <li>تسلسل هرمي متداخل — يمكن لـ XML أن يحتوي على معلومات متداخلة معقدة</li>
+      <li>حدود لا لبس فيها — لا خلط حول أين يبدأ كل قسم وأين ينتهي</li>
+      <li>مثبت في الإنتاج — يُستخدم على نطاق واسع من قِبل فرق تستخدم Claude في تطبيقات المؤسسات</li>
+    </ul>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">وسوم XML الشائعة:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">📋</div>
+        <h4>&lt;context&gt;</h4>
+        <p>المعلومات الأساسية أو البيانات أو الموقف الذي يحتاج النموذج لفهمه</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎯</div>
+        <h4>&lt;instructions&gt;</h4>
+        <p>ما تريد من النموذج أن يفعله</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>&lt;output_format&gt;</h4>
+        <p>البنية الدقيقة للرد (JSON، XML، markdown، إلخ.)</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">✅</div>
+        <h4>&lt;rules&gt;</h4>
+        <p>القيود والحواجز ("لا تفعل X"، "افعل دائماً Y")</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">💡</div>
+        <h4>&lt;examples&gt;</h4>
+        <p>أمثلة توضيحية (few-shot) تُظهر السلوك المتوقع</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🎭</div>
+        <h4>&lt;system_role&gt;</h4>
+        <p>هوية النموذج وخبرته</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — XML Structure</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;system_role&gt;</span>
+You are a senior Python architect.
+<span class="tag">&lt;/system_role&gt;</span>
+
+<span class="tag">&lt;context&gt;</span>
+The user has a function that processes
+large lists (100k+ items). It's slow.
+<span class="tag">&lt;/context&gt;</span>
+
+<span class="tag">&lt;instructions&gt;</span>
+Analyze the code and suggest optimizations.
+Focus on algorithm complexity first, then
+memory usage, then parallelization.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;rules&gt;</span>
+- Don't suggest rewrites unless necessary
+- Always explain the performance impact
+- Cite specific lines of code
+- Don't suggest external dependencies
+<span class="tag">&lt;/rules&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+{
+  "summary": "Brief overview",
+  "optimizations": [
+    {
+      "issue": "What's slow",
+      "fix": "How to fix it",
+      "performance_gain": "Expected improvement",
+      "code_location": "Line X-Y"
+    }
+  ]
+}
+<span class="tag">&lt;/output_format&gt;</span></pre>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>نصيحة احترافية: تداخل الوسوم</h4>
+        <p>
+          يمكنك تداخل الوسوم لإنشاء تسلسل هرمي. مثال: <code>&lt;examples&gt;&lt;example id="1"&gt;...&lt;/example&gt;&lt;/examples&gt;</code>.
+          هذا يساعد في تنظيم البرومبتات المعقدة إلى أقسام منطقية.
+        </p>
+      </div>
+    </div></div>
+
+  <!-- ────────────────────────────── القسم 2 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>الفواصل والمحددات</h2>
+    </div>
+    <p>
+      الفواصل (---، ```، ###) تفصل الأقسام بصرياً وتساعد النموذج على فهم الحدود.
+      وهي مفيدة بشكل خاص عندما يحتوي البرومبت على محتوى مقدَّم من المستخدم قد يتضمن نصاً
+      يشبه التعليمات (دفاع ضد حقن البرومبت).
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">الفواصل الشائعة:</p>
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">--- (Triple Dash)</div>
+<pre>Instruction text here.
+
+---
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">``` (Triple Backticks)</div>
+<pre>Instruction text here.
+
+```
+User-provided content here.
+This could contain anything.
+```</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">### (Markdown Header)</div>
+<pre>Instruction text here.
+
+### User Content
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label" style="color: #82aaff;">== (Double Equal)</div>
+<pre>Instruction text here.
+
+====================
+
+User-provided content here.
+This could contain anything.</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">متى تستخدم أيّاً منها:</p>
+    <ul style="margin-right: 20px;">
+      <li><strong>---</strong> الأفضل لفصل الأقسام الرئيسية؛ نظيف وسهل القراءة</li>
+      <li><strong>```</strong> الأفضل للكود أو البيانات التقنية؛ يشير دلالياً إلى "كتلة كود"</li>
+      <li><strong>###</strong> الأفضل للبرومبتات بتنسيق markdown؛ يندمج مع بنية markdown</li>
+      <li><strong>==</strong> جيد للتأكيد؛ يبرز بصرياً</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>فاصل + XML = أقصى وضوح</h4>
+        <p>
+          ادمج الفواصل مع وسوم XML لتحقيق وضوح مطلق:
+          <code>&lt;instructions&gt;...&lt;/instructions&gt; --- &lt;user_content&gt;...&lt;/user_content&gt;</code>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 3 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>المخرجات المنظمة (JSON)</h2>
+    </div>
+    <p>
+      في التطبيقات الإنتاجية، غالباً ما تحتاج إلى <strong>مخرجات JSON مضمونة</strong> يمكنك تحليلها برمجياً.
+      يتطلب ذلك أنماط برومبت نظام ومواصفات output_format واضحة.
+      Claude موثوق بدرجة عالية في إنتاج JSON صالح عند الطلب صراحةً.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — JSON Output Pattern</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+You are a sentiment analysis system.
+Analyze the text and respond with JSON
+containing sentiment, confidence, and
+supporting evidence.
+<span class="tag">&lt;/instructions&gt;</span>
+
+<span class="tag">&lt;output_format&gt;</span>
+{
+  "sentiment": "positive|negative|neutral",
+  "confidence": 0.0 to 1.0,
+  "supporting_quote": "...",
+  "explanation": "..."
+}
+
+IMPORTANT: Return ONLY valid JSON.
+No markdown, no extra text. Just JSON.
+<span class="tag">&lt;/output_format&gt;</span>
+
+Text to analyze: "I love this product!"</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">كود بايثون لتحليل JSON بأمان:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Safe JSON Parsing</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> json
+<span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">messages</span>=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"..."</span>}]
+)
+
+text = response.content[<span class="number">0</span>].text
+
+<span class="keyword">try</span>:
+    result = json.<span class="func">loads</span>(text)
+    <span class="func">print</span>(<span class="string">f"Sentiment: {result['sentiment']}"</span>)
+<span class="keyword">except</span> json.<span class="func">JSONDecodeError</span> <span class="keyword">as</span> e:
+    <span class="func">print</span>(<span class="string">f"Failed to parse JSON: {e}"</span>)
+    <span class="func">print</span>(<span class="string">f"Raw response: {text}"</span>)</pre>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>تحقق دائماً من صحة JSON</h4>
+        <p>
+          حتى مع التعليمات الصريحة، اغلف تحليل JSON دائماً في كتل try/except.
+          النماذج موثوقة لكنها ليست مثالية. التعامل الرشيق مع الأخطاء ضروري في الإنتاج.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 4 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>قوالب المخرجات</h2>
+    </div>
+    <p>
+      <strong>قوالب المخرجات</strong> تحدد مسبقاً الشكل الدقيق للرد.
+      بدلاً من القول ببساطة "أعطني ملخصاً"، تقدم البنية الدقيقة التي تريد ملأها.
+      هذا يضمن الاتساق عبر طلبات متعددة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال: قالب ملخص اجتماع</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Template-Driven Output</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+Summarize the meeting transcript using
+this exact template. Fill in each section.
+<span class="tag">&lt;/instructions&gt;</span>
+
+Meeting Summary Template:
+──────────────────────────
+<span class="string">Title: [Meeting name]
+Date: [Date]
+Duration: [Length in minutes]
+
+Attendees: [List names]
+
+Key Decisions:
+1. [Decision 1]
+2. [Decision 2]
+3. [Decision 3]
+
+Action Items:
+- [ ] [Action 1] - Owner: [Name]
+- [ ] [Action 2] - Owner: [Name]
+- [ ] [Action 3] - Owner: [Name]
+
+Next Steps: [What happens next]
+
+Follow-up Meeting: [Date/Time if scheduled]</span>
+──────────────────────────
+
+Now summarize this transcript: ...</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">فوائد القوالب:</p>
+    <ul style="margin-right: 20px;">
+      <li><strong>الاتساق:</strong> كل مخرج يتبع نفس البنية</li>
+      <li><strong>التحليل:</strong> سهولة استخراج الحقول من المخرجات القالبية</li>
+      <li><strong>الاكتمال:</strong> يضمن عدم تفويت أي قسم</li>
+      <li><strong>الجودة:</strong> البنية الصريحة غالباً ما تحسّن الاستدلال</li>
+    </ul>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>قالب + JSON = تركيبة قوية</h4>
+        <p>
+          ادمج القوالب مع JSON للحصول على أقصى بنية:
+          اجعل القالب يحدد أسماء الحقول، ثم اطلب مخرجات JSON.
+          هذا يمنحك بنية مقروءة للإنسان وتنسيقاً قابلاً للتحليل الآلي في آن واحد.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 5 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>البرومبت السلبي</h2>
+    </div>
+    <p>
+      <strong>البرومبت السلبي</strong> يخبر النموذج بما لا يجب فعله.
+      رغم أنه ليس بقوة التعليمات الإيجابية، إلا أنه مفيد كحواجز حماية.
+      كن محدداً: "لا تعتذر" تعمل أفضل من "كن واثقاً".
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">البرومبت السلبي الجيد مقابل السيئ:</p>
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <div class="compare-label">❌ سلبي غامض</div>
+<pre>Don't make mistakes.
+Don't be rude.
+Don't be boring.</pre>
+      </div>
+      <div class="compare-card good">
+        <div class="compare-label">✅ سلبي محدد</div>
+<pre>Don't include disclaimers or apologies.
+Don't use corporate jargon.
+Don't make up facts you're unsure about.
+Don't exceed 200 words.</pre>
+      </div>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">أنماط البرومبت السلبي:</p>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>قيود التنسيق</h4>
+        <p>"لا تستخدم markdown أبداً. أعد دائماً نصاً عادياً."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>قيود المحتوى</h4>
+        <p>"لا تذكر المنافسين. لا تكشف تفاصيل داخلية."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>قيود السلوك</h4>
+        <p>"لا تطرح أسئلة متابعة. لا تتردد في إجابتك."</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🚫</div>
+        <h4>قيود النبرة</h4>
+        <p>"لا تعتذر. لا تكن رسمياً بشكل مبالغ. لا تستخدم السخرية."</p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>فضّل التعليمات الإيجابية</h4>
+        <p>
+          التعليمات السلبية مفيدة لكنها أقل فعالية من الإيجابية.
+          بدلاً من "لا تكن فظاً"، قل "كن ودوداً ومحترماً".
+          القيود السلبية يجب أن تعزز السلوك الإيجابي، لا أن تحل محله.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 6 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>سلسلة البرومبتات</h2>
+    </div>
+    <p>
+      <strong>سلسلة البرومبتات (Prompt Chaining)</strong> تقسّم المهام المعقدة إلى برومبتات متتابعة.
+      بدلاً من سؤال نموذج واحد لفعل كل شيء، تمرر المخرجات عبر خط أنابيب: المهمة أ ← المهمة ب ← المهمة ج.
+      هذا يحسّن الدقة ويتيح معالجة الأخطاء بين الخطوات.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال على السلسلة: تحليل ← استخراج ← تلخيص</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Prompt Chaining</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+<span class="keyword">import</span> json
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">chain_analysis</span>(document):
+    <span class="comment"># Step 1: Extract key entities</span>
+    step1 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Extract names, dates, and amounts from this document:\n{document}\n\nReturn JSON."</span>
+        }]
+    )
+    entities = json.<span class="func">loads</span>(step1.content[<span class="number">0</span>].text)
+
+    <span class="comment"># Step 2: Analyze sentiment of entities</span>
+    step2 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">500</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Analyze sentiment of these names in context:\n{json.dumps(entities)}\n\nReturn JSON."</span>
+        }]
+    )
+    analysis = json.<span class="func">loads</span>(step2.content[<span class="number">0</span>].text)
+
+    <span class="comment"># Step 3: Generate summary</span>
+    step3 = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">300</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"Summarize this analysis:\n{json.dumps(analysis)}\n\nKeep it under 100 words."</span>
+        }]
+    )
+    summary = step3.content[<span class="number">0</span>].text
+
+    <span class="keyword">return</span> {
+        <span class="string">"entities"</span>: entities,
+        <span class="string">"analysis"</span>: analysis,
+        <span class="string">"summary"</span>: summary
+    }
+
+result = <span class="func">chain_analysis</span>(<span class="string">"Alice sold 100 shares..."</span>)
+<span class="func">print</span>(json.<span class="func">dumps</span>(result, indent=<span class="number">2</span>))</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">متى تستخدم سلسلة البرومبتات:</p>
+    <ul style="margin-right: 20px;">
+      <li>المهام المعقدة التي تتحلل بطبيعتها إلى خطوات</li>
+      <li>عندما تحتاج إلى التحقق من النتائج الوسيطة</li>
+      <li>عندما تستفيد خطوات مختلفة من برومبتات نظام أو قيم حرارة مختلفة</li>
+      <li>عندما تريد تطبيق قواعد مختلفة على خطوات مختلفة</li>
+    </ul>
+
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>معالجة الأخطاء في السلاسل</h4>
+        <p>
+          تحقق دائماً من صحة مخرجات كل خطوة قبل تمريرها للخطوة التالية.
+          إذا فشلت الخطوة 2 في إنتاج JSON صالح، يمكنك إعادة المحاولة أو استخدام بديل أو إيقاف السلسلة بشكل رشيق.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── القسم 7 ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>البرومبت الفوقي</h2>
+    </div>
+    <p>
+      <strong>البرومبت الفوقي (Meta-Prompting)</strong> يعني استخدام نموذج لغوي لتوليد أو تحسين البرومبتات.
+      يمكنك أن تطلب من Claude كتابة برومبتات لنفسه أو لنماذج أخرى.
+      هذا مفيد لبناء النماذج الأولية وتوسيع تطوير البرومبتات واستكشاف الصيغ البديلة.
+    </p>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">مثال: اطلب من Claude كتابة برومبت</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Prompt — Meta-Prompting</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="tag">&lt;instructions&gt;</span>
+Write a prompt that will make Claude classify
+customer support tickets as urgent, normal,
+or low-priority. The prompt should:
+- Use XML tags for clarity
+- Include 3 few-shot examples
+- Define output format as JSON
+- Include guardrails against bias
+<span class="tag">&lt;/instructions&gt;</span>
+
+Return the complete prompt as a markdown code
+block with proper formatting.</pre>
+    </div>
+
+    <p style="font-weight: 600; color: #fff; margin-top: 20px;">كود بايثون: توليد البرومبتات ديناميكياً</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — Dynamic Prompt Generation</span>
+        <button class="code-copy" onclick="copyCode(this)" data-copied-text="تم النسخ!">نسخ</button>
+      </div>
+<pre><span class="keyword">import</span> anthropic
+
+client = anthropic.<span class="func">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="func">generate_prompt</span>(task_description):
+    <span class="string">"""Use Claude to write a prompt."""</span>
+    response = client.messages.<span class="func">create</span>(
+        <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+        <span class="param">max_tokens</span>=<span class="number">1000</span>,
+        <span class="param">messages</span>=[{
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="string">f"""Write a production-grade prompt for this task:
+
+{task_description}
+
+The prompt should use XML tags, include
+few-shot examples, define output format,
+and include guardrails. Return just the
+prompt text, ready to use."""</span>
+        }]
+    )
+    <span class="keyword">return</span> response.content[<span class="number">0</span>].text
+
+<span class="comment"># Generate a prompt for data extraction</span>
+task = <span class="string">"Extract invoice data (vendor, amount, date) from unstructured text"</span>
+prompt = <span class="func">generate_prompt</span>(task)
+<span class="func">print</span>(prompt)
+
+<span class="comment"># Now use the generated prompt</span>
+response = client.messages.<span class="func">create</span>(
+    <span class="param">model</span>=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+    <span class="param">max_tokens</span>=<span class="number">500</span>,
+    <span class="param">messages</span>=[{
+        <span class="string">"role"</span>: <span class="string">"user"</span>,
+        <span class="string">"content"</span>: prompt
+    }]
+)
+<span class="func">print</span>(response.content[<span class="number">0</span>].text)</pre>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>حالات استخدام البرومبت الفوقي</h4>
+        <p>
+          استخدم البرومبت الفوقي لـ: توليد صيغ متعددة لبرومبت، وتحويل برومبت من تنسيق لآخر،
+          وتوسيع برومبت بسيط إلى نسخة بجودة الإنتاج، أو استكشاف صياغات بديلة.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✓</div>
+      <h2>اختبر فهمك</h2>
+    </div>
+
+    <div class="quiz">
+      <h4>اختبار سريع — 4 أسئلة</h4>
+
+      <div class="quiz-q" id="q1">
+        <p>1. لماذا يستجيب Claude بشكل جيد لوسوم XML في البرومبتات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">XML توفر بنية دلالية واضحة تساعد النموذج على تحليل الطلبات المعقدة بدقة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">Claude لا يفهم إلا تنسيق XML</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">وسوم XML تقلل عدد التوكنات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تجعل الردود أسرع</button>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q2">
+        <p>2. ما الاستخدام الأساسي لسلسلة البرومبتات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تشغيل البرومبتات بالتوازي</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تقسيم المهام المعقدة إلى خطوات متتابعة لتحسين الدقة والسماح بمعالجة الأخطاء بين الخطوات</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">ربط عدة نماذج معاً</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تقليل استخدام التوكنات</button>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q3">
+        <p>3. عند استخدام مخرجات JSON المنظمة، ماذا يجب أن تفعل دائماً؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">الثقة بمخرجات النموذج بدون تحقق</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تغليف تحليل JSON في كتل try/except للتعامل الرشيق مع الأخطاء</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">استخدام JSON فقط للمخرجات الصغيرة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">عدم استخدام JSON في الإنتاج أبداً</button>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+
+      <div class="quiz-q" id="q4">
+        <p>4. ما الميزة الرئيسية لقوالب المخرجات؟</p>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تجعل الردود أقصر</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, true)">تضمن الاتساق والاكتمال وسهولة التحليل للردود عبر طلبات متعددة</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">تتطلب توكنات API أقل</button>
+        <button class="quiz-option" data-correct-text="✅ صحيح!" data-wrong-text="❌ ليس تماماً — انظر الإجابة الصحيحة المظللة أعلاه." onclick="checkAnswer(this, false)">مخصصة فقط للمهام البسيطة</button>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── الملخص ────────────────────────────── -->
+  <div class="section" style="border-color: var(--accent); background: linear-gradient(135deg, var(--surface) 0%, rgba(45, 212, 191,0.05) 100%);">
+    <div class="section-header">
+      <div class="section-num" style="background: var(--green);">✓</div>
+      <h2>ملخص الموضوع 4</h2>
+    </div>
+    <p>إليك ما تعلمته:</p>
+    <p>
+      <strong>وسوم XML</strong> تهيكل البرومبتات للوضوح.
+      <strong>الفواصل</strong> تفصل الأقسام وتحمي من الحقن.
+      <strong>مخرجات JSON</strong> تجعل الردود قابلة للتحليل الآلي.
+      <strong>القوالب</strong> تفرض الاتساق.
+      <strong>البرومبت السلبي</strong> يضيف حواجز حماية.
+      <strong>سلسلة البرومبتات</strong> تقسّم التعقيد إلى خطوات.
+      <strong>البرومبت الفوقي</strong> يستخدم النماذج اللغوية لتوليد البرومبتات.
+      هذه التقنيات تتراكم معاً لتحقيق موثوقية بجودة الإنتاج.
+    </p>
+    <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+      <strong>التالي ← الموضوع 5: تكرار وتصحيح البرومبت</strong><br>
+      <span style="color: var(--text-dim);">تعلّم كيفية تحسين البرومبتات بشكل منهجي من المسودة الأولى إلى جاهزية الإنتاج.</span>
+    </p>
+  </div>
+
+</div>
+
+<!-- ── Bottom Nav ── -->
+<div class="bottom-nav">
+  <a class="nav-btn" href="topic-03-prompting-techniques.html">السابق →</a>
+  <span class="nav-info">الموضوع 5 من 23</span>
+  <a class="nav-btn primary" href="topic-05-prompt-iteration.html">← التالي: تكرار وتصحيح البرومبت</a>
+</div>
+
+<script src="../slides.js"></script>
+</body>
+</html>
