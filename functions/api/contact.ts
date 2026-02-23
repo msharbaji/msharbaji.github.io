@@ -22,10 +22,23 @@ interface ContactPayload {
   turnstileToken?: string;
 }
 
+// Handle CORS preflight
+export const onRequestOptions: PagesFunction<Env> = async (context) => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": context.env.CORS_ORIGIN || "https://malsharbaji.com",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
+};
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": context.env.CORS_ORIGIN || "https://malsharbaji.com",
-    "Access-Control-Allow-Methods": "POST",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
