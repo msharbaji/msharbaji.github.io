@@ -31,8 +31,6 @@ jobs:
           NEXT_PUBLIC_CF_ANALYTICS_TOKEN: ${{ secrets.CF_ANALYTICS_TOKEN }}
           NEXT_TELEMETRY_DISABLED: 1
 
-      - run: cp -r functions out/functions
-
       - uses: actions/upload-artifact@v4
         with:
           name: build-output
@@ -49,6 +47,10 @@ jobs:
       name: production
       url: https://malsharbaji.com
     steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: functions
+
       - uses: actions/download-artifact@v4
         with:
           name: build-output
