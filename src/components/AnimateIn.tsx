@@ -19,13 +19,10 @@ export default function AnimateIn({
   delay = 0,
 }: AnimateInProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const reducedMotion = prefersReducedMotion();
+  const [isVisible, setIsVisible] = useState(reducedMotion);
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
-      setIsVisible(true);
-      return;
-    }
     if (isVisible) return;
 
     const el = ref.current;
