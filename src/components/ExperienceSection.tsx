@@ -10,7 +10,7 @@ export default function ExperienceSection() {
   return (
     <section className="py-10 sm:py-16">
       <AnimateIn>
-        <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+        <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
           {t.sections.experience}
         </h2>
       </AnimateIn>
@@ -20,7 +20,7 @@ export default function ExperienceSection() {
 
         <div className="space-y-10">
           {experience.map((job, i) => (
-            <AnimateIn key={i} delay={i * 0.05}>
+            <AnimateIn key={`${job.company}-${job.period}`} delay={i * 0.05}>
               <div className="relative ps-8 sm:ps-10">
                 <div className="absolute start-0 top-1.5 size-[15px] rounded-full border-2 border-accent/50 bg-background sm:size-[19px] sm:top-1" />
                 <div className="absolute start-[5px] top-[11px] size-[5px] rounded-full bg-accent sm:start-[6.5px] sm:top-[10px] sm:size-[6px]" />

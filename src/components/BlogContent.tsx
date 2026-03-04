@@ -70,7 +70,7 @@ export default function BlogContent({
                         </svg>
                       </span>
                       <div>
-                        <h2 className="font-display text-sm font-600 tracking-wide text-foreground">
+                        <h2 className="font-display text-base font-700 tracking-wide text-foreground">
                           {seriesName}
                         </h2>
                         <p className="font-mono text-[10px] uppercase tracking-widest text-muted">

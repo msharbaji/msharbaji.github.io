@@ -96,6 +96,7 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem("theme");var d=document.documentElement;if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme:dark)").matches)){d.classList.add("dark")}var l=localStorage.getItem("locale");if(!l){var n=navigator.language||"";l=n.startsWith("ar")?"ar":"en"}if(l==="ar"){d.lang="ar";d.dir="rtl";d.classList.add("font-arabic")}}catch(e){}})()`,
           }}
         />
+        <link rel="alternate" type="application/rss+xml" href="/feed.xml" title="Mohamad Alsharbaji Blog" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

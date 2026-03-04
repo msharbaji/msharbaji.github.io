@@ -13,7 +13,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       href={`/projects/${project.slug}`}
       className="card-hover group flex h-full flex-col"
     >
-      <h3 className="font-display text-base font-600 text-foreground transition-colors group-hover:text-accent">
+      <h3 className="font-display text-base font-700 text-foreground transition-colors group-hover:text-accent">
         {project.title[locale]}
       </h3>
       <p className="mt-3 flex-1 text-sm leading-relaxed text-muted line-clamp-3">

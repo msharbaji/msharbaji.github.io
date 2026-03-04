@@ -16,7 +16,7 @@ export default function Hero() {
 
       <div className="relative grid items-center gap-10 sm:gap-12 lg:grid-cols-[1fr_auto] lg:gap-20">
         <div>
-          <h1 className="animate-slide-up stagger-1 font-display text-4xl font-800 leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
+          <h1 className="animate-slide-up stagger-1 font-display text-3xl font-800 leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
             {locale === "en" ? (
               <>
                 Mohamad{" "}

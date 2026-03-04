@@ -10,7 +10,7 @@ export default function SkillsSection() {
   return (
     <section className="py-10 sm:py-16">
       <AnimateIn>
-        <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+        <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
           {t.sections.skills}
         </h2>
       </AnimateIn>

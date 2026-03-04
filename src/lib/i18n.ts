@@ -53,9 +53,9 @@ const translations = {
       readMore: "Read more",
     },
     courses: {
-      title: "Open Courseware",
+      title: "My Courseware",
       description:
-        "Free, open-source courses created and maintained by Mohamad Alsharbaji.",
+        "Free, open-source courses I've created to share knowledge with the community.",
       backToCourses: "Back to courses",
       openLesson: "Open lesson",
       startLearning: "Start learning",
@@ -180,9 +180,9 @@ const translations = {
       readMore: "اقرأ المزيد",
     },
     courses: {
-      title: "تعليم مفتوح",
+      title: "دوراتي التعليمية",
       description:
-        "دورات مجانية ومفتوحة المصدر من إعداد محمد الشربجي.",
+        "دورات مجانية ومفتوحة المصدر أنشأتها لمشاركة المعرفة مع المجتمع.",
       backToCourses: "العودة للدورات",
       openLesson: "افتح الدرس",
       startLearning: "ابدأ التعلم",

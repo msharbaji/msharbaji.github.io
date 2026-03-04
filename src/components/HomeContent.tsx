@@ -36,7 +36,7 @@ export default function HomeContent({
       {/* About + Stats */}
       <section className="py-10 sm:py-16">
         <AnimateIn>
-          <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+          <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
             {t.sections.about}
           </h2>
         </AnimateIn>
@@ -88,7 +88,7 @@ export default function HomeContent({
                 <span className="font-display text-2xl font-800 tracking-tight text-accent sm:text-3xl">
                   {stat.value}
                 </span>
-                <span className="mt-1 text-[11px] uppercase tracking-wider text-muted">
+                <span className="mt-1 text-xs uppercase tracking-wider text-muted">
                   {t.home[stat.key]}
                 </span>
               </div>
@@ -110,7 +110,7 @@ export default function HomeContent({
       <section className="py-10 sm:py-16">
         <AnimateIn>
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+            <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
               {t.sections.projects}
             </h2>
             <Link
@@ -137,7 +137,7 @@ export default function HomeContent({
           <section className="py-10 sm:py-16">
             <AnimateIn>
               <div className="flex items-baseline justify-between">
-                <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+                <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
                   {t.blog.title}
                 </h2>
                 <Link
@@ -198,7 +198,7 @@ export default function HomeContent({
       <section className="py-10 sm:py-16">
         <AnimateIn>
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-sm font-600 uppercase tracking-[0.2em] text-accent">
+            <h2 className="font-display text-base font-700 uppercase tracking-[0.2em] text-accent">
               {t.courses.title}
             </h2>
             <Link
