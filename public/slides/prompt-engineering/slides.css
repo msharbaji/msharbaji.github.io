@@ -344,6 +344,12 @@ pre {
 .tip h4 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
 .tip p { font-size: 14px; color: var(--text); margin: 0; }
 
+/* Consecutive paragraphs in info boxes get spacing */
+.analogy p + p,
+.insight p + p,
+.warning p + p,
+.tip p + p { margin-top: 8px; }
+
 /* ── Interactive Demo ── */
 .demo-box {
   background: var(--surface2);
@@ -691,6 +697,57 @@ html { scroll-behavior: smooth; }
   margin: 14px 0;
 }
 
+/* ── Grid-2 (two-column layout for update sections) ── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+/* ── Update Sections (★ badge, 2025+ content) ── */
+.section-update {
+  border-color: rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(124, 58, 237, 0.04) 100%);
+}
+.dark .section-update {
+  border-color: rgba(167, 139, 250, 0.25);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(167, 139, 250, 0.06) 100%);
+}
+.section-update .section-num {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  font-size: 16px;
+}
+
+/* ── Compare Table ── */
+.compare-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 20px 0;
+}
+.compare-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.compare-table th {
+  padding: 10px 14px;
+  text-align: left;
+  background: var(--bg);
+  color: var(--accent-light);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+}
+.compare-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.compare-table tr:last-child td { border-bottom: none; }
+
 /* ── Compare Grid ── */
 .compare-grid {
   display: grid;
@@ -703,6 +760,8 @@ html { scroll-behavior: smooth; }
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 20px;
+  min-width: 0;
+  overflow: hidden;
 }
 .compare-label {
   font-size: 13px;
@@ -903,11 +962,12 @@ html { scroll-behavior: smooth; }
   pre { font-size: 12.5px; padding: 14px; }
   .bottom-nav { padding: 12px 16px; }
   .nav-btn { padding: 8px 16px; font-size: 13px; }
+  .compare-grid, .grid-2 { grid-template-columns: 1fr; }
 }
 
 /* ── Mobile (≤ 600px) ── */
 @media (max-width: 600px) {
-  .concept-grid, .compare-grid { grid-template-columns: 1fr; }
+  .concept-grid, .compare-grid, .grid-2 { grid-template-columns: 1fr; }
 
   .topbar {
     flex-direction: column;

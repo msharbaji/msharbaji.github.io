@@ -277,6 +277,20 @@ Step 3: Final answer: ...</pre>
         </p>
       </div>
     </div>
+
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>2025+ Update: Don't Use CoT with Reasoning Models</h4>
+        <p>
+          Newer <strong>reasoning models</strong> like OpenAI's <code>o3</code> / <code>o4-mini</code> and Claude's
+          <strong>extended thinking</strong> mode already perform chain-of-thought <em>internally</em>.
+          Adding "think step by step" to these models is redundant and can actually <strong>hurt performance</strong>
+          — it forces the model to show reasoning it's already doing behind the scenes, wasting tokens and
+          sometimes causing confusion. Use explicit CoT only with standard (non-reasoning) models.
+        </p>
+      </div>
+    </div>
   </div>
 
   <!-- ────────────────────────────── SECTION 4 ────────────────────────────── -->

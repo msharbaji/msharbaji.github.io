@@ -525,6 +525,52 @@ response = client.messages.<span class="func">create</span>(
     </div>
   </div>
 
+  <!-- ────────────────────────────── SECTION: 2026 UPDATE ────────────────────────────── -->
+  <div class="section section-update">
+    <div class="section-header">
+      <div class="section-num">★</div>
+      <h2>2025+ Update: Advanced RAG Patterns</h2>
+    </div>
+    <p>
+      RAG has evolved significantly. Beyond basic semantic search, two advanced patterns are now widely used in production:
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🕸️</div>
+        <h4>GraphRAG</h4>
+        <p>
+          Instead of just finding semantically similar chunks, <strong>GraphRAG</strong> builds a knowledge graph
+          from your documents — extracting entities and relationships. It then traverses the graph to find
+          contextually related information that semantic search alone would miss. Particularly powerful
+          for complex questions that span multiple documents or require multi-hop reasoning.
+        </p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🤖</div>
+        <h4>Agentic RAG</h4>
+        <p>
+          Traditional RAG does a single retrieval step. <strong>Agentic RAG</strong> lets an AI agent
+          iteratively query, evaluate results, refine its search, and re-retrieve — just like a human
+          researcher would. The agent decides if it has enough context or needs to dig deeper.
+          This dramatically improves answer quality for complex, multi-faceted questions.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>MCP for Data Access</h4>
+        <p>
+          The <strong>Model Context Protocol (MCP)</strong>, introduced by Anthropic and now adopted across the industry,
+          provides a standardized way for LLMs to connect to external data sources — databases, APIs, file systems, and more.
+          MCP is becoming the standard interface layer for RAG systems, replacing custom integrations with a universal protocol.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
   <div class="section">
     <div class="section-header">

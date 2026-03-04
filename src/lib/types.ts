@@ -62,4 +62,6 @@ export interface BlogPost {
   tags: string[];
   content: Bilingual;
   readingTime: number;
+  series?: string;
+  seriesOrder?: number;
 }

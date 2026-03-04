@@ -474,6 +474,45 @@ limiter = <span class="func">RateLimiter</span>(<span class="param">max_requests
     </div>
   </div>
 
+  <!-- ────────────────────────────── تحديث 2025+ ────────────────────────────── -->
+  <div class="section section-update">
+    <div class="section-header">
+      <div class="section-num">★</div>
+      <h2>تحديث 2025+: OWASP قائمة أهم 10 تهديدات لتطبيقات LLM</h2>
+    </div>
+
+    <p>
+      نشرت <strong>OWASP</strong> قائمة رسمية بأهم 10 مخاطر أمنية لتطبيقات النماذج اللغوية الكبيرة.
+      هذا هو المرجع الصناعي القياسي.
+    </p>
+
+    <div class="table-wrapper">
+    <table class="param-table">
+      <thead>
+        <tr><th>الرمز</th><th>التهديد</th><th>الوصف</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>LLM01</strong></td><td>حقن البرومبت</td><td>التلاعب بمدخلات النموذج لتجاهل التعليمات</td></tr>
+        <tr><td><strong>LLM02</strong></td><td>التعامل غير الآمن مع المخرجات</td><td>الثقة بمخرجات النموذج دون تنقية</td></tr>
+        <tr><td><strong>LLM03</strong></td><td>تسميم بيانات التدريب</td><td>بيانات تدريب ملوثة تؤثر على سلوك النموذج</td></tr>
+        <tr><td><strong>LLM04</strong></td><td>رفض الخدمة للنموذج</td><td>استنزاف موارد النموذج عبر مدخلات مصممة</td></tr>
+        <tr><td><strong>LLM05</strong></td><td>ثغرات سلسلة التوريد</td><td>مكونات ونماذج طرف ثالث غير موثوقة</td></tr>
+        <tr><td><strong>LLM06</strong></td><td>كشف المعلومات الحساسة</td><td>تسريب النموذج لبيانات خاصة من التدريب</td></tr>
+        <tr><td><strong>LLM07</strong></td><td>تصميم إضافات غير آمن</td><td>أدوات وإضافات بصلاحيات مفرطة</td></tr>
+        <tr><td><strong>LLM08</strong></td><td>صلاحيات مفرطة للوكيل</td><td>منح الوكلاء صلاحيات أكثر مما يحتاجون</td></tr>
+        <tr><td><strong>LLM09</strong></td><td>الاعتماد المفرط</td><td>الثقة العمياء بمخرجات النموذج دون مراجعة</td></tr>
+        <tr><td><strong>LLM10</strong></td><td>سرقة النموذج</td><td>استخراج النموذج أو بياناته عبر استعلامات</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="insight">
+      <strong>ملاحظة:</strong> الدفاعات التي تعلمتها في هذا الدرس تتطابق مباشرة مع تهديدات OWASP:
+      فصل المدخلات يعالج LLM01، تنقية المخرجات تعالج LLM02، والحواجز الوقائية تعالج LLM06-LLM09.
+      اعتبر هذه القائمة مرجعاً أمنياً لكل تطبيق LLM تبنيه.
+    </div>
+  </div>
+
   <!-- ────────────────────────────── الاختبار ────────────────────────────── -->
   <div class="section">
     <div class="section-header">

@@ -457,6 +457,65 @@ decision = debate.<span class="func">debate</span>(<span class="string">"Should 
     </div>
   </div>
 
+  <!-- ────────────────────────────── 2025+ UPDATE ────────────────────────────── -->
+  <div class="section section-update">
+    <div class="section-header">
+      <div class="section-num">★</div>
+      <h2>2025+ Update: Agent-to-Agent (A2A) Protocol</h2>
+    </div>
+
+    <p>
+      As multi-agent systems move from research to production, a major challenge has emerged:
+      <strong>how do agents from different vendors communicate?</strong> Google's <strong>A2A protocol</strong>
+      (Agent-to-Agent) is an open standard that solves this.
+    </p>
+
+    <div class="grid-2">
+      <div class="concept-card">
+        <h4>🔗 What is A2A?</h4>
+        <p>
+          An open protocol that lets agents <strong>discover each other's capabilities</strong>,
+          <strong>negotiate tasks</strong>, and <strong>exchange results</strong> — regardless of which
+          framework or vendor built them. Think of it as HTTP for agent communication.
+        </p>
+      </div>
+
+      <div class="concept-card">
+        <h4>📋 Agent Cards</h4>
+        <p>
+          Each agent publishes an <strong>Agent Card</strong> (a JSON descriptor) at a well-known URL.
+          It describes the agent's skills, input/output formats, and authentication requirements —
+          enabling automatic discovery and interoperability.
+        </p>
+      </div>
+
+      <div class="concept-card">
+        <h4>🤝 A2A + MCP Together</h4>
+        <p>
+          A2A and MCP are <strong>complementary</strong>, not competing. <strong>MCP</strong> connects
+          agents to <em>tools and data sources</em>. <strong>A2A</strong> connects agents to
+          <em>other agents</em>. Production systems use both protocols together.
+        </p>
+      </div>
+
+      <div class="concept-card">
+        <h4>🏢 Industry Adoption</h4>
+        <p>
+          Backed by Google, Salesforce, SAP, Atlassian, and 50+ companies. A2A supports
+          <strong>streaming</strong>, <strong>push notifications</strong>, and <strong>multi-turn conversations</strong>
+          between agents — designed for enterprise-grade orchestration.
+        </p>
+      </div>
+    </div>
+
+    <div class="insight">
+      <strong>Key Insight:</strong> The patterns you learned in this lesson (supervisor, pipeline, debate)
+      describe <em>how</em> agents collaborate. A2A standardizes the <em>communication layer</em> so those
+      patterns work across organizational and vendor boundaries. When building multi-agent systems,
+      design your agent interfaces to be A2A-compatible from the start.
+    </div>
+  </div>
+
   <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
   <div class="section">
     <div class="section-header">

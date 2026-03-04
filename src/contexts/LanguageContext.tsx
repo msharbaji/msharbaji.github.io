@@ -6,6 +6,7 @@ import {
   useSyncExternalStore,
   useEffect,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import { type Locale, type Translations, getTranslations } from "@/lib/i18n";
@@ -74,11 +75,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [locale]);
 
-  const dir = locale === "ar" ? "rtl" : "ltr";
-  const t = getTranslations(locale);
+  const value = useMemo(() => ({
+    locale,
+    setLocale,
+    t: getTranslations(locale),
+    dir: (locale === "ar" ? "rtl" : "ltr") as "ltr" | "rtl",
+  }), [locale, setLocale]);
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, t, dir }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

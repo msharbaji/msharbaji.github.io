@@ -23,6 +23,13 @@ export async function generateMetadata({
   return {
     title: course.title.en,
     description: course.description.en,
+    openGraph: {
+      title: course.title.en,
+      description: course.description.en,
+      type: "website",
+      url: `${SITE_URL}/courses/${slug}`,
+      images: [`${SITE_URL}/og-image.png`],
+    },
     alternates: {
       canonical: `${SITE_URL}/courses/${slug}`,
     },
@@ -45,6 +52,12 @@ export default async function CoursePage({ params }: PageProps) {
       name: "Mohamad Alsharbaji",
       url: SITE_URL,
     },
+    author: {
+      "@type": "Person",
+      name: "Mohamad Alsharbaji",
+      url: SITE_URL,
+    },
+    isAccessibleForFree: true,
     numberOfLessons: course.topics.length,
     hasCourseInstance: {
       "@type": "CourseInstance",

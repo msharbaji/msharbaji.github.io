@@ -11,12 +11,12 @@ export default function BackLink({
   label: "backToBlog" | "backToProjects" | "backToCourses";
 }) {
   const { t } = useLanguage();
-  const text =
-    label === "backToBlog"
-      ? t.blog.backToBlog
-      : label === "backToCourses"
-        ? t.courses.backToCourses
-        : t.projects.backToProjects;
+  const labelMap = {
+    backToBlog: t.blog.backToBlog,
+    backToCourses: t.courses.backToCourses,
+    backToProjects: t.projects.backToProjects,
+  } as const;
+  const text = labelMap[label];
 
   return (
     <Link
@@ -29,6 +29,7 @@ export default function BackLink({
         viewBox="0 0 24 24"
         stroke="currentColor"
         strokeWidth={2}
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"

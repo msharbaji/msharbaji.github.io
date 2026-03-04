@@ -477,6 +477,55 @@ messages = [{<span class="string">"role"</span>: <span class="string">"user"</sp
     </div>
   </div>
 
+  <!-- ────────────────────────────── SECTION: MCP ────────────────────────────── -->
+  <div class="section section-update">
+    <div class="section-header">
+      <div class="section-num">★</div>
+      <h2>2025+ Update: Model Context Protocol (MCP)</h2>
+    </div>
+    <p>
+      <strong>MCP (Model Context Protocol)</strong> is an open standard introduced by Anthropic that is rapidly becoming the
+      <em>universal way</em> LLMs connect to external tools and data sources. Instead of every app defining tools differently,
+      MCP provides a single protocol that works across providers.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔌</div>
+        <h4>Universal Standard</h4>
+        <p>MCP is now supported by Anthropic (Claude), OpenAI, Google, and Microsoft. Write your tool integration once, use it everywhere.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🛠️</div>
+        <h4>MCP Servers</h4>
+        <p>Tools are exposed as MCP servers — lightweight services that describe their capabilities. Clients (LLMs) discover and use tools through the protocol.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">📦</div>
+        <h4>Rich Ecosystem</h4>
+        <p>Thousands of pre-built MCP servers exist for databases, APIs, file systems, Slack, GitHub, and more. No need to build custom integrations from scratch.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>Built-in Security</h4>
+        <p>MCP includes authentication, authorization, and scoping controls so you can limit what tools an LLM can access and with what permissions.</p>
+      </div>
+    </div>
+
+    <div class="tip">
+      <div class="tip-icon">💎</div>
+      <div>
+        <h4>MCP vs Custom Tool Definitions</h4>
+        <p>
+          The tool definitions you learned above (JSON schemas passed to the API) still work. MCP is a higher-level
+          protocol that <strong>standardizes how tools are discovered, described, and invoked</strong>.
+          Think of it as the difference between writing raw HTTP requests vs. using a well-designed REST API.
+          For production systems, MCP is the recommended approach.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- ────────────────────────────── QUIZ ────────────────────────────── -->
   <div class="section">
     <div class="section-header">

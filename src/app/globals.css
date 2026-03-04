@@ -132,20 +132,22 @@ body::before {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.01em;
+  scroll-margin-top: 5rem;
 }
 
 .prose h2 {
   font-size: 1.5rem;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--color-accent);
 }
 
 .prose h3 {
   font-size: 1.2rem;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
+  color: var(--color-accent);
 }
 
 .prose p {
@@ -171,18 +173,63 @@ body::before {
 .prose pre {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-accent);
   color: var(--color-foreground);
   padding: 1.25rem;
   border-radius: var(--radius-lg);
   overflow-x: auto;
   margin-bottom: 1.5rem;
+  width: 100%;
+  font-size: 0.85rem;
+  line-height: 1.65;
 }
 
 .prose pre code {
   background: transparent;
   padding: 0;
   color: inherit;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  line-height: inherit;
 }
+
+/* Syntax highlighting — light mode */
+.prose pre .hljs-keyword,
+.prose pre .hljs-selector-tag,
+.prose pre .hljs-built_in { color: oklch(50% 0.18 300); }
+.prose pre .hljs-string,
+.prose pre .hljs-attr { color: oklch(45% 0.15 150); }
+.prose pre .hljs-comment,
+.prose pre .hljs-quote { color: var(--color-muted); font-style: italic; }
+.prose pre .hljs-number,
+.prose pre .hljs-literal { color: oklch(52% 0.16 45); }
+.prose pre .hljs-function .hljs-title,
+.prose pre .hljs-title.function_ { color: oklch(48% 0.14 250); }
+.prose pre .hljs-type,
+.prose pre .hljs-title.class_ { color: oklch(50% 0.14 60); }
+.prose pre .hljs-variable,
+.prose pre .hljs-template-variable { color: oklch(40% 0.14 30); }
+.prose pre .hljs-meta { color: var(--color-muted); }
+.prose pre .hljs-property { color: oklch(45% 0.12 200); }
+
+/* Syntax highlighting — dark mode */
+.dark .prose pre .hljs-keyword,
+.dark .prose pre .hljs-selector-tag,
+.dark .prose pre .hljs-built_in { color: oklch(75% 0.16 300); }
+.dark .prose pre .hljs-string,
+.dark .prose pre .hljs-attr { color: oklch(75% 0.14 150); }
+.dark .prose pre .hljs-comment,
+.dark .prose pre .hljs-quote { color: var(--color-muted); font-style: italic; }
+.dark .prose pre .hljs-number,
+.dark .prose pre .hljs-literal { color: oklch(78% 0.14 45); }
+.dark .prose pre .hljs-function .hljs-title,
+.dark .prose pre .hljs-title.function_ { color: oklch(78% 0.12 250); }
+.dark .prose pre .hljs-type,
+.dark .prose pre .hljs-title.class_ { color: oklch(78% 0.12 60); }
+.dark .prose pre .hljs-variable,
+.dark .prose pre .hljs-template-variable { color: oklch(72% 0.12 30); }
+.dark .prose pre .hljs-meta { color: var(--color-muted); }
+.dark .prose pre .hljs-property { color: oklch(75% 0.10 200); }
 
 .prose a {
   color: var(--color-accent);
@@ -198,6 +245,15 @@ body::before {
 .prose ul, .prose ol {
   padding-left: 1.5rem;
   margin-bottom: 1.25rem;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose ol li::marker {
+  color: var(--color-accent);
+  font-weight: 600;
 }
 
 .prose ul {
@@ -249,9 +305,65 @@ body::before {
   height: auto;
 }
 
+.dark .prose img {
+  filter: invert(1) hue-rotate(180deg);
+  border-color: var(--color-border);
+}
+
+/* Tables — scrollable on mobile */
+.prose .table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 28rem;
+}
+
+.prose thead {
+  border-bottom: 2px solid var(--color-border);
+}
+
+.prose th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-foreground);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  color: var(--color-muted);
+  border-bottom: 1px solid var(--color-border);
+  line-height: 1.6;
+}
+
+.prose tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.prose td strong {
+  white-space: nowrap;
+}
+
 /* Arabic font — applied when html has .font-arabic class */
 html.font-arabic body {
   font-family: var(--font-arabic);
+}
+
+/* RTL h2 border */
+html[dir="rtl"] .prose h2 {
+  border-left: none;
+  border-right: 3px solid var(--color-accent);
+  padding-left: 0;
+  padding-right: 0.75rem;
 }
 
 /* RTL blockquote border */
@@ -277,6 +389,24 @@ html[dir="rtl"] .prose ul li {
 html[dir="rtl"] .prose ul li::before {
   left: auto;
   right: 0;
+}
+
+/* RTL code blocks — code is always LTR */
+html[dir="rtl"] .prose pre {
+  direction: ltr;
+  text-align: left;
+  border-left: 1px solid var(--color-border);
+  border-right: 3px solid var(--color-accent);
+}
+
+html[dir="rtl"] .prose code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* RTL table alignment */
+html[dir="rtl"] .prose th {
+  text-align: right;
 }
 
 /* Respect reduced motion preference */

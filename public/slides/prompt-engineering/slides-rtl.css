@@ -72,6 +72,9 @@ pre {
   direction: ltr;
   display: inline-block;
 }
+.compare-table th {
+  text-align: right;
+}
 
 /* ── Slider (always LTR) ── */
 input[type="range"] {

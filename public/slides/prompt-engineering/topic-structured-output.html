@@ -163,7 +163,7 @@ data = json.<span class="func">loads</span>(match.<span class="func">group</span
       </div>
 <pre><span class="keyword">import</span> google.generativeai <span class="keyword">as</span> genai
 
-model = genai.<span class="func">GenerativeModel</span>(<span class="string">"gemini-1.5-pro"</span>)
+model = genai.<span class="func">GenerativeModel</span>(<span class="string">"gemini-2.5-flash"</span>)
 
 response = model.<span class="func">generate_content</span>(
     <span class="string">"Review the movie Inception"</span>,
@@ -460,6 +460,51 @@ review_stream = client.chat.completions.<span class="func">create_partial</span>
         <div class="icon">🎯</div>
         <h4>Start Simple</h4>
         <p>Begin with flat structures; add nesting only when needed. Deeply nested schemas are harder for models to get right and harder for you to validate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────── SECTION: CONSTRAINED DECODING ────────────────────────────── -->
+  <div class="section section-update">
+    <div class="section-header">
+      <div class="section-num">★</div>
+      <h2>2025+ Update: Guaranteed Structured Output</h2>
+    </div>
+    <p>
+      A major breakthrough: LLM providers now offer <strong>constrained decoding</strong> — the model is
+      <em>physically unable</em> to produce invalid JSON. This is different from "JSON mode" which merely
+      encourages JSON output. With constrained decoding, the model's token sampling is restricted at
+      each step to only valid JSON tokens.
+    </p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="icon">🔒</div>
+        <h4>JSON Mode (Old)</h4>
+        <p>Encourages the model to output JSON. Works most of the time, but can still produce malformed output. Requires validation and retry logic.</p>
+      </div>
+      <div class="concept-card">
+        <div class="icon">✅</div>
+        <h4>Guaranteed JSON (New)</h4>
+        <p>Constrains token generation to only valid JSON matching your schema. <strong>100% structural compliance</strong> — no parsing errors possible. No retry logic needed.</p>
+      </div>
+    </div>
+
+    <p>
+      OpenAI's <code>response_format</code> with <code>json_schema</code>, Anthropic's structured output tools,
+      and open-source solutions like <strong>Outlines</strong> and <strong>Instructor</strong> all support this.
+      The key difference: you provide a JSON Schema, and the model's output is <em>guaranteed</em> to conform.
+    </p>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>When to Use Which</h4>
+        <p>
+          <strong>Guaranteed JSON</strong>: Use for production pipelines where parsing failures break your system.
+          <strong>JSON mode</strong>: Fine for prototyping or when schemas are too complex for constrained decoding.
+          <strong>Prompt-only</strong>: Use when exploring or when the output format isn't strictly JSON.
+        </p>
       </div>
     </div>
   </div>

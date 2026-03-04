@@ -1,6 +1,6 @@
 "use client";
 
-import { skills, languages } from "@/lib/resume-data";
+import { skills } from "@/lib/resume-data";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AnimateIn from "./AnimateIn";
 
@@ -37,26 +37,6 @@ export default function SkillsSection() {
         ))}
       </div>
 
-      {/* Languages */}
-      <AnimateIn delay={0.3}>
-        <div className="mt-10">
-          <span className="mb-3 block font-mono text-[11px] font-medium uppercase tracking-widest text-muted">
-            {t.sections.languages}
-          </span>
-          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2 [&>*:not(:first-child)]:border-s [&>*:not(:first-child)]:border-border [&>*:not(:first-child)]:ps-5">
-            {languages.map((lang) => (
-              <div key={lang.name.en} className="flex flex-wrap items-baseline gap-x-1.5">
-                <span className="font-display text-sm font-600 text-foreground">
-                  {lang.name[locale]}
-                </span>
-                <span className="font-mono text-[11px] tracking-wider text-muted">
-                  ({lang.level[locale]})
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnimateIn>
     </section>
   );
 }

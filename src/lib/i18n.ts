@@ -7,7 +7,7 @@ const translations = {
     nav: {
       home: "Home",
       projects: "Projects",
-      courses: "Courses",
+      courses: "Courseware",
       blog: "Blog",
       contact: "Contact",
     },
@@ -36,6 +36,11 @@ const translations = {
       letsWorkDescription:
         "Interested in working together or have a question? Feel free to reach out.",
       getInTouch: "Get in touch",
+      yearsExperience: "Years Experience",
+      companies: "Companies",
+      certifications: "Certifications",
+      countries: "Countries",
+      readPost: "Read post",
     },
     projects: {
       title: "Projects",
@@ -48,11 +53,13 @@ const translations = {
       readMore: "Read more",
     },
     courses: {
-      title: "Courses",
+      title: "Open Courseware",
       description:
-        "Interactive courses on AI, prompt engineering, and building intelligent systems.",
+        "Free, open-source courses created and maintained by Mohamad Alsharbaji.",
       backToCourses: "Back to courses",
       openLesson: "Open lesson",
+      startLearning: "Start learning",
+      exploreCurriculum: "Explore curriculum",
       topics: "Topics",
       phase1: "Foundations",
       phase2: "Applied Prompt Engineering",
@@ -62,6 +69,25 @@ const translations = {
       phase2Desc: "RAG, tools, evaluation & projects",
       phase3Desc: "Architecture, frameworks & building agents",
       bonusDesc: "Career growth & staying current",
+      createdBy: "Created by",
+      freeAndOpen: "Free & Open Source",
+      whatYouLearn: "What you'll learn",
+      allPhases: "All Topics",
+      phases: "Phases",
+      concepts: "Concepts",
+      lessons: "Lessons",
+      learnPoint1:
+        "Understand how LLMs work under the hood — tokens, context windows, and model selection",
+      learnPoint2:
+        "Master prompt engineering techniques from zero-shot to chain-of-thought and meta-prompting",
+      learnPoint3:
+        "Build production applications with RAG, tool use, and structured output",
+      learnPoint4:
+        "Design and implement autonomous AI agents with memory, planning, and multi-agent orchestration",
+      tagTheory: "Theory",
+      tagHandsOn: "Hands-On",
+      tagProject: "Project",
+      tagCareer: "Career",
     },
     blog: {
       title: "Blog",
@@ -70,6 +96,11 @@ const translations = {
       noPosts: "No posts yet. Stay tuned.",
       backToBlog: "Back to blog",
       minRead: "min read",
+      part: "Part",
+      parts: "parts",
+      seriesCicdMigration: "CI/CD Migration Series",
+      onThisPage: "On this page",
+      backToTop: "Back to top",
     },
     contact: {
       title: "Contact",
@@ -103,7 +134,7 @@ const translations = {
     nav: {
       home: "الرئيسية",
       projects: "المشاريع",
-      courses: "الدورات",
+      courses: "المواد التعليمية",
       blog: "المدونة",
       contact: "تواصل",
     },
@@ -132,6 +163,11 @@ const translations = {
       letsWorkDescription:
         "مهتم بالتعاون أو لديك سؤال؟ لا تتردد في التواصل.",
       getInTouch: "تواصل معي",
+      yearsExperience: "سنوات خبرة",
+      companies: "شركات",
+      certifications: "شهادات",
+      countries: "دول",
+      readPost: "اقرأ المقال",
     },
     projects: {
       title: "المشاريع",
@@ -144,11 +180,13 @@ const translations = {
       readMore: "اقرأ المزيد",
     },
     courses: {
-      title: "الدورات",
+      title: "تعليم مفتوح",
       description:
-        "دورات تفاعلية عن AI وهندسة البرومبت وبناء أنظمة ذكية.",
+        "دورات مجانية ومفتوحة المصدر من إعداد محمد الشربجي.",
       backToCourses: "العودة للدورات",
       openLesson: "افتح الدرس",
+      startLearning: "ابدأ التعلم",
+      exploreCurriculum: "استعرض المنهج",
       topics: "المواضيع",
       phase1: "الأساسيات",
       phase2: "هندسة البرومبت التطبيقية",
@@ -158,6 +196,25 @@ const translations = {
       phase2Desc: "RAG والأدوات والتقييم ومشاريع عملية",
       phase3Desc: "بنية الـ agents وأطر العمل وبناء agents من الصفر",
       bonusDesc: "المسار المهني ومواكبة آخر التطورات",
+      createdBy: "من إعداد",
+      freeAndOpen: "مجاني ومفتوح المصدر",
+      whatYouLearn: "ماذا ستتعلم",
+      allPhases: "جميع المواضيع",
+      phases: "المراحل",
+      concepts: "المفاهيم",
+      lessons: "الدروس",
+      learnPoint1:
+        "فهم آلية عمل نماذج اللغة الكبيرة — الرموز ونوافذ السياق واختيار النموذج",
+      learnPoint2:
+        "إتقان تقنيات هندسة البرومبت من zero-shot إلى chain-of-thought والـ meta-prompting",
+      learnPoint3:
+        "بناء تطبيقات إنتاجية باستخدام RAG واستخدام الأدوات والمخرجات المنظمة",
+      learnPoint4:
+        "تصميم وتنفيذ وكلاء ذكاء اصطناعي مستقلين مع الذاكرة والتخطيط وتنسيق الوكلاء المتعددين",
+      tagTheory: "نظري",
+      tagHandsOn: "تطبيقي",
+      tagProject: "مشروع",
+      tagCareer: "مهني",
     },
     blog: {
       title: "المدونة",
@@ -166,6 +223,11 @@ const translations = {
       noPosts: "لا توجد مقالات بعد. ترقبوا الجديد.",
       backToBlog: "العودة للمدونة",
       minRead: "دقائق قراءة",
+      part: "الجزء",
+      parts: "أجزاء",
+      seriesCicdMigration: "سلسلة انتقال CI/CD",
+      onThisPage: "في هذه الصفحة",
+      backToTop: "العودة للأعلى",
     },
     contact: {
       title: "تواصل",

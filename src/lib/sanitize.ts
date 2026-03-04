@@ -17,6 +17,10 @@ const allowedAttributes: sanitizeHtml.IOptions["allowedAttributes"] = {
   div: ["class"],
   td: ["colspan", "rowspan"],
   th: ["colspan", "rowspan"],
+  h1: ["id"],
+  h2: ["id"],
+  h3: ["id"],
+  h4: ["id"],
 };
 
 export function sanitize(html: string): string {

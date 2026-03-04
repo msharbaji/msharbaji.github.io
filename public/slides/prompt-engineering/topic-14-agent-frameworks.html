@@ -320,17 +320,41 @@ user_proxy.<span class="func">initiate_chat</span>(
             <th>Ease of Use</th>
             <th>Flexibility</th>
             <th>Multi-Agent</th>
-            <th>Production Ready</th>
+            <th>MCP Support</th>
             <th>Community</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>LangChain</strong></td>
+            <td><strong>Claude Agent SDK</strong></td>
+            <td>Easy</td>
+            <td>High</td>
+            <td>Yes (native)</td>
+            <td>Native</td>
+            <td>Growing (Anthropic)</td>
+          </tr>
+          <tr>
+            <td><strong>OpenAI Agents SDK</strong></td>
+            <td>Easy</td>
+            <td>High</td>
+            <td>Yes (handoffs)</td>
+            <td>Yes</td>
+            <td>Large (OpenAI)</td>
+          </tr>
+          <tr>
+            <td><strong>Google ADK</strong></td>
+            <td>Easy</td>
+            <td>Medium</td>
+            <td>Yes</td>
+            <td>Yes</td>
+            <td>Growing (Google)</td>
+          </tr>
+          <tr>
+            <td><strong>LangGraph</strong></td>
             <td>Medium</td>
             <td>Very High</td>
-            <td>Yes (manual)</td>
-            <td>Yes</td>
+            <td>Yes (graph)</td>
+            <td>Plugin</td>
             <td>Huge</td>
           </tr>
           <tr>
@@ -338,23 +362,15 @@ user_proxy.<span class="func">initiate_chat</span>(
             <td>Easy</td>
             <td>Medium</td>
             <td>Yes (native)</td>
+            <td>Plugin</td>
             <td>Growing</td>
-            <td>Growing</td>
-          </tr>
-          <tr>
-            <td><strong>Claude SDK</strong></td>
-            <td>Easy</td>
-            <td>Medium</td>
-            <td>Possible</td>
-            <td>Yes</td>
-            <td>Small (Anthropic)</td>
           </tr>
           <tr>
             <td><strong>AutoGen</strong></td>
             <td>Easy</td>
             <td>High</td>
             <td>Yes</td>
-            <td>Yes</td>
+            <td>Plugin</td>
             <td>Large (Microsoft)</td>
           </tr>
           <tr>
@@ -362,11 +378,25 @@ user_proxy.<span class="func">initiate_chat</span>(
             <td>Hard</td>
             <td>Unlimited</td>
             <td>Yes</td>
-            <td>Up to you</td>
+            <td>Manual</td>
             <td>N/A</td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <h4>2025+ Shift: Provider-Native SDKs</h4>
+        <p>
+          A major trend: every LLM provider now offers their own agent SDK.
+          <strong>Claude Agent SDK</strong> (Anthropic), <strong>OpenAI Agents SDK</strong>, and <strong>Google ADK</strong>
+          offer first-party agent development with native MCP support and optimized tool calling.
+          Third-party frameworks like LangGraph and CrewAI remain valuable for provider-agnostic or complex workflows,
+          but provider SDKs are becoming the default starting point for new projects.
+        </p>
+      </div>
     </div>
   </div>
 

@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-import html from "remark-html";
+import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
+import rehypeStringify from "rehype-stringify";
 import { BlogPost } from "./types";
 import { sanitize } from "./sanitize";
 import type { Locale } from "./i18n";
@@ -36,6 +40,17 @@ function addImageDimensions(htmlContent: string): string {
       if (!dims) return match;
       return `<img ${before}src="${src}" width="${dims.width}" height="${dims.height}" loading="lazy"${after}>`;
     }
+  );
+}
+
+/** Wrap <table> elements in a scrollable div for mobile responsiveness. */
+function wrapTables(html: string): string {
+  return html.replace(
+    /<table/g,
+    '<div class="table-wrapper"><table'
+  ).replace(
+    /<\/table>/g,
+    '</table></div>'
   );
 }
 
@@ -129,6 +144,8 @@ export function getAllPosts(): Omit<BlogPost, "content">[] {
       },
       tags: (en.data.tags as string[]) || [],
       readingTime: getReadingTime(en.rawContent),
+      ...(en.data.series ? { series: en.data.series as string } : {}),
+      ...(en.data.seriesOrder ? { seriesOrder: en.data.seriesOrder as number } : {}),
     };
   }).filter(Boolean) as Omit<BlogPost, "content">[];
 
@@ -145,9 +162,16 @@ export async function getPostBySlug(
 
   const ar = readPostFile(slug, "ar");
 
-  const enProcessed = await remark().use(html).process(en.rawContent);
+  const processor = remark()
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeHighlight, { detect: true })
+    .use(rehypeStringify);
+
+  const enProcessed = await processor.process(en.rawContent);
   const arProcessed = ar
-    ? await remark().use(html).process(ar.rawContent)
+    ? await processor.process(ar.rawContent)
     : null;
 
   return {
@@ -163,9 +187,11 @@ export async function getPostBySlug(
     },
     tags: (en.data.tags as string[]) || [],
     content: {
-      en: addImageDimensions(sanitize(enProcessed.toString())),
-      ar: addImageDimensions(arProcessed ? sanitize(arProcessed.toString()) : sanitize(enProcessed.toString())),
+      en: wrapTables(addImageDimensions(sanitize(enProcessed.toString()))),
+      ar: wrapTables(addImageDimensions(arProcessed ? sanitize(arProcessed.toString()) : sanitize(enProcessed.toString()))),
     },
     readingTime: getReadingTime(en.rawContent),
+    ...(en.data.series ? { series: en.data.series as string } : {}),
+    ...(en.data.seriesOrder ? { seriesOrder: en.data.seriesOrder as number } : {}),
   };
 }
