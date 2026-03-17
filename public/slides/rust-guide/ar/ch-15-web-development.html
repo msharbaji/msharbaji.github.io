@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 15, تطوير الويب مع Rust | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 4</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 88%"></div></div>
+    <span class="progress-label">15 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🌐</div>
+    <h1>تطوير الويب مع Rust</h1>
+    <p>ابنِ خوادم ويب وواجهات برمجية باستخدام Actix Web و Axum, أبرز أطر عمل Rust للويب.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>نظرة عامة على منظومة الويب في Rust</h2>
+    </div>
+    <p>يقدم Rust عدة أطر عمل قوية لتطوير الويب. لكل منها نقاط قوة مختلفة: Axum معياري وقابل للتركيب، وActix-web عالي الأداء، وRocket يركز على تجربة المطور، وWarp يستخدم نهج المرشحات الوظيفية.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Key ecosystems and their strengths:</span>
+<span class="comment">// Axum    - Modular, composable, built on Tokio</span>
+<span class="comment">// Actix   - High performance, actor-based</span>
+<span class="comment">// Rocket  - Easy to use, focuses on developer experience</span>
+<span class="comment">// Warp    - Functional approach using filters</span>
+<span class="comment">// Tauri   - Desktop apps with web frontend</span>
+<span class="comment">// Common web dependencies in Cargo.toml:</span>
+<span class="comment">// [dependencies]</span>
+<span class="comment">// tokio = { version = "1", features = ["full"] }</span>
+<span class="comment">// axum = "0.7"</span>
+<span class="comment">// serde = { version = "1.0", features = ["derive"] }</span>
+<span class="comment">// serde_json = "1.0"</span>
+<span class="comment">// sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite"] }</span>
+<span class="comment">// tower = "0.4"</span></code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>أي إطار عمل تختار؟</h4>
+        <p><strong>Axum</strong> هو نقطة البداية الموصى بها لمعظم المشاريع, يتكامل بشكل وثيق مع منظومة Tokio، ويتمتع بقابلية تركيب ممتازة عبر Middleware Tower، ويُصان من قبل فريق Tokio.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>أساسيات Axum: الـ Routes والـ Handlerات والحالة</h2>
+    </div>
+    <p>Axum هو إطار عمل ويب معياري وقابل للتركيب مبني على Tokio. تربط الـ Routes طرق HTTP والـ Routes بدوال الـ Handlerة الـ Asyncة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Simple Axum server with basic routing</span>
+<span class="keyword">use</span> axum::{
+    routing::{get, post},
+    Router,
+};
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">hello</span>() -&gt; &amp;<span class="keyword">'static</span> <span class="keyword">str</span> {
+    <span class="string">"Hello, world!"</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">json_handler</span>() -&gt; axum::Json&lt;serde_json::Value&gt; {
+    axum::Json(<span class="func">serde_json::json!</span>({
+        <span class="string">"message"</span>: <span class="string">"Hello from JSON"</span>,
+        <span class="string">"status"</span>: <span class="string">"ok"</span>
+    }))
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> app = Router::<span class="func">new</span>()
+        .<span class="func">route</span>(<span class="string">"/"</span>, <span class="func">get</span>(hello))
+        .<span class="func">route</span>(<span class="string">"/json"</span>, <span class="func">get</span>(json_handler));
+    <span class="keyword">let</span> listener = tokio::net::TcpListener::<span class="func">bind</span>(<span class="string">"127.0.0.1:3000"</span>)
+        .<span class="keyword">await</span>
+        .<span class="func">unwrap</span>();
+    axum::<span class="func">serve</span>(listener, app).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Axum with path parameters</span>
+<span class="keyword">use</span> axum::{
+    extract::Path,
+    routing::get,
+    Router,
+};
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">get_user</span>(Path(<span class="param">id</span>): Path&lt;<span class="keyword">u32</span>&gt;) -&gt; String {
+    <span class="func">format!</span>(<span class="string">"Getting user with ID: {}"</span>, id)
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">get_user_post</span>(Path((<span class="param">id</span>, <span class="param">post_id</span>)): Path&lt;(<span class="keyword">u32</span>, <span class="keyword">u32</span>)&gt;) -&gt; String {
+    <span class="func">format!</span>(<span class="string">"User {} Post {}"</span>, id, post_id)
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> app = Router::<span class="func">new</span>()
+        .<span class="func">route</span>(<span class="string">"/users/:id"</span>, <span class="func">get</span>(get_user))
+        .<span class="func">route</span>(<span class="string">"/users/:id/posts/:post_id"</span>, <span class="func">get</span>(get_user_post));
+    <span class="keyword">let</span> listener = tokio::net::TcpListener::<span class="func">bind</span>(<span class="string">"127.0.0.1:3000"</span>)
+        .<span class="keyword">await</span>
+        .<span class="func">unwrap</span>();
+    axum::<span class="func">serve</span>(listener, app).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Axum with shared state</span>
+<span class="keyword">use</span> axum::{
+    extract::State,
+    routing::get,
+    Router,
+};
+<span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> std::sync::atomic::{AtomicUsize, Ordering};
+<span class="keyword">#[derive(Clone)]</span>
+<span class="keyword">struct</span> <span class="func">AppState</span> {
+    counter: Arc&lt;AtomicUsize&gt;,
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">increment_counter</span>(State(<span class="param">state</span>): State&lt;AppState&gt;) -&gt; String {
+    <span class="keyword">let</span> count = state.counter.<span class="func">fetch_add</span>(<span class="number">1</span>, Ordering::Relaxed);
+    <span class="func">format!</span>(<span class="string">"Counter: {}"</span>, count + <span class="number">1</span>)
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> state = AppState {
+        counter: Arc::<span class="func">new</span>(AtomicUsize::<span class="func">new</span>(<span class="number">0</span>)),
+    };
+    <span class="keyword">let</span> app = Router::<span class="func">new</span>()
+        .<span class="func">route</span>(<span class="string">"/counter"</span>, <span class="func">get</span>(increment_counter))
+        .<span class="func">with_state</span>(state);
+    <span class="keyword">let</span> listener = tokio::net::TcpListener::<span class="func">bind</span>(<span class="string">"127.0.0.1:3000"</span>)
+        .<span class="keyword">await</span>
+        .<span class="func">unwrap</span>();
+    axum::<span class="func">serve</span>(listener, app).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>المستخرجات هي المفهوم الأساسي</h4>
+        <p>يستخدم Axum <strong>المستخرجات</strong> (<code>Path</code> و<code>State</code> و<code>Json</code> و<code>Query</code>) كمعاملات للدوال. يقوم إطار العمل تلقائياً بتحليل الطلب إلى هذه الأنواع قبل استدعاء الـ Handler الخاص بك.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>بناء واجهة REST البرمجية مع Axum</h2>
+    </div>
+    <p>واجهة REST برمجية كاملة لعمليات CRUD باستخدام Axum مع حالة مشتركة وتسلسل JSON وأكواد حالة HTTP المناسبة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// REST API for managing todos</span>
+<span class="keyword">use</span> axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{delete, get, post, put},
+    Json, Router,
+};
+<span class="keyword">use</span> serde::{Deserialize, Serialize};
+<span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> tokio::sync::RwLock;
+<span class="keyword">use</span> std::collections::HashMap;
+<span class="keyword">#[derive(Serialize, Deserialize, Clone)]</span>
+<span class="keyword">struct</span> <span class="func">Todo</span> {
+    id: <span class="keyword">u32</span>,
+    title: String,
+    completed: <span class="keyword">bool</span>,
+<span class="keyword">#[derive(Serialize, Deserialize)]</span>
+<span class="keyword">struct</span> <span class="func">CreateTodo</span> {
+    title: String,
+<span class="keyword">#[derive(Clone)]</span>
+<span class="keyword">struct</span> <span class="func">AppState</span> {
+    todos: Arc&lt;RwLock&lt;HashMap&lt;<span class="keyword">u32</span>, Todo&gt;&gt;&gt;,
+<span class="comment">// Create todo</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">create_todo</span>(
+    State(<span class="param">state</span>): State&lt;AppState&gt;,
+    Json(<span class="param">create</span>): Json&lt;CreateTodo&gt;,
+) -&gt; (StatusCode, Json&lt;Todo&gt;) {
+    <span class="keyword">let</span> <span class="keyword">mut</span> todos = state.todos.<span class="func">write</span>().<span class="keyword">await</span>;
+    <span class="keyword">let</span> id = todos.<span class="func">len</span>() <span class="keyword">as</span> <span class="keyword">u32</span> + <span class="number">1</span>;
+    <span class="keyword">let</span> todo = Todo { id, title: create.title, completed: <span class="keyword">false</span> };
+    todos.<span class="func">insert</span>(id, todo.<span class="func">clone</span>());
+    (StatusCode::CREATED, Json(todo))
+<span class="comment">// Get all todos</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">list_todos</span>(State(<span class="param">state</span>): State&lt;AppState&gt;) -&gt; Json&lt;Vec&lt;Todo&gt;&gt; {
+    <span class="keyword">let</span> todos = state.todos.<span class="func">read</span>().<span class="keyword">await</span>;
+    <span class="keyword">let</span> list: Vec&lt;_&gt; = todos.<span class="func">values</span>().<span class="func">cloned</span>().<span class="func">collect</span>();
+    Json(list)
+<span class="comment">// Get single todo</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">get_todo</span>(
+    State(<span class="param">state</span>): State&lt;AppState&gt;,
+    Path(<span class="param">id</span>): Path&lt;<span class="keyword">u32</span>&gt;,
+) -&gt; Result&lt;Json&lt;Todo&gt;, StatusCode&gt; {
+    <span class="keyword">let</span> todos = state.todos.<span class="func">read</span>().<span class="keyword">await</span>;
+    todos.<span class="func">get</span>(&amp;id).<span class="func">cloned</span>().<span class="func">map</span>(Json).<span class="func">ok_or</span>(StatusCode::NOT_FOUND)
+<span class="comment">// Delete todo</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">delete_todo</span>(
+    State(<span class="param">state</span>): State&lt;AppState&gt;,
+    Path(<span class="param">id</span>): Path&lt;<span class="keyword">u32</span>&gt;,
+) -&gt; StatusCode {
+    <span class="keyword">let</span> <span class="keyword">mut</span> todos = state.todos.<span class="func">write</span>().<span class="keyword">await</span>;
+    <span class="keyword">if</span> todos.<span class="func">remove</span>(&amp;id).<span class="func">is_some</span>() {
+        StatusCode::NO_CONTENT
+    } <span class="keyword">else</span> {
+        StatusCode::NOT_FOUND
+    }
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> state = AppState {
+        todos: Arc::<span class="func">new</span>(RwLock::<span class="func">new</span>(HashMap::<span class="func">new</span>())),
+    };
+    <span class="keyword">let</span> app = Router::<span class="func">new</span>()
+        .<span class="func">route</span>(<span class="string">"/todos"</span>, <span class="func">post</span>(create_todo).<span class="func">get</span>(list_todos))
+        .<span class="func">route</span>(<span class="string">"/todos/:id"</span>,
+            <span class="func">get</span>(get_todo).<span class="func">delete</span>(delete_todo))
+        .<span class="func">with_state</span>(state);
+    <span class="keyword">let</span> listener = tokio::net::TcpListener::<span class="func">bind</span>(<span class="string">"127.0.0.1:3000"</span>)
+        .<span class="keyword">await</span>.<span class="func">unwrap</span>();
+    axum::<span class="func">serve</span>(listener, app).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+}</code></pre></div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>التكامل مع قواعد البيانات باستخدام SQLx</h2>
+    </div>
+    <p>يوفر SQLx استعلامات SQL مفحوصة في وقت التجميع. يتحقق من استعلاماتك مقابل مخطط قاعدة البيانات الفعلي في وقت البناء، مما يكشف الأخطاء قبل Runtime.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// SQLx integration example</span>
+<span class="keyword">use</span> sqlx::sqlite::SqlitePool;
+<span class="keyword">#[derive(Debug, Clone)]</span>
+<span class="keyword">struct</span> <span class="func">User</span> {
+    id: <span class="keyword">i32</span>,
+    name: String,
+    email: String,
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">create_user_db</span>(
+    <span class="param">pool</span>: &amp;SqlitePool,
+    <span class="param">name</span>: &amp;<span class="keyword">str</span>,
+    <span class="param">email</span>: &amp;<span class="keyword">str</span>,
+) -&gt; Result&lt;User, sqlx::Error&gt; {
+    <span class="keyword">let</span> user = sqlx::<span class="func">query_as</span>::&lt;_, User&gt;(
+        <span class="string">"INSERT INTO users (name, email)
+         VALUES (?, ?) RETURNING id, name, email"</span>
+    )
+    .<span class="func">bind</span>(name)
+    .<span class="func">bind</span>(email)
+    .<span class="func">fetch_one</span>(pool)
+    .<span class="keyword">await</span>?;
+    Ok(user)
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">get_user_by_id</span>(
+    <span class="param">pool</span>: &amp;SqlitePool,
+    <span class="param">id</span>: <span class="keyword">i32</span>,
+) -&gt; Result&lt;Option&lt;User&gt;, sqlx::Error&gt; {
+    sqlx::<span class="func">query_as</span>::&lt;_, User&gt;(
+        <span class="string">"SELECT id, name, email FROM users WHERE id = ?"</span>
+    )
+    .<span class="func">bind</span>(id)
+    .<span class="func">fetch_optional</span>(pool)
+    .<span class="keyword">await</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">list_all_users</span>(
+    <span class="param">pool</span>: &amp;SqlitePool,
+) -&gt; Result&lt;Vec&lt;User&gt;, sqlx::Error&gt; {
+    sqlx::<span class="func">query_as</span>::&lt;_, User&gt;(
+        <span class="string">"SELECT id, name, email FROM users"</span>
+    )
+    .<span class="func">fetch_all</span>(pool)
+    .<span class="keyword">await</span>
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>التحقق في وقت التجميع</h4>
+        <p>يمكن لـ SQLx فحص استعلاماتك في وقت التجميع مقابل قاعدة بيانات حقيقية باستخدام ماكرو <code>sqlx::query!</code>. هذا يكشف الأخطاء الإملائية وعدم تطابق الأنواع والأعمدة المفقودة قبل تشغيل الكود.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>نظرة عامة على Actix Web</h2>
+    </div>
+    <p>Actix-web هو إطار عمل عالي الأداء مبني على نمط الممثلين (actors). يحتل باستمرار مراتب متقدمة بين أسرع أطر عمل الويب في المعايير المستقلة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Simple Actix-web server</span>
+<span class="keyword">use</span> actix_web::{web, App, HttpServer, HttpResponse};
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">hello</span>() -&gt; HttpResponse {
+    HttpResponse::<span class="func">Ok</span>().<span class="func">body</span>(<span class="string">"Hello from Actix!"</span>)
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">echo</span>(<span class="param">path</span>: web::Path&lt;String&gt;) -&gt; HttpResponse {
+    HttpResponse::<span class="func">Ok</span>()
+        .<span class="func">body</span>(<span class="func">format!</span>(<span class="string">"Echo: {}"</span>, path.<span class="func">into_inner</span>()))
+<span class="keyword">#[actix_web::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() -&gt; std::io::Result&lt;()&gt; {
+    HttpServer::<span class="func">new</span>(|| {
+        App::<span class="func">new</span>()
+            .<span class="func">route</span>(<span class="string">"/"</span>, web::<span class="func">get</span>().<span class="func">to</span>(hello))
+            .<span class="func">route</span>(<span class="string">"/echo/{msg}"</span>, web::<span class="func">get</span>().<span class="func">to</span>(echo))
+    })
+    .<span class="func">bind</span>(<span class="string">"127.0.0.1:8000"</span>)?
+    .<span class="func">run</span>()
+    .<span class="keyword">await</span>
+}</code></pre></div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Error Handling في تطبيقات الويب</h2>
+    </div>
+    <p>الـ Handlerة السليمة للأخطاء في تطبيقات الويب تستخدم أنواع أخطاء مخصصة تنفّذ <code>IntoResponse</code>، وتربط أخطاء الـ Scope بأكواد حالة HTTP المناسبة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Custom error handling</span>
+<span class="keyword">use</span> axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
+<span class="keyword">use</span> serde_json::json;
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">enum</span> <span class="func">AppError</span> {
+    NotFound,
+    InvalidInput(String),
+    DatabaseError(String),
+<span class="keyword">impl</span> IntoResponse <span class="keyword">for</span> AppError {
+    <span class="keyword">fn</span> <span class="func">into_response</span>(<span class="keyword">self</span>) -&gt; Response {
+        <span class="keyword">let</span> (status, error_message) = <span class="keyword">match</span> <span class="keyword">self</span> {
+            AppError::NotFound =&gt;
+                (StatusCode::NOT_FOUND, <span class="string">"Resource not found"</span>),
+            AppError::InvalidInput(<span class="param">msg</span>) =&gt;
+                (StatusCode::BAD_REQUEST, &amp;msg),
+            AppError::DatabaseError(<span class="param">msg</span>) =&gt;
+                (StatusCode::INTERNAL_SERVER_ERROR, &amp;msg),
+        };
+        <span class="keyword">let</span> body = Json(<span class="func">json!</span>({
+            <span class="string">"error"</span>: error_message
+        }));
+        (status, body).<span class="func">into_response</span>()
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>استخدم <code>thiserror</code> + <code>anyhow</code></h4>
+        <p>في الإنتاج، اجمع بين <code>thiserror</code> لتعريف أنواع الأخطاء و<code>anyhow</code> لنشر الأخطاء. هذا يمنحك أخطاء منظمة لواجهتك البرمجية مع الحفاظ على سلاسة Error Handling الداخلية.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>مثال كامل: واجهة CRUD برمجية للإنتاج</h2>
+    </div>
+    <p>مثال عملي كامل يجمع بين التوجيه وإدارة الحالة وتسلسل JSON والطوابع الزمنية وعمليات CRUD السليمة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Production-ready CRUD API</span>
+<span class="keyword">use</span> axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    routing::{delete, get, post, put},
+    Json, Router,
+};
+<span class="keyword">use</span> serde::{Deserialize, Serialize};
+<span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> tokio::sync::RwLock;
+<span class="keyword">use</span> std::collections::HashMap;
+<span class="keyword">use</span> chrono::{DateTime, Utc};
+<span class="keyword">#[derive(Serialize, Deserialize, Clone)]</span>
+<span class="keyword">struct</span> <span class="func">Article</span> {
+    id: <span class="keyword">u32</span>,
+    title: String,
+    content: String,
+    created_at: DateTime&lt;Utc&gt;,
+    updated_at: DateTime&lt;Utc&gt;,
+<span class="keyword">#[derive(Serialize, Deserialize)]</span>
+<span class="keyword">struct</span> <span class="func">CreateArticle</span> { title: String, content: String }
+<span class="keyword">#[derive(Serialize, Deserialize)]</span>
+<span class="keyword">struct</span> <span class="func">UpdateArticle</span> { title: Option&lt;String&gt;, content: Option&lt;String&gt; }
+<span class="keyword">#[derive(Clone)]</span>
+<span class="keyword">struct</span> <span class="func">AppState</span> {
+    articles: Arc&lt;RwLock&lt;HashMap&lt;<span class="keyword">u32</span>, Article&gt;&gt;&gt;,
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">create_article</span>(
+    State(<span class="param">state</span>): State&lt;AppState&gt;,
+    Json(<span class="param">create</span>): Json&lt;CreateArticle&gt;,
+) -&gt; (StatusCode, Json&lt;Article&gt;) {
+    <span class="keyword">let</span> <span class="keyword">mut</span> articles = state.articles.<span class="func">write</span>().<span class="keyword">await</span>;
+    <span class="keyword">let</span> id = articles.<span class="func">len</span>() <span class="keyword">as</span> <span class="keyword">u32</span> + <span class="number">1</span>;
+    <span class="keyword">let</span> now = Utc::<span class="func">now</span>();
+    <span class="keyword">let</span> article = Article {
+        id, title: create.title, content: create.content,
+        created_at: now, updated_at: now,
+    };
+    articles.<span class="func">insert</span>(id, article.<span class="func">clone</span>());
+    (StatusCode::CREATED, Json(article))
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">update_article</span>(
+    State(<span class="param">state</span>): State&lt;AppState&gt;,
+    Path(<span class="param">id</span>): Path&lt;<span class="keyword">u32</span>&gt;,
+    Json(<span class="param">update</span>): Json&lt;UpdateArticle&gt;,
+) -&gt; Result&lt;Json&lt;Article&gt;, StatusCode&gt; {
+    <span class="keyword">let</span> <span class="keyword">mut</span> articles = state.articles.<span class="func">write</span>().<span class="keyword">await</span>;
+    <span class="keyword">let</span> article = articles.<span class="func">get_mut</span>(&amp;id)
+        .<span class="func">ok_or</span>(StatusCode::NOT_FOUND)?;
+    <span class="keyword">if</span> <span class="keyword">let</span> Some(title) = update.title { article.title = title; }
+    <span class="keyword">if</span> <span class="keyword">let</span> Some(content) = update.content { article.content = content; }
+    article.updated_at = Utc::<span class="func">now</span>();
+    Ok(Json(article.<span class="func">clone</span>()))
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> state = AppState {
+        articles: Arc::<span class="func">new</span>(RwLock::<span class="func">new</span>(HashMap::<span class="func">new</span>())),
+    };
+    <span class="keyword">let</span> app = Router::<span class="func">new</span>()
+        .<span class="func">route</span>(<span class="string">"/articles"</span>, <span class="func">post</span>(create_article))
+        .<span class="func">route</span>(<span class="string">"/articles/:id"</span>, <span class="func">put</span>(update_article))
+        .<span class="func">with_state</span>(state);
+    <span class="keyword">let</span> listener = tokio::net::TcpListener::<span class="func">bind</span>(<span class="string">"127.0.0.1:3000"</span>)
+        .<span class="keyword">await</span>.<span class="func">unwrap</span>();
+    <span class="func">println!</span>(<span class="string">"Server running at http://127.0.0.1:3000"</span>);
+    axum::<span class="func">serve</span>(listener, app).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+}</code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>الحالة في الـ Memory للتعلم فقط</h4>
+        <p>حالة <code>HashMap</code> المستخدمة هنا تُفقد عند إعادة التشغيل. للإنتاج، استخدم قاعدة بيانات دائمة (SQLx + PostgreSQL/SQLite) وضع في اعتبارك تجمع الاتصالات والترحيلات وError Handling السليمة.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-14-unsafe-rust.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 15 من 17</span>
+  <a href="ch-16-testing-best-practices.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

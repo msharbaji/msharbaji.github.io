@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 6, Collections | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 35%"></div></div>
+    <span class="progress-label">6 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">📦</div>
+    <h1>Collections</h1>
+    <p>Master Vec, String, and HashMap, the data structures you'll use in every Rust project.</p>
+  </div>
+  <!-- Section 1: Creating and Using Vectors -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Creating and Using Vectors</h2>
+    </div>
+    <p>Vectors are growable arrays stored on the heap. They allow you to store multiple values of the same type.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Creating vectors</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> v = Vec::new();
+v.push(<span class="number">5</span>);
+v.push(<span class="number">6</span>);
+v.push(<span class="number">7</span>);
+<span class="comment">// Using macro shorthand</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="comment">// Accessing elements</span>
+<span class="keyword">let</span> third = &amp;v[<span class="number">2</span>]; <span class="comment">// Index access, panics if out of bounds</span>
+<span class="func">println!</span>(<span class="string">"Third element: {}"</span>, third);
+<span class="keyword">match</span> v.get(<span class="number">10</span>) {
+    <span class="keyword">Some</span>(element) =&gt; <span class="func">println!</span>(<span class="string">"Element: {}"</span>, element),
+    <span class="keyword">None</span> =&gt; <span class="func">println!</span>(<span class="string">"No element at index 10"</span>),
+<span class="comment">// Modifying vectors</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+v.push(<span class="number">4</span>);
+v.pop(); <span class="comment">// Returns Option&lt;i32&gt;</span>
+v.insert(<span class="number">1</span>, <span class="number">99</span>); <span class="comment">// Insert at index</span>
+v.remove(<span class="number">1</span>); <span class="comment">// Remove and return element</span></code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>Prefer <code>v.get(index)</code> over <code>v[index]</code> when the index might be out of bounds. <code>get()</code> returns an <code>Option</code> instead of panicking.</p></div>
+    </div>
+  </div>
+  <!-- Section 2: Iterating Over Vectors -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Iterating Over Vectors</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="comment">// Immutable iteration</span>
+<span class="keyword">for</span> element <span class="keyword">in</span> &amp;v {
+    <span class="func">println!</span>(<span class="string">"Element: {}"</span>, element);
+<span class="comment">// Mutable iteration - modify elements</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">for</span> element <span class="keyword">in</span> &amp;<span class="keyword">mut</span> v {
+    *element += <span class="number">50</span>; <span class="comment">// Dereference to modify</span>
+<span class="comment">// Taking ownership</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">for</span> element <span class="keyword">in</span> v {
+    <span class="func">println!</span>(<span class="string">"Element: {}"</span>, element);
+} <span class="comment">// v is consumed here</span>
+<span class="comment">// Using enumerate</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>];
+<span class="keyword">for</span> (index, value) <span class="keyword">in</span> v.iter().enumerate() {
+    <span class="func">println!</span>(<span class="string">"Index: {}, Value: {}"</span>, index, value);
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>Warning</h4><p>Iterating with <code>for element in v</code> (without <code>&amp;</code>) moves the vector. After the loop, <code>v</code> is no longer usable. Use <code>&amp;v</code> for borrowing or <code>&amp;mut v</code> for mutable access.</p></div>
+    </div>
+  </div>
+  <!-- Section 3: Storing Multiple Types -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Storing Multiple Types</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Using enums to store multiple types</span>
+#[derive(Debug)]
+<span class="keyword">enum</span> SpreadsheetCell {
+    Int(<span class="param">i32</span>),
+    Float(<span class="param">f64</span>),
+    Text(<span class="param">String</span>),
+<span class="keyword">let</span> row = <span class="func">vec!</span>[
+    SpreadsheetCell::Int(<span class="number">3</span>),
+    SpreadsheetCell::Text(String::from(<span class="string">"blue"</span>)),
+    SpreadsheetCell::Float(<span class="number">10.12</span>),
+];
+<span class="keyword">for</span> cell <span class="keyword">in</span> &amp;row {
+    <span class="keyword">match</span> cell {
+        SpreadsheetCell::Int(i) =&gt; <span class="func">println!</span>(<span class="string">"Integer: {}"</span>, i),
+        SpreadsheetCell::Float(f) =&gt; <span class="func">println!</span>(<span class="string">"Float: {}"</span>, f),
+        SpreadsheetCell::Text(s) =&gt; <span class="func">println!</span>(<span class="string">"Text: {}"</span>, s),
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Using trait objects for polymorphism</span>
+<span class="keyword">trait</span> Shape {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="param">f64</span>;
+<span class="keyword">struct</span> Circle { radius: <span class="param">f64</span> }
+<span class="keyword">impl</span> Shape <span class="keyword">for</span> Circle {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="param">f64</span> { <span class="number">3.14</span> * <span class="keyword">self</span>.radius * <span class="keyword">self</span>.radius }
+<span class="keyword">struct</span> Square { side: <span class="param">f64</span> }
+<span class="keyword">impl</span> Shape <span class="keyword">for</span> Square {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="param">f64</span> { <span class="keyword">self</span>.side * <span class="keyword">self</span>.side }
+<span class="keyword">let</span> shapes: <span class="param">Vec</span>&lt;Box&lt;<span class="keyword">dyn</span> Shape&gt;&gt; = <span class="func">vec!</span>[
+    Box::new(Circle { radius: <span class="number">5.0</span> }),
+    Box::new(Square { side: <span class="number">4.0</span> }),
+];
+<span class="keyword">for</span> shape <span class="keyword">in</span> shapes {
+    <span class="func">println!</span>(<span class="string">"Area: {}"</span>, shape.<span class="func">area</span>());
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>Key Insight</h4><p>Vectors can only hold one type, but you can work around this using enums (when you know all types at compile time) or trait objects with <code>Box&lt;dyn Trait&gt;</code> (for open-ended polymorphism).</p></div>
+    </div>
+  </div>
+  <!-- Section 4: Strings (String vs &str) -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Strings (String vs &amp;str)</h2>
+    </div>
+    <h3>Creating and Concatenating Strings</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// String literals are &amp;str (string slices)</span>
+<span class="keyword">let</span> s: &amp;<span class="param">str</span> = <span class="string">"hello"</span>;
+<span class="comment">// String is an owned, growable UTF-8 encoded string</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> s = String::new();
+s.push_str(<span class="string">"hello"</span>);
+s.push(<span class="string">' '</span>);
+s.push_str(<span class="string">"world"</span>);
+<span class="comment">// Creating strings</span>
+<span class="keyword">let</span> s1 = String::from(<span class="string">"hello"</span>);
+<span class="keyword">let</span> s2 = <span class="string">"world"</span>.to_string();
+<span class="comment">// String slices</span>
+<span class="keyword">let</span> s = String::from(<span class="string">"hello world"</span>);
+<span class="keyword">let</span> hello = &amp;s[<span class="number">0</span>..<span class="number">5</span>];
+<span class="keyword">let</span> world = &amp;s[<span class="number">6</span>..<span class="number">11</span>];
+<span class="comment">// Concatenation with +</span>
+<span class="keyword">let</span> s1 = String::from(<span class="string">"hello"</span>);
+<span class="keyword">let</span> s2 = String::from(<span class="string">" world"</span>);
+<span class="keyword">let</span> s3 = s1 + &amp;s2; <span class="comment">// s1 moved, s2 borrowed</span>
+<span class="comment">// println!("{}", s1); // Error: s1 moved</span>
+<span class="comment">// Using format! macro for cleaner concatenation</span>
+<span class="keyword">let</span> s1 = String::from(<span class="string">"tic"</span>);
+<span class="keyword">let</span> s2 = String::from(<span class="string">"tac"</span>);
+<span class="keyword">let</span> s3 = String::from(<span class="string">"toe"</span>);
+<span class="keyword">let</span> s = <span class="func">format!</span>(<span class="string">"{}-{}-{}"</span>, s1, s2, s3); <span class="comment">// All s1, s2, s3 still valid</span></code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>Use <code>format!</code> instead of <code>+</code> for concatenating multiple strings. It doesn't take ownership of any of its arguments and produces cleaner code.</p></div>
+    </div>
+  </div>
+  <!-- Section 5: Indexing, Slicing, and Chars vs Bytes -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Indexing, Slicing, and Chars vs Bytes</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">let</span> s = String::from(<span class="string">"hello"</span>);
+<span class="comment">// Bytes</span>
+<span class="keyword">for</span> b <span class="keyword">in</span> s.as_bytes() {
+    <span class="func">println!</span>(<span class="string">"Byte: {}"</span>, b);
+<span class="comment">// Characters - use chars() not indexing!</span>
+<span class="keyword">let</span> s = <span class="string">"&#x41F;&#x440;&#x438;&#x432;&#x435;&#x442;"</span>; <span class="comment">// Russian, multi-byte chars</span>
+<span class="keyword">for</span> c <span class="keyword">in</span> s.chars() {
+    <span class="func">println!</span>(<span class="string">"Char: {}"</span>, c);
+<span class="comment">// Indexing a String panics - strings use UTF-8</span>
+<span class="comment">// let ch = s[0]; // ERROR!</span>
+<span class="comment">// Byte access</span>
+<span class="keyword">let</span> hello = <span class="string">"&#x417;&#x434;&#x440;&#x430;&#x432;&#x441;&#x442;&#x432;&#x443;&#x439;"</span>; <span class="comment">// 4-byte UTF-8 chars</span>
+<span class="func">println!</span>(<span class="string">"Byte length: {}"</span>, hello.len()); <span class="comment">// 20 bytes, not 10 chars</span>
+<span class="comment">// Correct slicing by byte boundaries</span>
+<span class="keyword">let</span> s = <span class="string">"hello"</span>;
+<span class="keyword">let</span> slice = &amp;s[<span class="number">0</span>..<span class="number">4</span>]; <span class="comment">// "hell" - valid boundary</span>
+<span class="comment">// Safe iteration</span>
+<span class="keyword">let</span> word = <span class="string">"&#x41F;&#x440;&#x438;&#x432;&#x435;&#x442;"</span>;
+<span class="keyword">let</span> first_char = word.chars().next().unwrap(); <span class="comment">// '&#x41F;'</span>
+<span class="keyword">let</span> char_count = word.chars().count(); <span class="comment">// 6</span>
+<span class="keyword">let</span> byte_count = word.len(); <span class="comment">// 12 (UTF-8 encoded)</span>
+<span class="comment">// Grapheme clusters (combining characters)</span>
+<span class="keyword">let</span> s = <span class="string">"e\u{0301}"</span>; <span class="comment">// e with accent</span>
+<span class="func">println!</span>(<span class="string">"Char count: {}"</span>, s.chars().count()); <span class="comment">// 2</span>
+<span class="func">println!</span>(<span class="string">"String: {}"</span>, s); <span class="comment">// Appears as 1 character</span></code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>Warning</h4><p>You cannot index into a Rust <code>String</code> with <code>s[0]</code>. Rust strings are UTF-8 encoded, and a single character may span multiple bytes. Use <code>.chars()</code>, <code>.bytes()</code>, or byte-boundary slicing instead.</p></div>
+    </div>
+  </div>
+  <!-- Section 6: Creating and Accessing HashMaps -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Creating and Accessing HashMaps</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::collections::HashMap;
+<span class="comment">// Creating a new HashMap</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> scores = HashMap::new();
+scores.insert(String::from(<span class="string">"Blue"</span>), <span class="number">10</span>);
+scores.insert(String::from(<span class="string">"Yellow"</span>), <span class="number">50</span>);
+<span class="comment">// Getting values</span>
+<span class="keyword">let</span> team = String::from(<span class="string">"Blue"</span>);
+<span class="keyword">let</span> score = scores.get(&amp;team);
+<span class="keyword">match</span> score {
+    <span class="keyword">Some</span>(s) =&gt; <span class="func">println!</span>(<span class="string">"Score: {}"</span>, s),
+    <span class="keyword">None</span> =&gt; <span class="func">println!</span>(<span class="string">"Team not found"</span>),
+<span class="comment">// Using unwrap_or</span>
+<span class="keyword">let</span> score = scores.get(&amp;String::from(<span class="string">"Red"</span>)).unwrap_or(&amp;<span class="number">0</span>);
+<span class="comment">// Iterating over HashMap</span>
+<span class="keyword">for</span> (key, value) <span class="keyword">in</span> &amp;scores {
+    <span class="func">println!</span>(<span class="string">"{}: {}"</span>, key, value);
+<span class="comment">// Creating HashMap from vectors</span>
+<span class="keyword">let</span> teams = <span class="func">vec!</span>[String::from(<span class="string">"Blue"</span>), String::from(<span class="string">"Yellow"</span>)];
+<span class="keyword">let</span> initial_scores = <span class="func">vec!</span>[<span class="number">10</span>, <span class="number">50</span>];
+<span class="keyword">let</span> scores: <span class="param">HashMap</span>&lt;_, _&gt; = teams.into_iter()
+    .zip(initial_scores.into_iter())
+    .collect();</code></pre>
+    </div>
+  </div>
+  <!-- Section 7: Updating HashMaps -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Updating HashMaps</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::collections::HashMap;
+<span class="keyword">let</span> <span class="keyword">mut</span> map = HashMap::new();
+<span class="comment">// Overwriting a value</span>
+map.insert(<span class="string">"a"</span>, <span class="number">10</span>);
+map.insert(<span class="string">"a"</span>, <span class="number">25</span>); <span class="comment">// "a" now maps to 25</span>
+<span class="comment">// Only insert if key doesn't exist</span>
+map.entry(<span class="string">"a"</span>).or_insert(<span class="number">50</span>); <span class="comment">// "a" still 25</span>
+map.entry(<span class="string">"b"</span>).or_insert(<span class="number">50</span>); <span class="comment">// "b" now 50</span>
+<span class="comment">// Updating based on old value</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> map = HashMap::new();
+map.insert(<span class="string">"word"</span>, <span class="number">1</span>);
+<span class="keyword">for</span> word <span class="keyword">in</span> <span class="func">vec!</span>[<span class="string">"word"</span>, <span class="string">"hello"</span>, <span class="string">"word"</span>] {
+    <span class="keyword">let</span> count = map.entry(word).or_insert(<span class="number">0</span>);
+    *count += <span class="number">1</span>;
+<span class="comment">// word: 2, hello: 1</span>
+<span class="comment">// Entry API for complex updates</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> map = HashMap::new();
+<span class="keyword">let</span> entry = map.entry(String::from(<span class="string">"key"</span>));
+<span class="keyword">let</span> value = entry.or_insert(<span class="func">vec!</span>[]);
+value.push(<span class="number">1</span>);
+<span class="comment">// Getting mutable reference</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> map = HashMap::new();
+map.insert(String::from(<span class="string">"key"</span>), <span class="number">5</span>);
+<span class="keyword">if</span> <span class="keyword">let</span> <span class="keyword">Some</span>(v) = map.get_mut(&amp;String::from(<span class="string">"key"</span>)) {
+    *v = <span class="number">10</span>;
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>Key Insight</h4><p>The Entry API (<code>map.entry(key).or_insert(default)</code>) is a powerful pattern that avoids double lookups. It checks for a key and inserts a default in one step, returning a mutable reference to the value.</p></div>
+    </div>
+  </div>
+  <!-- Section 8: Custom Types and Practical Examples -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Custom Types and Practical Examples</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::collections::HashMap;
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+<span class="keyword">struct</span> Person {
+    name: <span class="param">String</span>,
+    age: <span class="param">u32</span>,
+<span class="comment">// Using custom types as keys</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> people: <span class="param">HashMap</span>&lt;Person, <span class="param">String</span>&gt; = HashMap::new();
+<span class="keyword">let</span> alice = Person {
+    name: String::from(<span class="string">"Alice"</span>),
+    age: <span class="number">30</span>,
+};
+people.insert(alice, String::from(<span class="string">"Engineer"</span>));</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Word frequency counter</span>
+<span class="keyword">fn</span> <span class="func">count_words</span>(text: &amp;<span class="param">str</span>) -&gt; <span class="param">HashMap</span>&lt;&amp;<span class="param">str</span>, <span class="param">u32</span>&gt; {
+    <span class="keyword">let</span> <span class="keyword">mut</span> map = HashMap::new();
+    <span class="keyword">for</span> word <span class="keyword">in</span> text.split_whitespace() {
+        <span class="keyword">let</span> count = map.entry(word).or_insert(<span class="number">0</span>);
+        *count += <span class="number">1</span>;
+    }
+    map
+<span class="keyword">let</span> text = <span class="string">"hello world hello rust rust rust"</span>;
+<span class="keyword">let</span> frequencies = <span class="func">count_words</span>(text);
+<span class="keyword">for</span> (word, count) <span class="keyword">in</span> frequencies {
+    <span class="func">println!</span>(<span class="string">"{}: {}"</span>, word, count);
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Grouping values by key</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> groups: <span class="param">HashMap</span>&lt;<span class="param">char</span>, <span class="param">Vec</span>&lt;<span class="param">u32</span>&gt;&gt; = HashMap::new();
+<span class="keyword">let</span> data = <span class="func">vec!</span>[(<span class="number">1</span>, <span class="string">'a'</span>), (<span class="number">2</span>, <span class="string">'b'</span>), (<span class="number">3</span>, <span class="string">'a'</span>), (<span class="number">4</span>, <span class="string">'c'</span>), (<span class="number">5</span>, <span class="string">'b'</span>)];
+<span class="keyword">for</span> (num, letter) <span class="keyword">in</span> data {
+    groups.entry(letter).or_insert_with(Vec::new).push(num);
+<span class="keyword">for</span> (letter, nums) <span class="keyword">in</span> groups {
+    <span class="func">println!</span>(<span class="string">"{}: {:?}"</span>, letter, nums);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>To use a custom struct as a HashMap key, derive <code>Eq</code>, <code>PartialEq</code>, and <code>Hash</code>. Rust requires keys to be hashable and comparable for equality.</p></div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-05-error-handling.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 6 of 17</span>
+  <a href="ch-07-traits-generics.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

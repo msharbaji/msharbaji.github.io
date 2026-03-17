@@ -16,7 +16,7 @@ export const projects: Project[] = [
 <p>Kube-Manager is a custom multi-cluster management system built on top of the <strong>Cluster API</strong> project. It provides a unified control plane for provisioning, managing, and operating Kubernetes clusters across hybrid cloud environments spanning <strong>AWS</strong>, <strong>Alibaba Cloud</strong>, and <strong>GCP</strong>.</p>
 
 <h2>Problem</h2>
-<p>Managing Kubernetes clusters across multiple cloud providers introduces significant complexity — different APIs, authentication models, networking configurations, and lifecycle management approaches. Teams needed a consistent way to provision and manage clusters regardless of the underlying infrastructure.</p>
+<p>Managing Kubernetes clusters across multiple cloud providers introduces significant complexity: different APIs, authentication models, networking configurations, and lifecycle management approaches. Teams needed a consistent way to provision and manage clusters regardless of the underlying infrastructure.</p>
 
 <h2>Solution</h2>
 <p>Built a Kubernetes-native management layer using Cluster API as the foundation, with custom providers and controllers to handle the specifics of each cloud platform:</p>
@@ -38,7 +38,7 @@ export const projects: Project[] = [
 <p>Kube-Manager هو نظام مخصص لإدارة Multi-Cluster مبني على مشروع <strong>Cluster API</strong>. يوفر Control Plane موحد لتوفير وإدارة وتشغيل Kubernetes Clusters عبر بيئات Hybrid Cloud التي تشمل <strong>AWS</strong> و<strong>Alibaba Cloud</strong> و<strong>GCP</strong>.</p>
 
 <h2>المشكلة</h2>
-<p>إدارة Kubernetes Clusters عبر عدة Cloud Providers تُدخل تعقيداً كبيراً — APIs مختلفة، ونماذج Authentication، وإعدادات الشبكات، وأساليب Lifecycle Management متباينة. احتاجت الفرق إلى طريقة موحدة لتوفير وإدارة Clusters بغض النظر عن البنية التحتية الأساسية.</p>
+<p>إدارة Kubernetes Clusters عبر عدة Cloud Providers تُدخل تعقيداً كبيراً: APIs مختلفة، ونماذج Authentication، وإعدادات الشبكات، وأساليب Lifecycle Management متباينة. احتاجت الفرق إلى طريقة موحدة لتوفير وإدارة Clusters بغض النظر عن البنية التحتية الأساسية.</p>
 
 <h2>الحل</h2>
 <p>بناء طبقة إدارة Kubernetes-Native باستخدام Cluster API كأساس، مع Custom Providers وControllers للتعامل مع خصوصيات كل Cloud Platform:</p>
@@ -130,7 +130,7 @@ export const projects: Project[] = [
 <p>Deployed and customized <strong>Backstage</strong> as the internal developer portal for the engineering organization. The portal serves as the single entry point for service discovery, documentation, CI/CD workflows, and infrastructure management.</p>
 
 <h2>Problem</h2>
-<p>With hundreds of microservices, teams struggled with service discovery — finding who owns what, where documentation lives, and how to interact with other services. Knowledge was fragmented across wikis, Slack channels, and tribal memory.</p>
+<p>With hundreds of microservices, teams struggled with service discovery: finding who owns what, where documentation lives, and how to interact with other services. Knowledge was fragmented across wikis, Slack channels, and tribal memory.</p>
 
 <h2>Solution</h2>
 <ul>
@@ -158,7 +158,7 @@ export const projects: Project[] = [
 <p>نشر وتخصيص <strong>Backstage</strong> كـ Developer Portal داخلي للمؤسسة الهندسية. يعمل البوابة كنقطة دخول واحدة لـ Service Discovery والتوثيق وCI/CD Workflows وإدارة البنية التحتية.</p>
 
 <h2>المشكلة</h2>
-<p>مع مئات الـ Microservices، واجهت الفرق صعوبة في Service Discovery — إيجاد من يملك ماذا، وأين يوجد التوثيق، وكيفية التفاعل مع الخدمات الأخرى. كانت المعرفة مبعثرة عبر الـ Wikis وقنوات Slack.</p>
+<p>مع مئات الـ Microservices، واجهت الفرق صعوبة في Service Discovery: إيجاد من يملك ماذا، وأين يوجد التوثيق، وكيفية التفاعل مع الخدمات الأخرى. كانت المعرفة مبعثرة عبر الـ Wikis وقنوات Slack.</p>
 
 <h2>الحل</h2>
 <ul>
@@ -206,7 +206,7 @@ export const projects: Project[] = [
 <ul>
 <li>Designed a GitOps repository structure with environment-specific overlays using Helm values files</li>
 <li>Configured ArgoCD Application resources with automated sync policies and health checks</li>
-<li>Implemented a progressive rollout strategy — migrating applications in batches to minimize risk</li>
+<li>Implemented a progressive rollout strategy: migrating applications in batches to minimize risk</li>
 <li>Built self-service templates so teams could onboard their applications to ArgoCD independently</li>
 <li>Created monitoring dashboards to track sync status, drift detection, and deployment frequency</li>
 </ul>
@@ -236,7 +236,7 @@ export const projects: Project[] = [
 <ul>
 <li>تصميم هيكل GitOps Repository مع Environment-Specific Overlays باستخدام Helm Values Files</li>
 <li>إعداد ArgoCD Application Resources مع Automated Sync Policies وHealth Checks</li>
-<li>تطبيق استراتيجية Progressive Rollout — ترحيل التطبيقات على دفعات لتقليل المخاطر</li>
+<li>تطبيق استراتيجية Progressive Rollout: ترحيل التطبيقات على دفعات لتقليل المخاطر</li>
 <li>بناء Self-Service Templates ليتمكن الفرق من إضافة تطبيقاتهم إلى ArgoCD بشكل مستقل</li>
 <li>إنشاء Monitoring Dashboards لتتبع حالة Sync واكتشاف Drift وتكرار الـ Deployment</li>
 </ul>
@@ -274,13 +274,13 @@ export const projects: Project[] = [
 <p>Designed and deployed <strong>production EKS clusters</strong> from scratch for Coinmerce, a cryptocurrency exchange platform. The infrastructure uses reusable Terraform modules, <strong>Cilium CNI</strong> for advanced networking and observability, and <strong>Karpenter</strong> for cost-optimized autoscaling.</p>
 
 <h2>Problem</h2>
-<p>The platform needed a reliable, secure, and cost-efficient Kubernetes infrastructure on AWS that could handle variable workloads typical of a crypto exchange — traffic spikes during market volatility with low baseline usage during quiet periods.</p>
+<p>The platform needed a reliable, secure, and cost-efficient Kubernetes infrastructure on AWS that could handle variable workloads typical of a crypto exchange: traffic spikes during market volatility with low baseline usage during quiet periods.</p>
 
 <h2>Solution</h2>
 <ul>
 <li>Designed reusable Terraform modules for EKS cluster provisioning including VPC, subnets, security groups, and IAM roles</li>
 <li>Replaced the default AWS VPC CNI with <strong>Cilium</strong> for better network visibility, security policies, and eBPF-powered observability</li>
-<li>Implemented <strong>Karpenter</strong> for intelligent node provisioning — automatically selecting optimal instance types based on workload requirements</li>
+<li>Implemented <strong>Karpenter</strong> for intelligent node provisioning: automatically selecting optimal instance types based on workload requirements</li>
 <li>Set up comprehensive monitoring with Prometheus, Grafana, and Cilium Hubble for network flow visualization</li>
 </ul>
 
@@ -303,13 +303,13 @@ export const projects: Project[] = [
 <p>تصميم ونشر <strong>Production EKS Clusters</strong> من الصفر لـ Coinmerce، منصة تداول عملات رقمية. تستخدم البنية التحتية Terraform Modules قابلة لإعادة الاستخدام و<strong>Cilium CNI</strong> للشبكات المتقدمة والمراقبة و<strong>Karpenter</strong> للـ Autoscaling المحسن التكلفة.</p>
 
 <h2>المشكلة</h2>
-<p>احتاجت المنصة إلى بنية Kubernetes تحتية موثوقة وآمنة وفعالة من حيث التكلفة على AWS يمكنها التعامل مع أحمال العمل المتغيرة النموذجية لمنصة تداول العملات الرقمية — ارتفاعات في حركة المرور أثناء تقلبات السوق مع استخدام منخفض في الفترات الهادئة.</p>
+<p>احتاجت المنصة إلى بنية Kubernetes تحتية موثوقة وآمنة وفعالة من حيث التكلفة على AWS يمكنها التعامل مع أحمال العمل المتغيرة النموذجية لمنصة تداول العملات الرقمية: ارتفاعات في حركة المرور أثناء تقلبات السوق مع استخدام منخفض في الفترات الهادئة.</p>
 
 <h2>الحل</h2>
 <ul>
 <li>تصميم Terraform Modules قابلة لإعادة الاستخدام لتوفير EKS Clusters تشمل VPC وSubnets وSecurity Groups وIAM Roles</li>
 <li>استبدال AWS VPC CNI الافتراضي بـ <strong>Cilium</strong> لرؤية أفضل للشبكة وSecurity Policies وObservability المدعومة بـ eBPF</li>
-<li>تطبيق <strong>Karpenter</strong> لتوفير ذكي للـ Nodes — اختيار أنواع Instances المثلى تلقائياً بناءً على متطلبات العمل</li>
+<li>تطبيق <strong>Karpenter</strong> لتوفير ذكي للـ Nodes: اختيار أنواع Instances المثلى تلقائياً بناءً على متطلبات العمل</li>
 <li>إعداد مراقبة شاملة باستخدام Prometheus وGrafana وCilium Hubble لعرض Network Flow</li>
 </ul>
 
@@ -346,7 +346,7 @@ export const projects: Project[] = [
 <p>Led the migration of <strong>Terraform backend state</strong> from cloud-specific storage solutions (S3, GCS) to a centralized <strong>PostgreSQL</strong> database, creating a cloud-agnostic approach to infrastructure state management across a hybrid cloud environment.</p>
 
 <h2>Problem</h2>
-<p>With infrastructure spread across AWS, GCP, and Alibaba Cloud, Terraform state was fragmented across different cloud storage backends — S3 buckets for AWS resources, GCS buckets for GCP resources. This created operational complexity: different access patterns, inconsistent locking mechanisms, and no unified view of infrastructure state.</p>
+<p>With infrastructure spread across AWS, GCP, and Alibaba Cloud, Terraform state was fragmented across different cloud storage backends: S3 buckets for AWS resources, GCS buckets for GCP resources. This created operational complexity: different access patterns, inconsistent locking mechanisms, and no unified view of infrastructure state.</p>
 
 <h2>Solution</h2>
 <ul>
@@ -359,7 +359,7 @@ export const projects: Project[] = [
 <h2>Impact</h2>
 <ul>
 <li>Unified state management across all cloud providers into a single backend</li>
-<li>Simplified access control — one set of database credentials instead of IAM roles per cloud</li>
+<li>Simplified access control: one set of database credentials instead of IAM roles per cloud</li>
 <li>Improved auditability with database-level logging of all state changes</li>
 <li>Enabled easier disaster recovery with standard PostgreSQL backup and restore</li>
 </ul>
@@ -375,7 +375,7 @@ export const projects: Project[] = [
 <p>قيادة ترحيل <strong>Terraform Backend State</strong> من حلول التخزين السحابية (S3، GCS) إلى قاعدة بيانات <strong>PostgreSQL</strong> مركزية، لإنشاء نهج Cloud-Agnostic لإدارة Infrastructure State عبر بيئة Hybrid Cloud.</p>
 
 <h2>المشكلة</h2>
-<p>مع انتشار البنية التحتية عبر AWS وGCP وAlibaba Cloud، كانت Terraform State مجزأة عبر Cloud Storage Backends مختلفة — S3 Buckets لموارد AWS وGCS Buckets لموارد GCP. أدى هذا إلى تعقيد تشغيلي: أنماط وصول مختلفة، وآليات Locking غير متسقة، وعدم وجود رؤية موحدة لحالة البنية التحتية.</p>
+<p>مع انتشار البنية التحتية عبر AWS وGCP وAlibaba Cloud، كانت Terraform State مجزأة عبر Cloud Storage Backends مختلفة: S3 Buckets لموارد AWS وGCS Buckets لموارد GCP. أدى هذا إلى تعقيد تشغيلي: أنماط وصول مختلفة، وآليات Locking غير متسقة، وعدم وجود رؤية موحدة لحالة البنية التحتية.</p>
 
 <h2>الحل</h2>
 <ul>
@@ -388,7 +388,7 @@ export const projects: Project[] = [
 <h2>الأثر</h2>
 <ul>
 <li>توحيد إدارة State عبر جميع Cloud Providers في Backend واحد</li>
-<li>تبسيط التحكم في الوصول — مجموعة واحدة من Database Credentials بدلاً من IAM Roles لكل سحابة</li>
+<li>تبسيط التحكم في الوصول: مجموعة واحدة من Database Credentials بدلاً من IAM Roles لكل سحابة</li>
 <li>تحسين قابلية التدقيق مع تسجيل جميع تغييرات State على مستوى قاعدة البيانات</li>
 <li>تمكين Disaster Recovery أسهل مع PostgreSQL Backup and Restore القياسي</li>
 </ul>

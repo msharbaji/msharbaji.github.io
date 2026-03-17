@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 1, البدء مع Rust | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 6%"></div></div>
+    <span class="progress-label">1 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<!-- Main Content -->
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🚀</div>
+    <h1>البدء مع Rust</h1>
+    <p>ثبّت Rust، اكتب أول برنامج لك، وتعلّم أساسيات Cargo, البوابة إلى برمجة الأنظمة.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>ما هي Rust ولماذا نستخدمها؟</h2>
+    </div>
+    <p>Rust هي لغة برمجة أنظمة تعمل بسرعة فائقة، تمنع أخطاء الـ Memory، وتضمن Thread Safety. صدرت في عام 2010 ويتم تطويرها باستمرار من قبل مجتمع مفتوح المصدر نشط. تجمع Rust بين أداء لغات مثل C وC++ مع ضمانات Memory Safety التي تمنع فئات كاملة من الأخطاء في Compile-time.</p>
+    <h3>الركائز الثلاث لـ Rust</h3>
+    <ul>
+      <li><strong>Memory Safety</strong>: تمنع Rust إلغاء Reference Null Pointers، وBuffer Overflow، وأخطاء الاستخدام بعد التحرير من خلال نظام Ownership. لا يوجد Garbage Collector, Rust Compiler يضمن إدارة الـ Memory بشكل صحيح.</li>
+      <li><strong>الأداء</strong>: مع Zero-cost Abstractions ودون أي عبء إضافي أثناء التشغيل، تعمل كود Rust بنفس سرعة كود C المكافئة. تحصل على ميزات لغة عالية المستوى دون التضحية بالسرعة.</li>
+      <li><strong>التزامن</strong>: يزيل نظام Ownership في Rust Data Races في Compile-time. اكتب كود متزامنة مضمونة Thread Safety دون الاعتماد على Locks.</li>
+    </ul>
+    <p>هذه الخصائص تجعل Rust مثالية لـ:</p>
+    <ul>
+      <li>برمجة الأنظمة (أنظمة التشغيل، الأنظمة المضمنة)</li>
+      <li>خوادم الويب والتطبيقات الشبكية</li>
+      <li>التطبيقات الحساسة للأداء</li>
+      <li>WebAssembly والتطبيقات المبنية على المتصفح</li>
+      <li>مشاريع البلوكتشين والعملات الرقمية</li>
+      <li>محركات الألعاب وتطبيقات الرسومات</li>
+    </ul>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>تثبيت Rust</h2>
+    </div>
+    <p>أسهل طريقة لتثبيت Rust هي باستخدام <code>rustup</code>، الذي يدير إصدارات Rust والأدوات المرتبطة بها. إليك كيفية البدء:</p>
+    <h3>خطوات التثبيت</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code><span class="comment"># On macOS, Linux, or Windows (with WSL/Git Bash):</span>
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+<span class="comment"># This installs:</span>
+<span class="comment"># - rustc: The Rust compiler</span>
+<span class="comment"># - cargo: The package manager and build system</span>
+<span class="comment"># - rustup: The installer and version manager</span></code></pre>
+    </div>
+    <p>بعد التثبيت، تحقق من أن كل شيء يعمل بشكل صحيح:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>rustc --version
+cargo --version</code></pre>
+    </div>
+    <p>يجب أن ترى معلومات الإصدار لكلتا الأداتين. إذا كنت على Windows، يمكنك أيضاً تنزيل وتشغيل المثبّت من <code>https://rustup.rs/</code>.</p>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>حافظ على تحديث Rust</h4><p>يتم تحديث Rust بشكل متكرر. لتحديث تثبيت Rust لديك، قم ببساطة بتشغيل <code>rustup update</code> من الطرفية.</p></div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>أول برنامج Rust: Hello World</h2>
+    </div>
+    <p>لنكتب أول برنامج Rust لك. أنشئ مجلداً جديداً وملفاً باسم <code>main.rs</code>:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Hello, world!"</span>);
+}</code></pre>
+    </div>
+    <p>الآن قم بترجمته وتشغيله:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>rustc main.rs
+./main</code></pre>
+    </div>
+    <p>يجب أن ترى <code>Hello, world!</code> مطبوعاً في الطرفية. تهانينا! لقد كتبت أول برنامج Rust لك.</p>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>البرنامج الأول اكتمل!</h4><p>لقد قمت بترجمة وتنفيذ أول برنامج Rust لك. الكلمة المفتاحية <code>fn</code> تعلن عن Function، و<code>println!</code> هو ماكرو يطبع النص في وحدة التحكم.</p></div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Cargo: مدير الحزم ونظام البناء في Rust</h2>
+    </div>
+    <p>لأي شيء يتجاوز البرامج البسيطة، ستحتاج لاستخدام Cargo. هو مدير الحزم ونظام البناء الرسمي في Rust الذي يتعامل مع Dependencies وCompilation وTesting وDocumentation.</p>
+    <h3>إنشاء مشروع جديد</h3>
+    <p>أنشئ مشروع Cargo جديداً بأمر واحد:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>cargo new hello_world
+<span class="keyword">cd</span> hello_world</code></pre>
+    </div>
+    <p>هذا ينشئ هيكل المجلدات التالي:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code>hello_world/
+├── Cargo.toml          <span class="comment"># Project manifest with metadata and dependencies</span>
+└── src/
+    └── main.rs         <span class="comment"># Your source code</span></code></pre>
+    </div>
+    <h3>ملف Cargo.toml</h3>
+    <p>يحتوي هذا الملف على بيانات المشروع الوصفية وDependencies. إليك مثالاً نموذجياً:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TOML</span>
+      </div>
+      <pre><code>[package]
+name = <span class="string">"hello_world"</span>
+version = <span class="string">"0.1.0"</span>
+edition = <span class="string">"2021"</span>
+[dependencies]
+<span class="comment"># Add dependencies here</span>
+serde = <span class="string">"1.0"</span>
+tokio = { version = <span class="string">"1.0"</span>, features = [<span class="string">"full"</span>] }</code></pre>
+    </div>
+    <h3>أوامر Cargo</h3>
+    <p>أوامر Cargo الرئيسية التي ستستخدمها يومياً:</p>
+    <ul>
+      <li><strong><code>cargo build</code></strong>: يترجم مشروعك في وضع التصحيح. ينشئ ملفاً تنفيذياً في <code>target/debug/</code>.</li>
+      <li><strong><code>cargo run</code></strong>: يترجم ويشغّل مشروعك فوراً. مفيد أثناء التطوير.</li>
+      <li><strong><code>cargo build --release</code></strong>: يترجم مع تفعيل التحسينات. ينشئ ملفاً تنفيذياً في <code>target/release/</code>. أبطأ في Compilation لكن أسرع بكثير في التشغيل.</li>
+      <li><strong><code>cargo test</code></strong>: يشغّل جميع Testingات في مشروعك.</li>
+      <li><strong><code>cargo check</code></strong>: يتحقق بسرعة من أن شيفرتك تُترجم دون إنشاء ملف تنفيذي. ممتاز للحصول على ملاحظات سريعة أثناء التطوير.</li>
+      <li><strong><code>cargo fmt</code></strong>: ينسّق شيفرتك تلقائياً وفقاً لإرشادات أسلوب Rust.</li>
+      <li><strong><code>cargo clippy</code></strong>: أداة تحليل تقدم اقتراحات لتحسين شيفرتك.</li>
+      <li><strong><code>cargo doc --open</code></strong>: ينشئ ويفتح توثيق HTML لمشروعك وتبعياته.</li>
+    </ul>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>بناء وتشغيل مشروع Cargo</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code><span class="comment"># Create the project</span>
+cargo new my_app
+<span class="comment"># Navigate to the project</span>
+<span class="keyword">cd</span> my_app
+<span class="comment"># Edit src/main.rs with your code</span>
+<span class="comment"># Check if it compiles (fast, no binary)</span>
+cargo check
+<span class="comment"># Run during development (slower compile, good for debugging)</span>
+cargo run
+<span class="comment"># Build for production (much faster execution)</span>
+cargo build --release
+<span class="comment"># Run the release binary directly</span>
+./target/release/my_app</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>نصيحة احترافية</h4><p>استخدم <code>cargo check</code> أثناء التطوير للحصول على ملاحظات سريعة. استخدم <code>cargo build --release</code> فقط عندما تكون جاهزاً للنشر أو اختبار أداء تطبيقك.</p></div>
+    </div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>أول مشروع Cargo حقيقي لك</h2>
+    </div>
+    <p>لننشئ مشروع Cargo أكثر إثارة يوضح المفاهيم الأساسية:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="comment">// File: src/main.rs</span>
+<span class="keyword">use</span> std::io;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> input = String::new();
+    <span class="func">println!</span>(<span class="string">"Welcome to the Rust Guessing Game!"</span>);
+    <span class="func">println!</span>(<span class="string">"Enter a number between 1 and 100:"</span>);
+    io::stdin()
+        .read_line(&amp;<span class="keyword">mut</span> input)
+        .expect(<span class="string">"Failed to read line"</span>);
+    <span class="keyword">let</span> number<span class="param">: u32</span> = input
+        .trim()
+        .parse()
+        .expect(<span class="string">"Please enter a valid number"</span>);
+    <span class="func">println!</span>(<span class="string">"You entered: {}"</span>, number);
+    <span class="keyword">if</span> number &gt; <span class="number">50</span> {
+        <span class="func">println!</span>(<span class="string">"That's a high number!"</span>);
+    } <span class="keyword">else</span> {
+        <span class="func">println!</span>(<span class="string">"That's a low number!"</span>);
+    }
+}</code></pre>
+    </div>
+    <p>يوضح هذا البرنامج عدة ميزات أساسية في Rust:</p>
+    <ul>
+      <li>استخدام وحدة <code>std::io</code> من مكتبة Rust القياسية</li>
+      <li>Variables الـ Mutable باستخدام <code>let mut</code></li>
+      <li>تحليل النصوص وError Handling باستخدام <code>expect()</code></li>
+      <li>Control Flow باستخدام <code>if/else</code></li>
+    </ul>
+    <p>قم ببنائه وتشغيله:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>cargo run</code></pre>
+    </div>
+  </div>
+</div>
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="/courses/rust-guide" class="nav-btn">الرئيسية →</a>
+  <span class="nav-info">الفصل 1 من 17</span>
+  <a href="ch-02-fundamentals.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

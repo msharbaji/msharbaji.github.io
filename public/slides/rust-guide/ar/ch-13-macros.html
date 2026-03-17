@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 13, الماكرو | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 76%"></div></div>
+    <span class="progress-label">13 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🪄</div>
+    <h1>الماكرو</h1>
+    <p>Metaprogramming في Rust, Declarative Macros وProcedural Macros وDerive Macros.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Declarative Macros (<code>macro_rules!</code>)</h2>
+    </div>
+    <p>يتيح Declarative Macros Pattern Matching على تسلسلات الرموز وتوليد الكود. وهو أكثر أنواع الماكرو شيوعاً في Rust ويستخدم صيغة <code>macro_rules!</code>.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Simple declarative macro</span>
+<span class="keyword">macro_rules!</span> <span class="func">say_hello</span> {
+    () =&gt; {
+        <span class="func">println!</span>(<span class="string">"Hello!"</span>);
+    };
+<span class="comment">// Macro with arguments</span>
+<span class="keyword">macro_rules!</span> <span class="func">create_function</span> {
+    (<span class="param">$func_name</span>:ident) =&gt; {
+        <span class="keyword">fn</span> <span class="param">$func_name</span>() {
+            <span class="func">println!</span>(<span class="string">"You called {:?}"</span>, <span class="func">stringify!</span>(<span class="param">$func_name</span>));
+        }
+    };
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">say_hello!</span>();
+    <span class="func">create_function!</span>(my_function);
+    <span class="func">my_function</span>();
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Variadic macro with repetition</span>
+<span class="keyword">macro_rules!</span> <span class="func">vec_repeat</span> {
+    (<span class="param">$item</span>:expr; <span class="param">$count</span>:expr) =&gt; {
+        {
+            <span class="keyword">let</span> <span class="keyword">mut</span> v = Vec::new();
+            <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="param">$count</span> {
+                v.<span class="func">push</span>(<span class="param">$item</span>);
+            }
+            v
+        }
+    };
+<span class="comment">// Macro with multiple arguments</span>
+<span class="keyword">macro_rules!</span> <span class="func">calculate</span> {
+    (<span class="param">$a</span>:expr, +, <span class="param">$b</span>:expr) =&gt; { <span class="param">$a</span> + <span class="param">$b</span> };
+    (<span class="param">$a</span>:expr, -, <span class="param">$b</span>:expr) =&gt; { <span class="param">$a</span> - <span class="param">$b</span> };
+    (<span class="param">$a</span>:expr, *, <span class="param">$b</span>:expr) =&gt; { <span class="param">$a</span> * <span class="param">$b</span> };
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> v = <span class="func">vec_repeat!</span>(<span class="number">5</span>; <span class="number">3</span>);
+    <span class="func">println!</span>(<span class="string">"Vector: {:?}"</span>, v);
+    <span class="func">println!</span>(<span class="string">"10 + 5 = {}"</span>, <span class="func">calculate!</span>(<span class="number">10</span>, +, <span class="number">5</span>));
+    <span class="func">println!</span>(<span class="string">"10 - 5 = {}"</span>, <span class="func">calculate!</span>(<span class="number">10</span>, -, <span class="number">5</span>));
+    <span class="func">println!</span>(<span class="string">"10 * 5 = {}"</span>, <span class="func">calculate!</span>(<span class="number">10</span>, *, <span class="number">5</span>));
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>صيغة استدعاء الماكرو</h4>
+        <p>يمكن استدعاء الماكرو بعلامة <code>!</code> مع أقواس عادية <code>()</code> أو أقواس مربعة <code>[]</code> أو أقواس معقوفة <code>{}</code>. الاختيار أسلوبي, فمثلاً <code>vec![]</code> يستخدم الأقواس المربعة، و<code>println!()</code> يستخدم الأقواس العادية.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Patterns التكرار (<code>$()*</code>)</h2>
+    </div>
+    <p>تتيح Patterns التكرار للماكرو التعامل مع عدد Variable من المعاملات. صيغة <code>$(...)*</code> تطابق صفراً أو أكثر من التكرارات، بينما <code>$(...)+</code> تطابق واحداً أو أكثر.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Macro for printing multiple values</span>
+<span class="keyword">macro_rules!</span> <span class="func">print_vals</span> {
+    ($(<span class="param">$val</span>:expr),*) =&gt; {
+        $(
+            <span class="func">println!</span>(<span class="string">"{}"</span>, <span class="param">$val</span>);
+        )*
+    };
+<span class="comment">// Macro for creating tuples</span>
+<span class="keyword">macro_rules!</span> <span class="func">make_tuple</span> {
+    ($(<span class="param">$item</span>:expr),*) =&gt; {
+        ($(<span class="param">$item</span>),*)
+    };
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">print_vals!</span>(<span class="string">"Hello"</span>, <span class="number">42</span>, <span class="number">3.14</span>, <span class="keyword">true</span>);
+    <span class="keyword">let</span> tuple = <span class="func">make_tuple!</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="string">"three"</span>, <span class="number">4.0</span>);
+    <span class="func">println!</span>(<span class="string">"Tuple: {:?}"</span>, tuple);
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// HashMap creation macro</span>
+<span class="keyword">macro_rules!</span> <span class="func">map</span> {
+    ($(<span class="param">$key</span>:expr =&gt; <span class="param">$value</span>:expr),* $(,)?) =&gt; {
+        {
+            <span class="keyword">let</span> <span class="keyword">mut</span> m = std::collections::HashMap::new();
+            $(
+                m.<span class="func">insert</span>(<span class="param">$key</span>, <span class="param">$value</span>);
+            )*
+            m
+        }
+    };
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> m = <span class="func">map!</span>{
+        <span class="string">"name"</span> =&gt; <span class="string">"Alice"</span>,
+        <span class="string">"age"</span> =&gt; <span class="string">"30"</span>,
+        <span class="string">"city"</span> =&gt; <span class="string">"Boston"</span>,
+    };
+    <span class="keyword">for</span> (k, v) <span class="keyword">in</span> &amp;m {
+        <span class="func">println!</span>(<span class="string">"{}: {}"</span>, k, v);
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>دعم الفاصلة اللاحقة</h4>
+        <p>نمط <code>$(,)?</code> في نهاية ذراع الماكرو يسمح بفاصلة لاحقة اختيارية، مما يجعل استخدام الماكرو أكثر سلاسة.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Patterns الماكرو الشائعة</h2>
+    </div>
+    <p>تظهر عدة Patterns بشكل متكرر في كود Rust. تشمل طباعة التنقيح والتأكيدات المخصصة وتوليد الكود بنمط البناء.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Debug printing macro</span>
+<span class="keyword">macro_rules!</span> <span class="func">dbg_macro</span> {
+    (<span class="param">$val</span>:expr) =&gt; {
+        <span class="keyword">match</span> &amp;<span class="param">$val</span> {
+            tmp =&gt; {
+                <span class="func">eprintln!</span>(<span class="string">"[{}:{}] {} = {:#?}"</span>,
+                    <span class="func">file!</span>(),
+                    <span class="func">line!</span>(),
+                    <span class="func">stringify!</span>(<span class="param">$val</span>),
+                    &amp;tmp);
+                tmp
+            }
+        }
+    };
+<span class="comment">// Assert with custom message</span>
+<span class="keyword">macro_rules!</span> <span class="func">assert_msg</span> {
+    (<span class="param">$cond</span>:expr, <span class="param">$msg</span>:expr) =&gt; {
+        <span class="func">assert!</span>(<span class="param">$cond</span>, <span class="string">"Custom message: {}"</span>, <span class="param">$msg</span>);
+    };
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">42</span>;
+    <span class="keyword">let</span> _ = <span class="func">dbg_macro!</span>(x);
+    <span class="func">assert_msg!</span>(x &gt; <span class="number">0</span>, <span class="string">"x should be positive"</span>);
+    <span class="func">println!</span>(<span class="string">"Assertions passed"</span>);
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Builder pattern macro</span>
+<span class="keyword">macro_rules!</span> <span class="func">builder</span> {
+    (<span class="param">$name</span>:ident { $(<span class="param">$field</span>:ident: <span class="param">$typ</span>:ty),* $(,)? }) =&gt; {
+        <span class="keyword">struct</span> <span class="param">$name</span> {
+            $(
+                <span class="param">$field</span>: <span class="param">$typ</span>,
+            )*
+        }
+        <span class="keyword">impl</span> <span class="param">$name</span> {
+            <span class="keyword">fn</span> <span class="func">new</span>() -&gt; <span class="keyword">Self</span> {
+                <span class="keyword">Self</span> {
+                    $(
+                        <span class="param">$field</span>: Default::default(),
+                    )*
+                }
+            }
+        }
+    };
+<span class="func">builder!</span>(Config {
+    host: String,
+    port: u16,
+    debug: bool,
+});
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> _config = Config::<span class="func">new</span>();
+    <span class="func">println!</span>(<span class="string">"Config created"</span>);
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>ماكرو الأدوات المدمجة</h4>
+        <p>يوفر Rust ماكرو <code>file!()</code> و<code>line!()</code> و<code>column!()</code> و<code>stringify!()</code> كماكرو مدمجة, وهي مثالية لإنشاء أدوات التنقيح والتسجيل الخاصة بك.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Procedural Macros</h2>
+    </div>
+    <p>يعمل Procedural Macros على تدفقات الرموز ويمنح قوة أكبر من Declarative Macros. يُعرَّف في حزمة منفصلة مع تعيين <code>proc-macro = true</code> في <code>Cargo.toml</code>.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// A procedural macro using the proc_macro crate</span>
+<span class="comment">// This would be in a separate crate with proc-macro = true</span>
+<span class="keyword">extern</span> <span class="keyword">crate</span> proc_macro;
+<span class="keyword">use</span> proc_macro::TokenStream;
+<span class="keyword">use</span> quote::quote;
+<span class="keyword">use</span> syn;
+<span class="keyword">#[proc_macro]</span>
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">my_macro</span>(<span class="param">input</span>: TokenStream) -&gt; TokenStream {
+    <span class="keyword">let</span> input = syn::<span class="func">parse_macro_input!</span>(input <span class="keyword">as</span> syn::LitInt);
+    <span class="keyword">let</span> n = input.<span class="func">base10_parse</span>::&lt;i32&gt;().<span class="func">unwrap</span>();
+    <span class="keyword">let</span> expanded = <span class="func">quote!</span> {
+        {
+            <span class="keyword">let</span> value = #n;
+            <span class="func">println!</span>(<span class="string">"Value: {}"</span>, value);
+            value
+        }
+    };
+    TokenStream::<span class="func">from</span>(expanded)
+}</code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>متطلب الحزمة المنفصلة</h4>
+        <p>يجب أن يكون Procedural Macros في حزمته الخاصة مع تعيين <code>proc-macro = true</code> في <code>Cargo.toml</code>. يعتمد على حزمة <code>syn</code> للتحليل وحزمة <code>quote</code> لتوليد الرموز.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Derive Macros</h2>
+    </div>
+    <p>يقوم Derive Macros بتنفيذ الـ Traits تلقائياً لـ Structs وEnums. الاشتقاقات القياسية مثل <code>Debug</code> و<code>Clone</code> و<code>PartialEq</code> مدمجة، ويمكنك إنشاء اشتقاقات مخصصة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="keyword">use</span> std::fmt;
+<span class="comment">// Standard derive macros</span>
+<span class="keyword">#[derive(Debug, Clone, Copy, PartialEq, Eq)]</span>
+<span class="keyword">struct</span> <span class="func">Point</span> {
+    x: <span class="keyword">i32</span>,
+    y: <span class="keyword">i32</span>,
+<span class="comment">// Custom trait that could be derived with a proc macro</span>
+<span class="keyword">trait</span> <span class="func">Drawable</span> {
+    <span class="keyword">fn</span> <span class="func">draw</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">impl</span> Drawable <span class="keyword">for</span> Point {
+    <span class="keyword">fn</span> <span class="func">draw</span>(&amp;<span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"Drawing point at ({}, {})"</span>, <span class="keyword">self</span>.x, <span class="keyword">self</span>.y);
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> p = Point { x: <span class="number">10</span>, y: <span class="number">20</span> };
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, p);
+    p.<span class="func">draw</span>();
+}</code></pre></div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Attribute Macros</h2>
+    </div>
+    <p>يُعلَّق Attribute Macros على العناصر ويحوّلها. كثير منها مدمج في Rust ويُستخدم يومياً, مثل <code>#[test]</code> و<code>#[cfg]</code> و<code>#[deprecated]</code> و<code>#[inline]</code> وهي جميعها ماكرو سمات.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// #[test] - marks functions as tests</span>
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests {
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_example</span>() {
+        <span class="func">assert_eq!</span>(<span class="number">2</span> + <span class="number">2</span>, <span class="number">4</span>);
+    }
+<span class="comment">// #[deprecated] - marks items as deprecated</span>
+<span class="keyword">#[deprecated(since = "0.2.0", note = "use new_function instead")]</span>
+<span class="keyword">fn</span> <span class="func">old_function</span>() {
+    <span class="func">println!</span>(<span class="string">"This is old"</span>);
+<span class="comment">// #[inline] - hints to compiler to inline function</span>
+<span class="keyword">#[inline]</span>
+<span class="keyword">fn</span> <span class="func">simple_operation</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    x * <span class="number">2</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> _result = <span class="func">simple_operation</span>(<span class="number">5</span>);
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Attribute Macros المخصصة</h4>
+        <p>تستخدم أطر العمل مثل Actix Web وRocket Attribute Macros المخصصة بكثرة, فمثلاً <code>#[get("/")]</code> و<code>#[tokio::main]</code> و<code>#[actix_web::main]</code> هي جميعها ماكرو سمات إجرائية.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>متى تستخدم الماكرو بدلاً من Functions</h2>
+    </div>
+    <p>يجب أن تكون Functions خيارك الافتراضي, فهي أبسط وأوضح وأسهل في التنقيح. استخدم الماكرو عندما تحتاج إمكانيات لا توفرها Functions.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Use functions when possible - they're simpler and clearer</span>
+<span class="keyword">fn</span> <span class="func">add</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + b
+<span class="comment">// Use macros for:</span>
+<span class="comment">// 1. Variable argument counts</span>
+<span class="keyword">macro_rules!</span> <span class="func">sum</span> {
+    ($(<span class="param">$num</span>:expr),+) =&gt; {
+        <span class="number">0</span> $( + <span class="param">$num</span> )*
+    };
+<span class="comment">// 2. Code generation patterns</span>
+<span class="keyword">macro_rules!</span> <span class="func">implement_ops</span> {
+    ($(<span class="param">$op_name</span>:ident -&gt; <span class="param">$op_fn</span>:expr)*) =&gt; {
+        $(
+            <span class="keyword">fn</span> <span class="param">$op_name</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+                <span class="param">$op_fn</span>(a, b)
+            }
+        )*
+    };
+<span class="func">implement_ops!</span> {
+    multiply -&gt; |a, b| a * b
+    divide -&gt; |a, b| <span class="keyword">if</span> b != <span class="number">0</span> { a / b } <span class="keyword">else</span> { <span class="number">0</span> }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Sum: {}"</span>, <span class="func">sum!</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>));
+    <span class="func">println!</span>(<span class="string">"Multiply: {}"</span>, <span class="func">multiply</span>(<span class="number">3</span>, <span class="number">4</span>));
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>دليل الاختيار</h4>
+        <p>استخدم <strong>Functions</strong> للمنطق العادي. استخدم <strong>Declarative Macros</strong> للمعاملات الـ Variableة والـ Patterns البسيطة. استخدم <strong>Procedural Macros</strong> لتوليد الكود المعقد والاشتقاقات المخصصة. فضّل دائماً الأداة الأبسط التي تنجز المهمة.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-12-async-await.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 13 من 17</span>
+  <a href="ch-14-unsafe-rust.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

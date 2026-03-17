@@ -61,14 +61,6 @@ const translations = {
       startLearning: "Start learning",
       exploreCurriculum: "Explore curriculum",
       topics: "Topics",
-      phase1: "Foundations",
-      phase2: "Applied Prompt Engineering",
-      phase3: "AI Agents",
-      bonus: "Bonus",
-      phase1Desc: "Core concepts & first API calls",
-      phase2Desc: "RAG, tools, evaluation & projects",
-      phase3Desc: "Architecture, frameworks & building agents",
-      bonusDesc: "Career growth & staying current",
       createdBy: "Created by",
       freeAndOpen: "Free & Open Source",
       whatYouLearn: "What you'll learn",
@@ -76,14 +68,6 @@ const translations = {
       phases: "Phases",
       concepts: "Concepts",
       lessons: "Lessons",
-      learnPoint1:
-        "Understand how LLMs work under the hood — tokens, context windows, and model selection",
-      learnPoint2:
-        "Master prompt engineering techniques from zero-shot to chain-of-thought and meta-prompting",
-      learnPoint3:
-        "Build production applications with RAG, tool use, and structured output",
-      learnPoint4:
-        "Design and implement autonomous AI agents with memory, planning, and multi-agent orchestration",
       tagTheory: "Theory",
       tagHandsOn: "Hands-On",
       tagProject: "Project",
@@ -188,14 +172,6 @@ const translations = {
       startLearning: "ابدأ التعلم",
       exploreCurriculum: "استعرض المنهج",
       topics: "المواضيع",
-      phase1: "الأساسيات",
-      phase2: "هندسة البرومبت التطبيقية",
-      phase3: "وكلاء الذكاء الاصطناعي",
-      bonus: "إضافي",
-      phase1Desc: "المفاهيم الأساسية وأول تجربة مع الـ API",
-      phase2Desc: "RAG والأدوات والتقييم ومشاريع عملية",
-      phase3Desc: "بنية الـ agents وأطر العمل وبناء agents من الصفر",
-      bonusDesc: "المسار المهني ومواكبة آخر التطورات",
       createdBy: "من إعداد",
       freeAndOpen: "مجاني ومفتوح المصدر",
       whatYouLearn: "ماذا ستتعلم",
@@ -203,14 +179,6 @@ const translations = {
       phases: "المراحل",
       concepts: "المفاهيم",
       lessons: "الدروس",
-      learnPoint1:
-        "فهم آلية عمل نماذج اللغة الكبيرة — الرموز ونوافذ السياق واختيار النموذج",
-      learnPoint2:
-        "إتقان تقنيات هندسة البرومبت من zero-shot إلى chain-of-thought والـ meta-prompting",
-      learnPoint3:
-        "بناء تطبيقات إنتاجية باستخدام RAG واستخدام الأدوات والمخرجات المنظمة",
-      learnPoint4:
-        "تصميم وتنفيذ وكلاء ذكاء اصطناعي مستقلين مع الذاكرة والتخطيط وتنسيق الوكلاء المتعددين",
       tagTheory: "نظري",
       tagHandsOn: "تطبيقي",
       tagProject: "مشروع",

@@ -30,13 +30,11 @@ function getStoredLocale(): Locale {
 }
 
 // External store for locale — avoids setState-in-effect lint issue
-let localeListeners: Array<() => void> = [];
+const localeListeners = new Set<() => void>();
 
 function subscribeLocale(cb: () => void) {
-  localeListeners.push(cb);
-  return () => {
-    localeListeners = localeListeners.filter((l) => l !== cb);
-  };
+  localeListeners.add(cb);
+  return () => { localeListeners.delete(cb); };
 }
 
 function notifyLocaleListeners() {

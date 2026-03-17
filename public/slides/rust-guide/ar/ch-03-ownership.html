@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 3, Ownership | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 18%"></div></div>
+    <span class="progress-label">3 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<!-- Main Content -->
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔑</div>
+    <h1>Ownership, الميزة الأقوى في Rust</h1>
+    <p>الميزة الأكثر تميزاً في Rust, افهم القواعد التي تضمن Memory Safety بدون Garbage Collector.</p>
+  </div>
+  <!-- Section 1: What is Ownership? -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>ما هو الـ Ownership؟</h2>
+    </div>
+    <p>الـ Ownership هو أكثر ميزات Rust تميزاً وهي ضرورية لفهم كيف تضمن Rust Memory Safety بدون Garbage Collector. وهي أيضاً مصدر معظم صعوبات المبتدئين مع Rust. لكن بمجرد فهمها، ستقدّر قوتها.</p>
+    <p>الـ Ownership هو مجموعة من القواعد التي تحكم كيفية إدارة برنامج Rust للذاكرة. كل قيمة في Rust لها Owner، وعندما يخرج الـ Owner من الـ Scope، يتم إسقاط القيمة (تحرير الـ Memory). هذا يضمن تنظيف الـ Memory بشكل صحيح دائماً.</p>
+    <h3>الـ Stack مقابل الـ Heap</h3>
+    <p>لفهم الـ Ownership، من المفيد فهم كيفية عمل الـ Stack والـ Heap:</p>
+    <ul>
+      <li><strong>الـ Stack:</strong> يخزن القيم بطريقة الداخل أخيراً يخرج أولاً. جميع البيانات المخزنة على الـ Stack يجب أن يكون لها حجم معروف وثابت. وهو سريع لأنك لا تحتاج للبحث عن مكان لوضع بيانات جديدة؛ فهي تذهب دائماً إلى الأعلى.</li>
+      <li><strong>الـ Heap:</strong> تخزن البيانات ذات الحجم غير المعروف في Compile-time أو الحجم الذي قد يتغير. الـ Heap أقل تنظيماً؛ عند وضع بيانات على الـ Heap، تخصص مساحة وتحصل على مؤشر. الوصول إلى Heap data أبطأ من Stack data.</li>
+    </ul>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">5</span>;           <span class="comment">// Small integer on stack</span>
+    <span class="keyword">let</span> y = <span class="string">"hello"</span>;     <span class="comment">// String literal (stack)</span>
+    <span class="keyword">let</span> s = String::new();  <span class="comment">// String on heap (pointer on stack)</span>
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 2: Ownership Rules -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>قواعد Ownership</h2>
+    </div>
+    <p>لدى Rust ثلاث قواعد أساسية للملكية:</p>
+    <ol>
+      <li>كل قيمة في Rust لها Variable يُسمى <strong>Ownerها</strong>.</li>
+      <li>لا يمكن أن يكون هناك سوى <strong>Owner واحد</strong> في وقت واحد.</li>
+      <li>عندما يخرج الـ Owner من الـ Scope، يتم <strong>إسقاط</strong> القيمة.</li>
+    </ol>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>فكرة جوهرية</h4><p>هذه القواعد الثلاث هي أساس Memory Safety في Rust. يفرضها الـ Compiler في Compile-time، لذلك لا توجد تكلفة أثناء التشغيل لإدارة الـ Memory.</p></div>
+    </div>
+  </div>
+  <!-- Section 3: Move Semantics -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Move Semantics</h2>
+    </div>
+    <p>عندما تسند قيمة من Variable إلى آخر، يتم نقل الـ Ownership. يُسمى هذا "نقل":</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s1 = String::from(<span class="string">"hello"</span>);
+    <span class="keyword">let</span> s2 = s1;  <span class="comment">// s1's ownership moves to s2</span>
+    <span class="comment">// This would cause a compile error:</span>
+    <span class="comment">// println!("{}", s1);  // Error: s1 has been moved</span>
+    <span class="func">println!</span>(<span class="string">"{}"</span>, s2);  <span class="comment">// This works fine</span>
+}</code></pre>
+    </div>
+    <h3>لماذا Move Semantics؟</h3>
+    <p>بالنسبة للأنواع البسيطة مثل Integers، تنسخ Rust القيمة بدلاً من نقلها. وذلك لأنها مخزنة على الـ Stack ونسخها رخيص:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">5</span>;
+    <span class="keyword">let</span> y = x;  <span class="comment">// x is copied (integers implement Copy)</span>
+    <span class="func">println!</span>(<span class="string">"x = {}, y = {}"</span>, x, y);  <span class="comment">// Both are valid</span>
+}</code></pre>
+    </div>
+    <h3>Clone: نسخة عميقة صريحة</h3>
+    <p>عندما تريد عمل نسخة من Heap data، استدعِ <code>clone()</code> بشكل صريح:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s1 = String::from(<span class="string">"hello"</span>);
+    <span class="keyword">let</span> s2 = s1.clone();  <span class="comment">// Explicit deep copy</span>
+    <span class="func">println!</span>(<span class="string">"s1 = {}, s2 = {}"</span>, s1, s2);  <span class="comment">// Both are valid</span>
+}</code></pre>
+    </div>
+    <h3>سمة Copy</h3>
+    <p>الأنواع التي تُطبّق سمة <code>Copy</code> يتم نسخها تلقائياً بدلاً من نقلها. الأنواع البسيطة مثل Integers والأعداد العشرية وBooleans والأحرف تُطبّق <code>Copy</code>:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">42</span>;        <span class="comment">// i32 implements Copy</span>
+    <span class="keyword">let</span> y = x;          <span class="comment">// x is copied automatically</span>
+    <span class="keyword">let</span> z<span class="param">: bool</span> = <span class="keyword">true</span>;  <span class="comment">// bool implements Copy</span>
+    <span class="keyword">let</span> w = z;          <span class="comment">// z is copied automatically</span>
+    <span class="func">println!</span>(<span class="string">"x={}, y={}, z={}, w={}"</span>, x, y, z, w);
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 4: Functions and Ownership -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Functions والـ Ownership</h2>
+    </div>
+    <p>عندما تمرر قيمة إلى Function، يتم نقل الـ Ownership (أو نسخها):</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">take_ownership</span>(s<span class="param">: String</span>) {
+    <span class="func">println!</span>(<span class="string">"I own: {}"</span>, s);
+}  <span class="comment">// s is dropped here</span>
+<span class="keyword">fn</span> <span class="func">copy_integer</span>(x<span class="param">: i32</span>) {
+    <span class="func">println!</span>(<span class="string">"I have: {}"</span>, x);
+}  <span class="comment">// x is not dropped because i32 implements Copy</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s = String::from(<span class="string">"hello"</span>);
+    <span class="func">take_ownership</span>(s);  <span class="comment">// s's ownership moves into function</span>
+    <span class="comment">// This would error: println!("{}", s);  // s no longer valid</span>
+    <span class="keyword">let</span> num = <span class="number">5</span>;
+    <span class="func">copy_integer</span>(num);  <span class="comment">// num is copied</span>
+    <span class="func">println!</span>(<span class="string">"num = {}"</span>, num);  <span class="comment">// num is still valid</span>
+}</code></pre>
+    </div>
+    <p>يمكن للدوال أيضاً إعادة الـ Ownership:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">give_ownership</span>() -&gt; String {
+    String::from(<span class="string">"hello"</span>)
+<span class="keyword">fn</span> <span class="func">take_and_give_back</span>(s<span class="param">: String</span>) -&gt; String {
+    s  <span class="comment">// Return ownership</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s1 = <span class="func">give_ownership</span>();
+    <span class="keyword">let</span> s2 = String::from(<span class="string">"world"</span>);
+    <span class="keyword">let</span> s3 = <span class="func">take_and_give_back</span>(s2);  <span class="comment">// s2 moves in, s3 receives ownership</span>
+    <span class="func">println!</span>(<span class="string">"s1 = {}, s3 = {}"</span>, s1, s3);
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 5: References and Borrowing -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>الـ References و Borrowing</h2>
+    </div>
+    <p>بدلاً من نقل الـ Ownership، يمكنك إعارة Reference لقيمة. يسمح لك الـ Reference باستخدام قيمة دون أخذ الـ Ownership:</p>
+    <h3>الـ References Immutable</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">calculate_length</span>(s<span class="param">: &amp;String</span>) -&gt; usize {
+    s.len()
+}  <span class="comment">// s goes out of scope, but it doesn't own s, so nothing happens</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s1 = String::from(<span class="string">"hello"</span>);
+    <span class="keyword">let</span> len = <span class="func">calculate_length</span>(&amp;s1);  <span class="comment">// Borrow s1</span>
+    <span class="func">println!</span>(<span class="string">"'{}' has length {}"</span>, s1, len);  <span class="comment">// s1 is still valid</span>
+}</code></pre>
+    </div>
+    <h3>الـ References الـ Mutable</h3>
+    <p>يمكنك تعديل قيمة من خلال Mutable Reference:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">change_string</span>(s<span class="param">: &amp;<span class="keyword">mut</span> String</span>) {
+    s.push_str(<span class="string">" world"</span>);
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> s = String::from(<span class="string">"hello"</span>);
+    <span class="func">change_string</span>(&amp;<span class="keyword">mut</span> s);  <span class="comment">// Mutable borrow</span>
+    <span class="func">println!</span>(<span class="string">"{}"</span>, s);  <span class="comment">// Prints: hello world</span>
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>قواعد Borrowing</h4><p>في أي وقت، يمكنك الحصول على إما Mutable Reference واحد أو أي عدد من الـ References Immutable. لا يمكنك الحصول على كليهما في نفس الوقت.</p></div>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> s = String::from(<span class="string">"hello"</span>);
+    <span class="keyword">let</span> r1 = &amp;s;      <span class="comment">// Immutable reference</span>
+    <span class="keyword">let</span> r2 = &amp;s;      <span class="comment">// Another immutable reference (OK)</span>
+    <span class="func">println!</span>(<span class="string">"{}, {}"</span>, r1, r2);
+    <span class="comment">// This would error (can't mix mutable and immutable):</span>
+    <span class="comment">// let r3 = &amp;mut s;</span>
+    <span class="keyword">let</span> r3 = &amp;<span class="keyword">mut</span> s;  <span class="comment">// Mutable reference (now OK after r1, r2 are gone)</span>
+    r3.push_str(<span class="string">" world"</span>);
+    <span class="func">println!</span>(<span class="string">"{}"</span>, r3);
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 6: The Slice Type -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>نوع الـ Slice</h2>
+    </div>
+    <p>الـ Slice هي Reference لتسلسل متجاور من العناصر داخل مجموعة. Slices لا تأخذ الـ Ownership:</p>
+    <h3>شرائح النصوص</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s = String::from(<span class="string">"Hello World"</span>);
+    <span class="keyword">let</span> hello = &amp;s[<span class="number">0</span>..<span class="number">5</span>];   <span class="comment">// "Hello"</span>
+    <span class="keyword">let</span> world = &amp;s[<span class="number">6</span>..<span class="number">11</span>];  <span class="comment">// "World"</span>
+    <span class="func">println!</span>(<span class="string">"{} {}"</span>, hello, world);
+}</code></pre>
+    </div>
+    <h3>Array Slices</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+    <span class="keyword">let</span> slice = &amp;a[<span class="number">1</span>..<span class="number">4</span>];  <span class="comment">// [2, 3, 4]</span>
+    <span class="keyword">for</span> &amp;item <span class="keyword">in</span> slice {
+        <span class="func">println!</span>(<span class="string">"Item: {}"</span>, item);
+    }
+}</code></pre>
+    </div>
+    <h3>Function عملية مع Slices</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">first_word</span>(s<span class="param">: &amp;String</span>) -&gt; &amp;str {
+    <span class="keyword">let</span> bytes = s.as_bytes();
+    <span class="keyword">for</span> (i, &amp;item) <span class="keyword">in</span> bytes.iter().enumerate() {
+        <span class="keyword">if</span> item == b<span class="string">' '</span> {
+            <span class="keyword">return</span> &amp;s[<span class="number">0</span>..i];
+        }
+    }
+    &amp;s[..]  <span class="comment">// Return the whole string</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s = String::from(<span class="string">"hello world"</span>);
+    <span class="keyword">let</span> word = <span class="func">first_word</span>(&amp;s);
+    <span class="func">println!</span>(<span class="string">"First word: {}"</span>, word);  <span class="comment">// Prints: First word: hello</span>
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 7: Dangling References -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Dangling References</h2>
+    </div>
+    <p>تمنع Rust Dangling References, وهي مراجع لبيانات لم تعد موجودة. يكتشفها الـ Compiler في Compile-time:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">dangle</span>() -&gt; &amp;String {  <span class="comment">// This won't compile!</span>
+    <span class="keyword">let</span> s = String::from(<span class="string">"hello"</span>);
+    &amp;s  <span class="comment">// s is dropped at end of function, so reference is invalid</span>
+}  <span class="comment">// ERROR: `s` does not live long enough</span>
+<span class="keyword">fn</span> <span class="func">no_dangle</span>() -&gt; String {  <span class="comment">// This works!</span>
+    <span class="keyword">let</span> s = String::from(<span class="string">"hello"</span>);
+    s  <span class="comment">// Ownership is transferred, not a reference</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s = <span class="func">no_dangle</span>();
+    <span class="func">println!</span>(<span class="string">"{}"</span>, s);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>الـ Compiler يحميك</h4><p>يكتشف الـ Borrow Checker في Rust Dangling References في Compile-time. في C أو C++، ستكون هذه أخطاء Runtime المعروفة بصعوبة تتبعها.</p></div>
+    </div>
+  </div>
+  <!-- Section 8: Ownership Summary -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>ملخص Ownership</h2>
+    </div>
+    <p>الـ Ownership قوي بمجرد فهمها. إليك مثالاً عملياً يجمع كل شيء معاً:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> text = String::from(<span class="string">"Ownership"</span>);
+    <span class="comment">// Immutable borrow - we can read</span>
+    <span class="keyword">let</span> len = <span class="func">get_length</span>(&amp;text);
+    <span class="func">println!</span>(<span class="string">"Length: {}"</span>, len);
+    <span class="comment">// Mutable borrow - we can modify</span>
+    <span class="func">add_exclamation</span>(&amp;<span class="keyword">mut</span> text);
+    <span class="func">println!</span>(<span class="string">"Text: {}"</span>, text);
+    <span class="comment">// Transfer ownership</span>
+    <span class="keyword">let</span> owned = text;
+    <span class="func">println!</span>(<span class="string">"Owned: {}"</span>, owned);
+    <span class="comment">// text is no longer valid here</span>
+<span class="keyword">fn</span> <span class="func">get_length</span>(s<span class="param">: &amp;String</span>) -&gt; usize {
+    s.len()
+<span class="keyword">fn</span> <span class="func">add_exclamation</span>(s<span class="param">: &amp;<span class="keyword">mut</span> String</span>) {
+    s.push_str(<span class="string">"!!!"</span>);
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>ورقة Reference للملكية</h4>
+        <ul>
+          <li><strong>النقل (Move)</strong>: نقل الـ Ownership من Variable إلى آخر (<code>let s2 = s1;</code>)</li>
+          <li><strong>الاستنساخ (Clone)</strong>: نسخة عميقة صريحة لHeap data (<code>let s2 = s1.clone();</code>)</li>
+          <li><strong>النسخ (Copy)</strong>: نسخ تلقائي للأنواع المخزنة على الـ Stack فقط (Integers، Booleans، الأحرف)</li>
+          <li><strong>Borrowing (Borrow)</strong>: إعارة Reference دون التنازل عن الـ Ownership (<code>&amp;s</code> أو <code>&amp;mut s</code>)</li>
+          <li><strong>الـ Slice (Slice)</strong>: Reference لجزء من مجموعة (<code>&amp;s[0..5]</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="ch-02-fundamentals.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 3 من 17</span>
+  <a href="ch-04-structs-enums.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 7, Traits و Generics | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/ar/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 41%"></div></div>
+    <span class="progress-label">7 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل الـ Trait"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🧬</div>
+    <h1>Traits و Generics</h1>
+    <p>عرّف السلوك المشترك باستخدام Traits واكتب كوداً مرناً باستخدام Generics وTrait Bounds.</p>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>تعريف Traits مع التطبيقات الافتراضية</h2>
+    </div>
+    <p>
+      تُعرّف <strong>الـ Trait (trait)</strong> السلوك المشترك من خلال إعلان توقيعات Functions التي يمكن للأنواع تطبيقها.
+      يمكن للسمات أيضاً تقديم <strong>تطبيقات افتراضية</strong> يمكن للأنواع المُطبِّقة تجاوزها.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Basic trait definition</span>
+<span class="keyword">trait</span> <span class="func">Animal</span> {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String;
+    <span class="comment">// Default implementation</span>
+    <span class="keyword">fn</span> <span class="func">introduce</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        <span class="func">format!</span>(<span class="string">"Hello, I'm an animal!"</span>)
+    }
+<span class="keyword">struct</span> <span class="func">Dog</span>;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Dog {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        String::<span class="func">from</span>(<span class="string">"Woof!"</span>)
+    }
+<span class="keyword">struct</span> <span class="func">Cat</span>;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Cat {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        String::<span class="func">from</span>(<span class="string">"Meow!"</span>)
+    }
+    <span class="comment">// Override default implementation</span>
+    <span class="keyword">fn</span> <span class="func">introduce</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        <span class="func">format!</span>(<span class="string">"{} {}"</span>, <span class="keyword">self</span>.<span class="func">speak</span>(), <span class="string">"I'm a cat!"</span>)
+    }
+<span class="keyword">let</span> dog = Dog;
+<span class="func">println!</span>(<span class="string">"{}"</span>, dog.<span class="func">speak</span>());     <span class="comment">// Woof!</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, dog.<span class="func">introduce</span>()); <span class="comment">// Hello, I'm an animal!</span>
+<span class="keyword">let</span> cat = Cat;
+<span class="func">println!</span>(<span class="string">"{}"</span>, cat.<span class="func">speak</span>());     <span class="comment">// Meow!</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, cat.<span class="func">introduce</span>()); <span class="comment">// Meow! I'm a cat!</span></code></pre>
+    </div>
+    <p>
+      يمكن أن تحتوي Traits على <strong>دوال متعددة</strong>، ويمكن للتطبيقات الافتراضية استدعاء دوال أخرى في نفس الـ Trait:
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">trait</span> <span class="func">Shape</span> {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">f64</span>;
+    <span class="keyword">fn</span> <span class="func">perimeter</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">f64</span>;
+    <span class="keyword">fn</span> <span class="func">describe</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        <span class="func">format!</span>(<span class="string">"Area: {}, Perimeter: {}"</span>, <span class="keyword">self</span>.<span class="func">area</span>(), <span class="keyword">self</span>.<span class="func">perimeter</span>())
+    }
+<span class="keyword">struct</span> <span class="func">Rectangle</span> {
+    width: <span class="keyword">f64</span>,
+    height: <span class="keyword">f64</span>,
+<span class="keyword">impl</span> Shape <span class="keyword">for</span> Rectangle {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">f64</span> {
+        <span class="keyword">self</span>.width * <span class="keyword">self</span>.height
+    }
+    <span class="keyword">fn</span> <span class="func">perimeter</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">f64</span> {
+        <span class="number">2.0</span> * (<span class="keyword">self</span>.width + <span class="keyword">self</span>.height)
+    }
+<span class="keyword">let</span> rect = Rectangle { width: <span class="number">5.0</span>, height: <span class="number">3.0</span> };
+<span class="func">println!</span>(<span class="string">"{}"</span>, rect.<span class="func">describe</span>());</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Functions الافتراضية تستدعي دوالاً أخرى</h4>
+        <p>يمكن للـ Function الافتراضية استدعاء Functions المطلوبة على <code>self</code>. هذا يتيح لك تقديم سلوك غني من خلال تطبيق عدد قليل فقط من Functions المطلوبة.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Trait Bounds وStatements Where</h2>
+    </div>
+    <p>
+      تُقيّد <strong>Trait Bounds (trait bounds)</strong> Generics بحيث يجب أن تُطبّق سمات محددة.
+      توفر <strong>Statements where</strong> صيغة أوضح عندما تصبح القيود معقدة.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fmt::Display;
+<span class="comment">// Simple trait bound</span>
+<span class="keyword">fn</span> <span class="func">print_item</span>&lt;<span class="param">T</span>: Display&gt;(<span class="param">item</span>: <span class="param">T</span>) {
+    <span class="func">println!</span>(<span class="string">"Item: {}"</span>, item);
+<span class="func">print_item</span>(<span class="number">42</span>);
+<span class="func">print_item</span>(<span class="string">"hello"</span>);
+<span class="comment">// Multiple trait bounds</span>
+<span class="keyword">fn</span> <span class="func">compare_and_print</span>&lt;<span class="param">T</span>: PartialOrd + Display&gt;(<span class="param">a</span>: <span class="param">T</span>, <span class="param">b</span>: <span class="param">T</span>) {
+    <span class="keyword">if</span> a &gt; b {
+        <span class="func">println!</span>(<span class="string">"{} is greater"</span>, a);
+    } <span class="keyword">else</span> {
+        <span class="func">println!</span>(<span class="string">"{} is greater"</span>, b);
+    }
+}</code></pre>
+    </div>
+    <p>
+      عندما تصبح Trait Bounds معقدة، تنقلها <strong>Statement where</strong> إلى ما بعد توقيع الـ Function لتحسين الوضوح:
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">trait</span> <span class="func">Summary</span> {
+    <span class="keyword">fn</span> <span class="func">summarize</span>(&amp;<span class="keyword">self</span>) -&gt; String;
+<span class="keyword">struct</span> <span class="func">Article</span> {
+    title: String,
+    content: String,
+<span class="keyword">impl</span> Summary <span class="keyword">for</span> Article {
+    <span class="keyword">fn</span> <span class="func">summarize</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        <span class="func">format!</span>(<span class="string">"{}"</span>, <span class="keyword">self</span>.title)
+    }
+<span class="comment">// Using where clause for clarity</span>
+<span class="keyword">fn</span> <span class="func">notify</span>&lt;<span class="param">T</span>, <span class="param">U</span>&gt;(<span class="param">item</span>: &amp;<span class="param">T</span>, <span class="param">other</span>: &amp;<span class="param">U</span>) -&gt; String
+<span class="keyword">where</span>
+    <span class="param">T</span>: Summary + Display,
+    <span class="param">U</span>: Summary,
+{
+    <span class="func">format!</span>(<span class="string">"{} and {}"</span>, item.<span class="func">summarize</span>(), other.<span class="func">summarize</span>())
+<span class="comment">// Conditional trait implementations with where clause</span>
+<span class="keyword">struct</span> <span class="func">Pair</span>&lt;<span class="param">T</span>&gt; {
+    x: <span class="param">T</span>,
+    y: <span class="param">T</span>,
+<span class="keyword">impl</span>&lt;<span class="param">T</span>: Display + PartialOrd&gt; Pair&lt;<span class="param">T</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">cmp_display</span>(&amp;<span class="keyword">self</span>) {
+        <span class="keyword">if</span> <span class="keyword">self</span>.x &gt;= <span class="keyword">self</span>.y {
+            <span class="func">println!</span>(<span class="string">"The largest member is x = {}"</span>, <span class="keyword">self</span>.x);
+        } <span class="keyword">else</span> {
+            <span class="func">println!</span>(<span class="string">"The largest member is y = {}"</span>, <span class="keyword">self</span>.y);
+        }
+    }
+<span class="keyword">let</span> pair = Pair { x: <span class="number">5</span>, y: <span class="number">3</span> };
+pair.<span class="func">cmp_display</span>();
+<span class="comment">// Multiple where conditions</span>
+<span class="keyword">fn</span> <span class="func">process</span>&lt;<span class="param">T</span>, <span class="param">U</span>, <span class="param">V</span>&gt;(<span class="param">a</span>: <span class="param">T</span>, <span class="param">b</span>: <span class="param">U</span>, <span class="param">c</span>: <span class="param">V</span>)
+<span class="keyword">where</span>
+    <span class="param">T</span>: Display + Clone,
+    <span class="param">U</span>: Display + Default,
+    <span class="param">V</span>: Display + Send + Sync,
+{
+    <span class="func">println!</span>(<span class="string">"{}, {}, {}"</span>, a, b, c);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>متى تستخدم Statements Where</h4>
+        <p>استخدم Statements <code>where</code> كلما كان لديك أكثر من قيد أو قيدين على الـ Traits، أو عندما تنطبق القيود على عدة معاملات عامة. فهي تحافظ على قراءة توقيعات Functions بسهولة.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Functions وStructs العامة</h2>
+    </div>
+    <p>
+      تتيح لك <strong>Generics</strong> كتابة كود يعمل مع أنواع متعددة. يُولّد الـ Compiler نسخاً مخصصة لكل نوع مُستخدم (<strong>التخصيص أحادي الشكل - monomorphization</strong>)، لذلك لا توجد تكلفة في Runtime.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Generic function</span>
+<span class="keyword">fn</span> <span class="func">largest</span>&lt;<span class="param">T</span>: PartialOrd + Copy&gt;(<span class="param">list</span>: &amp;[<span class="param">T</span>]) -&gt; <span class="param">T</span> {
+    <span class="keyword">let</span> <span class="keyword">mut</span> largest = list[<span class="number">0</span>];
+    <span class="keyword">for</span> &amp;item <span class="keyword">in</span> list.<span class="func">iter</span>() {
+        <span class="keyword">if</span> item &gt; largest {
+            largest = item;
+        }
+    }
+    largest
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">largest</span>(&amp;[<span class="number">34</span>, <span class="number">50</span>, <span class="number">25</span>, <span class="number">100</span>, <span class="number">65</span>])); <span class="comment">// 100</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">largest</span>(&amp;[<span class="number">102.4</span>, <span class="number">34.2</span>, <span class="number">5000.2</span>])); <span class="comment">// 5000.2</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Generic struct</span>
+<span class="keyword">struct</span> <span class="func">Point</span>&lt;<span class="param">T</span>&gt; {
+    x: <span class="param">T</span>,
+    y: <span class="param">T</span>,
+<span class="keyword">let</span> point_int = Point { x: <span class="number">5</span>, y: <span class="number">10</span> };
+<span class="keyword">let</span> point_float = Point { x: <span class="number">1.0</span>, y: <span class="number">4.0</span> };
+<span class="comment">// Multiple type parameters</span>
+<span class="keyword">struct</span> <span class="func">MultiPoint</span>&lt;<span class="param">T</span>, <span class="param">U</span>&gt; {
+    x: <span class="param">T</span>,
+    y: <span class="param">U</span>,
+<span class="keyword">let</span> point = MultiPoint { x: <span class="number">5</span>, y: <span class="number">4.0</span> };
+<span class="comment">// Generic methods</span>
+<span class="keyword">impl</span>&lt;<span class="param">T</span>: std::fmt::Display&gt; Point&lt;<span class="param">T</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">x</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="param">T</span> {
+        &amp;<span class="keyword">self</span>.x
+    }
+    <span class="keyword">fn</span> <span class="func">print_coords</span>(&amp;<span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"x: {}, y: {}"</span>, <span class="keyword">self</span>.x, <span class="keyword">self</span>.y);
+    }
+<span class="comment">// Specialized implementation for f64 only</span>
+<span class="keyword">impl</span> Point&lt;<span class="keyword">f64</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">distance_from_origin</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">f64</span> {
+        (<span class="keyword">self</span>.x.<span class="func">powi</span>(<span class="number">2</span>) + <span class="keyword">self</span>.y.<span class="func">powi</span>(<span class="number">2</span>)).<span class="func">sqrt</span>()
+    }
+<span class="keyword">let</span> p = Point { x: <span class="number">3.0</span>, y: <span class="number">4.0</span> };
+<span class="func">println!</span>(<span class="string">"Distance: {}"</span>, p.<span class="func">distance_from_origin</span>()); <span class="comment">// 5.0</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Generic enum</span>
+<span class="keyword">enum</span> <span class="func">Option</span>&lt;<span class="param">T</span>&gt; {
+    Some(<span class="param">T</span>),
+    None,
+<span class="keyword">enum</span> <span class="func">Result</span>&lt;<span class="param">T</span>, <span class="param">E</span>&gt; {
+    Ok(<span class="param">T</span>),
+    Err(<span class="param">E</span>),
+<span class="keyword">let</span> num: Option&lt;<span class="keyword">i32</span>&gt; = Some(<span class="number">5</span>);
+<span class="keyword">let</span> text: Option&lt;&amp;<span class="keyword">str</span>&gt; = None;</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Generics بدون تكلفة</h4>
+        <p>تستخدم Generics في Rust <strong>التخصيص أحادي الشكل (monomorphization)</strong> في Compile-time. يصبح <code>Point&lt;i32&gt;</code> و <code>Point&lt;f64&gt;</code> نوعين منفصلين بدون أي عبء في Runtime، تماماً مثل الكود المتخصص المكتوب يدوياً.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>صيغة impl Trait</h2>
+    </div>
+    <p>
+      توفر صيغة <code>impl Trait</code> طريقة مختصرة لتحديد أن معاملاً أو نوع إرجاع يُطبّق سمة معينة، دون تسمية النوع المحدد.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fmt::Display;
+<span class="comment">// impl Trait return type - concrete type at compile time</span>
+<span class="keyword">fn</span> <span class="func">returns_summarizable</span>() -&gt; <span class="keyword">impl</span> Display {
+    <span class="number">42</span>
+<span class="comment">// Returning different types that implement trait</span>
+<span class="keyword">fn</span> <span class="func">get_value</span>(<span class="param">is_int</span>: <span class="keyword">bool</span>) -&gt; Box&lt;<span class="keyword">dyn</span> Display&gt; {
+    <span class="keyword">if</span> is_int {
+        Box::<span class="func">new</span>(<span class="number">42</span>)
+    } <span class="keyword">else</span> {
+        Box::<span class="func">new</span>(<span class="string">"hello"</span>)
+    }
+<span class="comment">// impl Trait in parameters (trait bound shorthand)</span>
+<span class="keyword">fn</span> <span class="func">print_it</span>(<span class="param">val</span>: <span class="keyword">impl</span> Display) {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, val);
+<span class="comment">// More flexible than specifying generic type</span>
+<span class="keyword">fn</span> <span class="func">combine</span>(<span class="param">a</span>: <span class="keyword">impl</span> Display, <span class="param">b</span>: <span class="keyword">impl</span> Display) -&gt; String {
+    <span class="func">format!</span>(<span class="string">"{}{}"</span>, a, b)
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">combine</span>(<span class="number">5</span>, <span class="string">"hello"</span>)); <span class="comment">// 5hello</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">combine</span>(<span class="string">"a"</span>, <span class="string">"b"</span>));     <span class="comment">// ab</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// impl Trait with multiple bounds</span>
+<span class="keyword">fn</span> <span class="func">process</span>(<span class="param">item</span>: <span class="keyword">impl</span> Display + Clone) -&gt; <span class="keyword">impl</span> Display {
+    item.<span class="func">clone</span>()
+<span class="comment">// Using in iterators</span>
+<span class="keyword">fn</span> <span class="func">skip_falsy</span>&lt;<span class="param">'a</span>&gt;(<span class="param">v</span>: &amp;<span class="param">'a</span> Vec&lt;<span class="keyword">i32</span>&gt;) -&gt; <span class="keyword">impl</span> Iterator&lt;Item = &amp;<span class="param">'a</span> <span class="keyword">i32</span>&gt; {
+    v.<span class="func">iter</span>().<span class="func">filter</span>(|&amp;&amp;x| x != <span class="number">0</span>)
+<span class="keyword">let</span> nums = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">3</span>];
+<span class="keyword">for</span> n <span class="keyword">in</span> <span class="func">skip_falsy</span>(&amp;nums) {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, n);
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>impl Trait مقابل dyn Trait</h4>
+        <p>يُحلّ <code>impl Trait</code> إلى <strong>نوع محدد واحد</strong> في Compile-time (Static Dispatch). بينما يستخدم <code>dyn Trait</code> جدول vtable لـ<strong>Dynamic Dispatch</strong> في Runtime. استخدم <code>impl Trait</code> عندما يكون النوع ثابتاً؛ واستخدم <code>dyn Trait</code> عندما تحتاج إلى مجموعات غير متجانسة.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Trait Objects (dyn Trait) مقابل Static Dispatch</h2>
+    </div>
+    <p>
+      يُخصّص <strong>Static Dispatch (Static dispatch)</strong> (Generics) الكود لكل نوع محدد، مما يعطي أقصى سرعة لكن بملفات تنفيذية أكبر.
+      يستخدم <strong>Dynamic Dispatch (Dynamic dispatch)</strong> (Trait Objects) مؤشراً وجدول vtable، مما يتيح المجموعات غير المتجانسة بتكلفة تشغيل بسيطة.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">trait</span> <span class="func">Animal</span> {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String;
+<span class="keyword">struct</span> <span class="func">Dog</span>;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Dog {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String { String::<span class="func">from</span>(<span class="string">"Woof"</span>) }
+<span class="keyword">struct</span> <span class="func">Cat</span>;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Cat {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String { String::<span class="func">from</span>(<span class="string">"Meow"</span>) }
+<span class="comment">// Static dispatch: monomorphization at compile time</span>
+<span class="comment">// Compiler generates separate code for each type</span>
+<span class="keyword">fn</span> <span class="func">static_animal</span>&lt;<span class="param">T</span>: Animal&gt;(<span class="param">animal</span>: <span class="param">T</span>) {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, animal.<span class="func">speak</span>());
+<span class="func">static_animal</span>(Dog); <span class="comment">// Generates Dog version</span>
+<span class="func">static_animal</span>(Cat); <span class="comment">// Generates Cat version</span>
+<span class="comment">// Dynamic dispatch: trait objects</span>
+<span class="comment">// Single runtime lookup, smaller binary</span>
+<span class="keyword">fn</span> <span class="func">dynamic_animal</span>(<span class="param">animal</span>: &amp;<span class="keyword">dyn</span> Animal) {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, animal.<span class="func">speak</span>());
+<span class="keyword">let</span> dog = Dog;
+<span class="keyword">let</span> cat = Cat;
+<span class="func">dynamic_animal</span>(&amp;dog);
+<span class="func">dynamic_animal</span>(&amp;cat);</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Trait object collections</span>
+<span class="keyword">let</span> animals: Vec&lt;&amp;<span class="keyword">dyn</span> Animal&gt; = <span class="func">vec!</span>[&amp;dog, &amp;cat];
+<span class="keyword">for</span> animal <span class="keyword">in</span> animals {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, animal.<span class="func">speak</span>());
+<span class="comment">// Trait objects with ownership</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> animals: Vec&lt;Box&lt;<span class="keyword">dyn</span> Animal&gt;&gt; = <span class="func">vec!</span>[
+    Box::<span class="func">new</span>(Dog),
+    Box::<span class="func">new</span>(Cat),
+];
+<span class="keyword">for</span> animal <span class="keyword">in</span> &amp;animals {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, animal.<span class="func">speak</span>());
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>قواعد أمان الكائنات</h4>
+        <p>يمكن استخدام الـ Trait ككائن سمة (<code>dyn Trait</code>) فقط إذا كانت <strong>آمنة للكائنات</strong>. يتطلب ذلك: ألا يكون نوع الإرجاع <code>Self</code>، وألا توجد معاملات نوع عامة، وأن تحتوي Functions الساكنة على قيد <code>where Self: Sized</code>.</p>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Safe trait - can be used as dyn Drawable</span>
+<span class="keyword">trait</span> <span class="func">Drawable</span> {
+    <span class="keyword">fn</span> <span class="func">draw</span>(&amp;<span class="keyword">self</span>);
+<span class="comment">// NOT object-safe - has Self return type</span>
+<span class="keyword">trait</span> <span class="func">Creator</span> {
+    <span class="keyword">fn</span> <span class="func">create</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">Self</span>;
+    <span class="comment">// Cannot use: dyn Creator</span>
+<span class="comment">// Making it safe with where clause</span>
+<span class="keyword">trait</span> <span class="func">SafeCreator</span> {
+    <span class="keyword">fn</span> <span class="func">create</span>(&amp;<span class="keyword">self</span>) -&gt; String
+    <span class="keyword">where</span>
+        <span class="keyword">Self</span>: Sized,
+    ;
+<span class="comment">// Can use: dyn SafeCreator</span></code></pre>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Traits الشائعة في Standard Library</h2>
+    </div>
+    <p>
+      تُعرّف Standard Library في Rust العديد من الـ Traits المفيدة. معرفة هذه الـ Traits أمر أساسي لكتابة كود Rust اصطلاحي.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Display and Debug</span>
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">struct</span> <span class="func">Person</span> {
+    name: String,
+    age: <span class="keyword">u32</span>,
+<span class="keyword">use</span> std::fmt;
+<span class="keyword">impl</span> fmt::Display <span class="keyword">for</span> Person {
+    <span class="keyword">fn</span> <span class="func">fmt</span>(&amp;<span class="keyword">self</span>, <span class="param">f</span>: &amp;<span class="keyword">mut</span> fmt::Formatter) -&gt; fmt::Result {
+        <span class="func">write!</span>(f, <span class="string">"{} ({})"</span>, <span class="keyword">self</span>.name, <span class="keyword">self</span>.age)
+    }
+<span class="keyword">let</span> p = Person { name: String::<span class="func">from</span>(<span class="string">"Alice"</span>), age: <span class="number">30</span> };
+<span class="func">println!</span>(<span class="string">"{}"</span>, p);   <span class="comment">// Display: Alice (30)</span>
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, p); <span class="comment">// Debug: Person { name: "Alice", age: 30 }</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Clone and Copy</span>
+<span class="keyword">#[derive(Clone, Copy)]</span>
+<span class="keyword">struct</span> <span class="func">Point</span> {
+    x: <span class="keyword">i32</span>,
+    y: <span class="keyword">i32</span>,
+<span class="keyword">let</span> p1 = Point { x: <span class="number">5</span>, y: <span class="number">10</span> };
+<span class="keyword">let</span> p2 = p1;          <span class="comment">// Copy: p1 still valid</span>
+<span class="keyword">let</span> p3 = p1.<span class="func">clone</span>(); <span class="comment">// Explicit clone</span>
+<span class="comment">// From and Into traits</span>
+<span class="keyword">struct</span> <span class="func">Number</span>(<span class="keyword">i32</span>);
+<span class="keyword">impl</span> From&lt;<span class="keyword">i32</span>&gt; <span class="keyword">for</span> Number {
+    <span class="keyword">fn</span> <span class="func">from</span>(<span class="param">item</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">Self</span> {
+        Number(item)
+    }
+<span class="keyword">let</span> num: Number = <span class="number">5</span>.<span class="func">into</span>(); <span class="comment">// Automatically uses From impl for Into</span>
+<span class="comment">// Default trait</span>
+<span class="keyword">#[derive(Default)]</span>
+<span class="keyword">struct</span> <span class="func">Config</span> {
+    name: String,
+    value: <span class="keyword">i32</span>,
+<span class="keyword">let</span> config = Config::<span class="func">default</span>();</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Iterator trait</span>
+<span class="keyword">struct</span> <span class="func">Counter</span> {
+    count: <span class="keyword">u32</span>,
+<span class="keyword">impl</span> Iterator <span class="keyword">for</span> Counter {
+    <span class="keyword">type</span> Item = <span class="keyword">u32</span>;
+    <span class="keyword">fn</span> <span class="func">next</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">self</span>.count += <span class="number">1</span>;
+        <span class="keyword">if</span> <span class="keyword">self</span>.count &lt; <span class="number">6</span> {
+            Some(<span class="keyword">self</span>.count)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">let</span> <span class="keyword">mut</span> counter = Counter { count: <span class="number">0</span> };
+<span class="keyword">while</span> <span class="keyword">let</span> Some(val) = counter.<span class="func">next</span>() {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, val); <span class="comment">// 1 2 3 4 5</span>
+<span class="comment">// PartialEq, Eq, and Ordering traits</span>
+<span class="keyword">#[derive(PartialEq, Eq)]</span>
+<span class="keyword">struct</span> <span class="func">Value</span>(<span class="keyword">i32</span>);
+<span class="keyword">let</span> a = Value(<span class="number">5</span>);
+<span class="keyword">let</span> b = Value(<span class="number">5</span>);
+<span class="func">assert_eq!</span>(a, b);
+<span class="keyword">use</span> std::cmp::Ordering;
+<span class="keyword">#[derive(PartialOrd, Ord, PartialEq, Eq)]</span>
+<span class="keyword">struct</span> <span class="func">Item</span>(<span class="keyword">i32</span>);
+<span class="keyword">let</span> a = Item(<span class="number">5</span>);
+<span class="keyword">let</span> b = Item(<span class="number">10</span>);
+<span class="func">assert_eq!</span>(a.<span class="func">cmp</span>(&amp;b), Ordering::Less);</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>ماكرو Derive يوفر الوقت</h4>
+        <p>استخدم <code>#[derive(...)]</code> لتطبيق الـ Traits الشائعة تلقائياً مثل <code>Debug</code> و <code>Clone</code> و <code>Copy</code> و <code>PartialEq</code> و <code>Eq</code> و <code>Default</code> وسمات الترتيب. اكتب تطبيقات يدوية فقط عندما تحتاج سلوكاً مخصصاً.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Supertraits</h2>
+    </div>
+    <p>
+      <strong>الـ Trait الأعلى (supertrait)</strong> هي سمة تعتمد عليها سمة أخرى. إذا كانت الـ Trait <code>B</code> تتطلب الـ Trait <code>A</code>، فإن أي نوع يُطبّق <code>B</code> يجب أن يُطبّق أيضاً <code>A</code>.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fmt::Display;
+<span class="comment">// Supertrait: OutlinePrint requires Display</span>
+<span class="keyword">trait</span> <span class="func">OutlinePrint</span>: Display {
+    <span class="keyword">fn</span> <span class="func">outline_print</span>(&amp;<span class="keyword">self</span>) {
+        <span class="keyword">let</span> output = <span class="keyword">self</span>.<span class="func">to_string</span>();
+        <span class="keyword">let</span> len = output.<span class="func">len</span>();
+        <span class="func">println!</span>(<span class="string">"{}"</span>, <span class="string">"*"</span>.<span class="func">repeat</span>(len + <span class="number">4</span>));
+        <span class="func">println!</span>(<span class="string">"*{}*"</span>, <span class="string">" "</span>.<span class="func">repeat</span>(len + <span class="number">2</span>));
+        <span class="func">println!</span>(<span class="string">"* {} *"</span>, output);
+        <span class="func">println!</span>(<span class="string">"*{}*"</span>, <span class="string">" "</span>.<span class="func">repeat</span>(len + <span class="number">2</span>));
+        <span class="func">println!</span>(<span class="string">"{}"</span>, <span class="string">"*"</span>.<span class="func">repeat</span>(len + <span class="number">4</span>));
+    }
+<span class="keyword">struct</span> <span class="func">Point</span> {
+    x: <span class="keyword">i32</span>,
+    y: <span class="keyword">i32</span>,
+<span class="keyword">impl</span> Display <span class="keyword">for</span> Point {
+    <span class="keyword">fn</span> <span class="func">fmt</span>(&amp;<span class="keyword">self</span>, <span class="param">f</span>: &amp;<span class="keyword">mut</span> std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="func">write!</span>(f, <span class="string">"({}, {})"</span>, <span class="keyword">self</span>.x, <span class="keyword">self</span>.y)
+    }
+<span class="keyword">impl</span> OutlinePrint <span class="keyword">for</span> Point {}
+<span class="keyword">let</span> p = Point { x: <span class="number">5</span>, y: <span class="number">10</span> };
+p.<span class="func">outline_print</span>();</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Multiple supertrait bounds</span>
+<span class="keyword">trait</span> <span class="func">Drawable</span>: Display {
+    <span class="keyword">fn</span> <span class="func">draw</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">trait</span> <span class="func">Printable</span>: Display {
+    <span class="keyword">fn</span> <span class="func">print</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">trait</span> <span class="func">Document</span>: Drawable + Printable {
+    <span class="keyword">fn</span> <span class="func">save</span>(&amp;<span class="keyword">self</span>);
+<span class="comment">// Using supertrait in bounds</span>
+<span class="keyword">fn</span> <span class="func">process</span>&lt;<span class="param">T</span>: OutlinePrint&gt;(<span class="param">item</span>: <span class="param">T</span>) {
+    <span class="comment">// T automatically has Display methods available</span>
+    <span class="keyword">let</span> s = item.<span class="func">to_string</span>();
+    item.<span class="func">outline_print</span>();
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>تسلسل Supertraits</h4>
+        <p>تُنشئ Supertraits تسلسلاً هرمياً: إذا كان <code>Document: Drawable + Printable</code> وكلاهما يتطلب <code>Display</code>، فإن أي نوع يُطبّق <code>Document</code> يجب أن يُطبّق الثلاثة جميعاً. فكّر في الأمر كوراثة الـ Traits.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Patterns تعدد الأشكال</h2>
+    </div>
+    <p>
+      يدعم Rust تعدد الأشكال (Polymorphism) من خلال Generics وTrait Objects. فيما يلي الـ Patterns الأكثر شيوعاً المستخدمة في كود Rust الواقعي.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">trait</span> <span class="func">Vehicle</span> {
+    <span class="keyword">fn</span> <span class="func">start</span>(&amp;<span class="keyword">self</span>);
+    <span class="keyword">fn</span> <span class="func">stop</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">struct</span> <span class="func">Car</span>;
+<span class="keyword">impl</span> Vehicle <span class="keyword">for</span> Car {
+    <span class="keyword">fn</span> <span class="func">start</span>(&amp;<span class="keyword">self</span>) { <span class="func">println!</span>(<span class="string">"Car engine starts"</span>); }
+    <span class="keyword">fn</span> <span class="func">stop</span>(&amp;<span class="keyword">self</span>) { <span class="func">println!</span>(<span class="string">"Car engine stops"</span>); }
+<span class="keyword">struct</span> <span class="func">Bike</span>;
+<span class="keyword">impl</span> Vehicle <span class="keyword">for</span> Bike {
+    <span class="keyword">fn</span> <span class="func">start</span>(&amp;<span class="keyword">self</span>) { <span class="func">println!</span>(<span class="string">"Bike engine starts"</span>); }
+    <span class="keyword">fn</span> <span class="func">stop</span>(&amp;<span class="keyword">self</span>) { <span class="func">println!</span>(<span class="string">"Bike engine stops"</span>); }
+<span class="comment">// Pattern 1: Generic polymorphism (static dispatch)</span>
+<span class="keyword">fn</span> <span class="func">operate</span>&lt;<span class="param">V</span>: Vehicle&gt;(<span class="param">vehicle</span>: <span class="param">V</span>) {
+    vehicle.<span class="func">start</span>();
+    vehicle.<span class="func">stop</span>();
+<span class="func">operate</span>(Car);
+<span class="func">operate</span>(Bike);</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Pattern 2: Trait object polymorphism (dynamic dispatch)</span>
+<span class="keyword">fn</span> <span class="func">fleet_start</span>(<span class="param">vehicles</span>: &amp;[Box&lt;<span class="keyword">dyn</span> Vehicle&gt;]) {
+    <span class="keyword">for</span> vehicle <span class="keyword">in</span> vehicles {
+        vehicle.<span class="func">start</span>();
+    }
+<span class="keyword">let</span> vehicles: Vec&lt;Box&lt;<span class="keyword">dyn</span> Vehicle&gt;&gt; = <span class="func">vec!</span>[
+    Box::<span class="func">new</span>(Car),
+    Box::<span class="func">new</span>(Bike),
+];
+<span class="func">fleet_start</span>(&amp;vehicles);
+<span class="comment">// Pattern 3: Factory pattern with trait objects</span>
+<span class="keyword">struct</span> <span class="func">Factory</span>;
+<span class="keyword">impl</span> Factory {
+    <span class="keyword">fn</span> <span class="func">create_vehicle</span>(<span class="param">vehicle_type</span>: &amp;<span class="keyword">str</span>) -&gt; Box&lt;<span class="keyword">dyn</span> Vehicle&gt; {
+        <span class="keyword">match</span> vehicle_type {
+            <span class="string">"car"</span> =&gt; Box::<span class="func">new</span>(Car),
+            <span class="string">"bike"</span> =&gt; Box::<span class="func">new</span>(Bike),
+            _ =&gt; <span class="func">panic!</span>(<span class="string">"Unknown vehicle"</span>),
+        }
+    }
+<span class="keyword">let</span> vehicle = Factory::<span class="func">create_vehicle</span>(<span class="string">"car"</span>);
+vehicle.<span class="func">start</span>();</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Pattern 4: Decorator pattern</span>
+<span class="keyword">trait</span> <span class="func">Logger</span> {
+    <span class="keyword">fn</span> <span class="func">log</span>(&amp;<span class="keyword">self</span>, <span class="param">msg</span>: &amp;<span class="keyword">str</span>);
+<span class="keyword">struct</span> <span class="func">ConsoleLogger</span>;
+<span class="keyword">impl</span> Logger <span class="keyword">for</span> ConsoleLogger {
+    <span class="keyword">fn</span> <span class="func">log</span>(&amp;<span class="keyword">self</span>, <span class="param">msg</span>: &amp;<span class="keyword">str</span>) {
+        <span class="func">println!</span>(<span class="string">"LOG: {}"</span>, msg);
+    }
+<span class="keyword">struct</span> <span class="func">FileLogger</span>;
+<span class="keyword">impl</span> Logger <span class="keyword">for</span> FileLogger {
+    <span class="keyword">fn</span> <span class="func">log</span>(&amp;<span class="keyword">self</span>, <span class="param">msg</span>: &amp;<span class="keyword">str</span>) {
+        <span class="func">println!</span>(<span class="string">"FILE: {}"</span>, msg);
+    }
+<span class="keyword">fn</span> <span class="func">do_work</span>(<span class="param">logger</span>: &amp;<span class="keyword">dyn</span> Logger) {
+    logger.<span class="func">log</span>(<span class="string">"Starting work"</span>);
+    logger.<span class="func">log</span>(<span class="string">"Work complete"</span>);
+<span class="func">do_work</span>(&amp;ConsoleLogger);
+<span class="func">do_work</span>(&amp;FileLogger);</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>اختيار الـ Pattern المناسب</h4>
+        <p>استخدم <strong>Generics</strong> (Static Dispatch) عندما تعرف الأنواع في Compile-time وتريد أقصى أداء. استخدم <strong>Trait Objects</strong> (Dynamic Dispatch) عندما تحتاج مجموعات غير متجانسة أو مرونة في Runtime، مثل Patterns المصنع والمزخرف أعلاه.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-06-collections.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 7 من 17</span>
+  <a href="ch-08-iterators-closures.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

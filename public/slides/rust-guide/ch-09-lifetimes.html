@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 9, Lifetimes | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 2</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 53%"></div></div>
+    <span class="progress-label">9 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">⏳</div>
+    <h1>Lifetimes</h1>
+    <p>Lifetime annotations demystified, how Rust tracks reference validity at compile time.</p>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Why Lifetimes Exist</h2>
+    </div>
+    <p>
+      Lifetimes prevent <strong>dangling references</strong>, pointers to data that has been freed. The Rust compiler uses lifetime annotations to verify that every reference is valid for as long as it is used.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Problem: dangling references</span>
+<span class="comment">// fn dangle() -&gt; &amp;String {</span>
+<span class="comment">//     let s = String::from("hello");</span>
+<span class="comment">//     &amp;s  // ERROR: s goes out of scope, reference becomes invalid</span>
+<span class="comment">// }</span>
+<span class="comment">// Solution: return owned value</span>
+<span class="keyword">fn</span> <span class="func">no_dangle</span>() -&gt; String {
+    <span class="keyword">let</span> s = String::<span class="func">from</span>(<span class="string">"hello"</span>);
+    s  <span class="comment">// Ownership transferred to caller</span>
+<span class="comment">// Lifetime annotation tells compiler how long references are valid</span>
+<span class="keyword">fn</span> <span class="func">longest</span>&lt;<span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        y
+    }
+<span class="keyword">let</span> s1 = String::<span class="func">from</span>(<span class="string">"long string"</span>);
+<span class="keyword">let</span> s2 = <span class="string">"short"</span>;
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">longest</span>(&amp;s1, s2));</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Without lifetime annotations, compiler can't ensure safety:</span>
+<span class="comment">// fn broken&lt;'a&gt;(s: &amp;str) -&gt; &amp;'a str {</span>
+<span class="comment">//     let local = String::from("local");</span>
+<span class="comment">//     &amp;local  // ERROR: local doesn't live long enough</span>
+<span class="comment">// }</span>
+<span class="comment">// Lifetime 'a means: reference is valid for at least duration 'a</span>
+<span class="keyword">fn</span> <span class="func">get_first</span>&lt;<span class="param">'a</span>&gt;(<span class="param">data</span>: &amp;<span class="param">'a</span> [&amp;<span class="param">'a</span> <span class="keyword">str</span>]) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    data[<span class="number">0</span>]
+<span class="keyword">let</span> strs = <span class="func">vec!</span>[&amp;<span class="string">"hello"</span>, &amp;<span class="string">"world"</span>];
+<span class="keyword">let</span> first = <span class="func">get_first</span>(&amp;strs);</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Lifetimes Don't Change How Long Data Lives</h4>
+        <p>Lifetime annotations do <strong>not</strong> extend or shorten the actual lifespan of any data. They are a way to tell the compiler about the <em>relationships</em> between the lifetimes of different references, so it can verify correctness at compile time.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Lifetime Annotation Syntax</h2>
+    </div>
+    <p>
+      Lifetime parameters are declared in angle brackets after the function name, using a tick followed by a lowercase letter: <code>'a</code>, <code>'b</code>, etc. They describe how the lifetimes of inputs and outputs relate.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Single lifetime parameter</span>
+<span class="keyword">fn</span> <span class="func">take_ref</span>&lt;<span class="param">'a</span>&gt;(<span class="param">s</span>: &amp;<span class="param">'a</span> String) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    &amp;s[..]
+<span class="comment">// Multiple lifetime parameters</span>
+<span class="keyword">fn</span> <span class="func">compare</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; <span class="keyword">bool</span> {
+    x.<span class="func">len</span>() == y.<span class="func">len</span>()
+<span class="comment">// Lifetime bounds: 'b must live at least as long as 'a</span>
+<span class="keyword">fn</span> <span class="func">subset</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>: <span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &lt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        y  <span class="comment">// y lives longer, can be returned as 'a</span>
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Struct with lifetime parameters</span>
+<span class="keyword">struct</span> <span class="func">Excerpt</span>&lt;<span class="param">'a</span>&gt; {
+    part: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">let</span> text = String::<span class="func">from</span>(<span class="string">"hello world"</span>);
+<span class="keyword">let</span> excerpt = Excerpt { part: &amp;text[<span class="number">0</span>..<span class="number">5</span>] };
+<span class="comment">// Method with lifetimes</span>
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Excerpt&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">level</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="keyword">i32</span> {
+        <span class="number">3</span>
+    }
+    <span class="keyword">fn</span> <span class="func">announce_and_return_part</span>(&amp;<span class="keyword">self</span>, <span class="param">announcement</span>: &amp;<span class="keyword">str</span>) -&gt; &amp;<span class="keyword">str</span> {
+        <span class="func">println!</span>(<span class="string">"Attention: {}"</span>, announcement);
+        <span class="keyword">self</span>.part
+    }
+<span class="comment">// Complex lifetime relationships</span>
+<span class="keyword">fn</span> <span class="func">complex</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span>
+<span class="keyword">where</span>
+    <span class="param">'b</span>: <span class="param">'a</span>,  <span class="comment">// 'b must outlive 'a</span>
+{
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        y
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Named lifetime for struct references</span>
+<span class="keyword">struct</span> <span class="func">Person</span> {
+    name: String,
+<span class="keyword">struct</span> <span class="func">Group</span>&lt;<span class="param">'a</span>&gt; {
+    members: Vec&lt;&amp;<span class="param">'a</span> Person&gt;,
+<span class="keyword">let</span> person = Person { name: String::<span class="func">from</span>(<span class="string">"Alice"</span>) };
+<span class="keyword">let</span> <span class="keyword">mut</span> group = Group { members: <span class="func">vec!</span>[&amp;person] };</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Lifetime Bounds with Where</h4>
+        <p>The syntax <code>'b: 'a</code> means <em>"'b outlives 'a"</em>. This lets you return a reference with lifetime <code>'a</code> from a value that has the longer lifetime <code>'b</code>. Use <code>where</code> clauses to express these constraints clearly.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Lifetime Elision Rules</h2>
+    </div>
+    <p>
+      Rust has three <strong>lifetime elision rules</strong> that let the compiler infer lifetimes in common patterns, so you don't need to write them explicitly every time.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Rule 1: Each input lifetime gets its own lifetime parameter</span>
+<span class="comment">// These are equivalent:</span>
+<span class="keyword">fn</span> <span class="func">input_ref</span>&lt;<span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; String {
+    String::<span class="func">from</span>(x)
+<span class="keyword">fn</span> <span class="func">input_ref</span>(<span class="param">x</span>: &amp;<span class="keyword">str</span>) -&gt; String {
+    String::<span class="func">from</span>(x)
+<span class="comment">// Rule 2: If there's one input lifetime, it's assigned to output</span>
+<span class="comment">// These are equivalent:</span>
+<span class="keyword">fn</span> <span class="func">only_input</span>&lt;<span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    x
+<span class="keyword">fn</span> <span class="func">only_input</span>(<span class="param">x</span>: &amp;<span class="keyword">str</span>) -&gt; &amp;<span class="keyword">str</span> {
+    x
+<span class="comment">// Rule 3: If there's &amp;self, self's lifetime applies to output</span>
+<span class="keyword">struct</span> <span class="func">Container</span>;
+<span class="keyword">impl</span> Container {
+    <span class="comment">// Implicit: fn first&lt;'a&gt;(&amp;'a self) -&gt; &amp;'a str</span>
+    <span class="keyword">fn</span> <span class="func">first</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="keyword">str</span> {
+        <span class="string">"hello"</span>
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// When elision rules don't apply, explicit annotation required</span>
+<span class="keyword">fn</span> <span class="func">two_inputs</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        x  <span class="comment">// Must choose one lifetime</span>
+    }
+<span class="comment">// Compiler can't elide this - which lifetime for output?</span>
+<span class="comment">// fn ambiguous(x: &amp;str, y: &amp;str) -&gt; &amp;str {</span>
+<span class="comment">//     if true { x } else { y }</span>
+<span class="comment">// }</span>
+<span class="comment">// Method with explicit lifetimes</span>
+<span class="keyword">struct</span> <span class="func">Parser</span>&lt;<span class="param">'a</span>&gt; {
+    input: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Parser&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">parse</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+        <span class="keyword">self</span>.input
+    }
+    <span class="keyword">fn</span> <span class="func">parse_ref</span>&lt;<span class="param">'b</span>&gt;(&amp;<span class="param">'b</span> <span class="keyword">self</span>) -&gt; &amp;<span class="param">'b</span> <span class="keyword">str</span> {
+        <span class="keyword">self</span>.input
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Elision Keeps Code Clean</h4>
+        <p>In practice, the three elision rules cover the vast majority of cases. You only need explicit lifetime annotations when the compiler cannot determine the relationship between input and output lifetimes, typically when there are multiple reference parameters and a reference return type.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Lifetimes in Structs</h2>
+    </div>
+    <p>
+      Structs that hold references must declare lifetime parameters. This ensures the struct cannot outlive the data it borrows.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Simple struct with lifetime</span>
+<span class="keyword">struct</span> <span class="func">Quote</span>&lt;<span class="param">'a</span>&gt; {
+    text: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">let</span> text = String::<span class="func">from</span>(<span class="string">"Life is short"</span>);
+<span class="keyword">let</span> quote = Quote { text: &amp;text };
+<span class="comment">// Multiple lifetime parameters</span>
+<span class="keyword">struct</span> <span class="func">Relation</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>&gt; {
+    person1: &amp;<span class="param">'a</span> String,
+    person2: &amp;<span class="param">'b</span> String,
+<span class="keyword">let</span> alice = String::<span class="func">from</span>(<span class="string">"Alice"</span>);
+<span class="keyword">let</span> bob = String::<span class="func">from</span>(<span class="string">"Bob"</span>);
+<span class="keyword">let</span> rel = Relation { person1: &amp;alice, person2: &amp;bob };
+<span class="comment">// Lifetime bounds in structs</span>
+<span class="keyword">struct</span> <span class="func">Container</span>&lt;<span class="param">'a</span>, <span class="param">T</span>: <span class="param">'a</span>&gt; {
+    items: &amp;<span class="param">'a</span> [<span class="param">T</span>],
+<span class="keyword">let</span> data = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> container = Container { items: &amp;data };</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Struct methods with lifetime</span>
+<span class="keyword">struct</span> <span class="func">TextBlock</span>&lt;<span class="param">'a</span>&gt; {
+    content: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; TextBlock&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">first_word</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+        <span class="keyword">for</span> (i, &amp;item) <span class="keyword">in</span> <span class="keyword">self</span>.content.<span class="func">as_bytes</span>().<span class="func">iter</span>().<span class="func">enumerate</span>() {
+            <span class="keyword">if</span> item == <span class="string">b' '</span> {
+                <span class="keyword">return</span> &amp;<span class="keyword">self</span>.content[<span class="number">0</span>..i];
+            }
+        }
+        &amp;<span class="keyword">self</span>.content[..]
+    }
+<span class="keyword">let</span> text = String::<span class="func">from</span>(<span class="string">"hello world"</span>);
+<span class="keyword">let</span> block = TextBlock { content: &amp;text };
+<span class="keyword">let</span> word = block.<span class="func">first_word</span>();
+<span class="comment">// Struct with generic and lifetime</span>
+<span class="keyword">struct</span> <span class="func">Cache</span>&lt;<span class="param">'a</span>, <span class="param">T</span>&gt; {
+    data: &amp;<span class="param">'a</span> <span class="param">T</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>, <span class="param">T</span>: Clone&gt; Cache&lt;<span class="param">'a</span>, <span class="param">T</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">get_copy</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="param">T</span> {
+        <span class="keyword">self</span>.data.<span class="func">clone</span>()
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Multiple references in struct</span>
+<span class="keyword">struct</span> <span class="func">DocumentRef</span>&lt;<span class="param">'a</span>&gt; {
+    title: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    content: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    author: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="comment">// Nested lifetimes</span>
+<span class="keyword">struct</span> <span class="func">Graph</span>&lt;<span class="param">'a</span>&gt; {
+    nodes: Vec&lt;&amp;<span class="param">'a</span> <span class="keyword">str</span>&gt;,
+    edges: Vec&lt;(&amp;<span class="param">'a</span> <span class="keyword">str</span>, &amp;<span class="param">'a</span> <span class="keyword">str</span>)&gt;,
+<span class="keyword">let</span> n1 = <span class="string">"A"</span>.<span class="func">to_string</span>();
+<span class="keyword">let</span> n2 = <span class="string">"B"</span>.<span class="func">to_string</span>();
+<span class="keyword">let</span> graph = Graph {
+    nodes: <span class="func">vec!</span>[&amp;n1, &amp;n2],
+    edges: <span class="func">vec!</span>[(&amp;n1, &amp;n2)],
+};</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>When to Use Multiple Lifetimes</h4>
+        <p>Use a <strong>single lifetime</strong> when all references in a struct must come from data with the same scope. Use <strong>multiple lifetimes</strong> (e.g., <code>'a</code>, <code>'b</code>) when references may come from data with different scopes, giving the compiler more flexibility.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Static Lifetime and Lifetime Bounds</h2>
+    </div>
+    <p>
+      The <code>'static</code> lifetime is special, it means the data lives for the <strong>entire duration of the program</strong>. String literals and owned types without borrowed references satisfy <code>'static</code>.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// 'static lifetime: data lives for entire program duration</span>
+<span class="keyword">let</span> s: &amp;<span class="keyword">'static</span> <span class="keyword">str</span> = <span class="string">"hello"</span>; <span class="comment">// String literals are 'static</span>
+<span class="comment">// 'static bound: type must only contain 'static references</span>
+<span class="keyword">fn</span> <span class="func">print_static</span>&lt;<span class="param">T</span>: <span class="keyword">'static</span>&gt;(<span class="param">val</span>: <span class="param">T</span>) {
+    <span class="comment">// T doesn't contain borrowed references</span>
+<span class="func">print_static</span>(String::<span class="func">from</span>(<span class="string">"hello"</span>));
+<span class="func">print_static</span>(<span class="number">5</span>);
+<span class="comment">// print_static(&amp;String::from("hello")); // Error: not 'static</span>
+<span class="comment">// Using 'static with trait objects</span>
+<span class="keyword">trait</span> <span class="func">MyTrait</span> {
+    <span class="keyword">fn</span> <span class="func">do_something</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">struct</span> <span class="func">MyType</span>;
+<span class="keyword">impl</span> MyTrait <span class="keyword">for</span> MyType {
+    <span class="keyword">fn</span> <span class="func">do_something</span>(&amp;<span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"Doing something"</span>);
+    }
+<span class="keyword">fn</span> <span class="func">get_trait_object</span>() -&gt; Box&lt;<span class="keyword">dyn</span> MyTrait + <span class="keyword">'static</span>&gt; {
+    Box::<span class="func">new</span>(MyType)
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// 'static vs non-'static trait objects</span>
+<span class="keyword">fn</span> <span class="func">non_static</span>&lt;<span class="param">'a</span>&gt;(<span class="param">s</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; Box&lt;<span class="keyword">dyn</span> std::fmt::Display + <span class="param">'a</span>&gt; {
+    Box::<span class="func">new</span>(s)
+<span class="comment">// Combining 'static with generics</span>
+<span class="keyword">struct</span> <span class="func">Container</span>&lt;<span class="param">T</span>: <span class="keyword">'static</span>&gt; {
+    data: <span class="param">T</span>,
+<span class="comment">// Lifetime bounds on generics</span>
+<span class="keyword">fn</span> <span class="func">print_ref</span>&lt;<span class="param">'a</span>, <span class="param">T</span>: <span class="param">'a</span> + std::fmt::Display&gt;(<span class="param">val</span>: &amp;<span class="param">'a</span> <span class="param">T</span>) {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, val);
+<span class="comment">// 'static bound on function pointers</span>
+<span class="keyword">fn</span> <span class="func">call_fn</span>&lt;<span class="param">F</span>: Fn() + <span class="keyword">'static</span>&gt;(<span class="param">f</span>: <span class="param">F</span>) {
+    <span class="func">f</span>();
+<span class="comment">// 'a bound on iterators</span>
+<span class="keyword">fn</span> <span class="func">iterate</span>&lt;<span class="param">'a</span>, <span class="param">I</span>&gt;(<span class="param">iter</span>: <span class="param">I</span>)
+<span class="keyword">where</span>
+    <span class="param">I</span>: Iterator&lt;Item = &amp;<span class="param">'a</span> <span class="keyword">str</span>&gt;,
+{
+    <span class="keyword">for</span> item <span class="keyword">in</span> iter {
+        <span class="func">println!</span>(<span class="string">"{}"</span>, item);
+    }
+<span class="keyword">let</span> strs = <span class="func">vec!</span>[&amp;<span class="string">"hello"</span>, &amp;<span class="string">"world"</span>];
+<span class="func">iterate</span>(strs.<span class="func">iter</span>().<span class="func">cloned</span>());</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Leaked values become 'static</span>
+<span class="keyword">fn</span> <span class="func">leak_to_static</span>&lt;<span class="param">T</span>&gt;(<span class="param">val</span>: <span class="param">T</span>) -&gt; &amp;<span class="keyword">'static</span> <span class="param">T</span> {
+    Box::<span class="func">leak</span>(Box::<span class="func">new</span>(val))
+<span class="keyword">let</span> s = <span class="func">leak_to_static</span>(String::<span class="func">from</span>(<span class="string">"hello"</span>));
+<span class="func">println!</span>(<span class="string">"{}"</span>, s); <span class="comment">// Valid forever</span></code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Don't Overuse 'static</h4>
+        <p><code>Box::leak</code> intentionally leaks memory and should only be used for data that truly needs to live forever (e.g., global configuration). In most cases, prefer proper lifetime annotations or owned types over <code>'static</code> bounds.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Multiple Lifetime Parameters and Patterns</h2>
+    </div>
+    <p>
+      When functions or structs work with references that have different lifetimes, you may need multiple lifetime parameters and bounds to express the correct relationships.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Simple multiple lifetimes</span>
+<span class="keyword">fn</span> <span class="func">process</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; <span class="keyword">usize</span> {
+    x.<span class="func">len</span>() + y.<span class="func">len</span>()
+<span class="comment">// Lifetime ordering: 'b must outlive 'a</span>
+<span class="keyword">fn</span> <span class="func">process_ordered</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>: <span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        y
+    }
+<span class="comment">// Three lifetime parameters</span>
+<span class="keyword">struct</span> <span class="func">Triple</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>, <span class="param">'c</span>&gt; {
+    x: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    y: &amp;<span class="param">'b</span> <span class="keyword">str</span>,
+    z: &amp;<span class="param">'c</span> <span class="keyword">str</span>,
+<span class="comment">// Relationships between lifetimes</span>
+<span class="keyword">struct</span> <span class="func">StringPair</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>: <span class="param">'a</span>&gt; {
+    first: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    second: &amp;<span class="param">'b</span> <span class="keyword">str</span>, <span class="comment">// 'b must live at least as long as 'a</span>
+<span class="comment">// Lifetimes with generics</span>
+<span class="keyword">fn</span> <span class="func">collect_refs</span>&lt;<span class="param">'a</span>, <span class="param">T</span>&gt;(<span class="param">items</span>: &amp;<span class="param">'a</span> [<span class="param">T</span>]) -&gt; Vec&lt;&amp;<span class="param">'a</span> <span class="param">T</span>&gt; {
+    items.<span class="func">iter</span>().<span class="func">collect</span>()
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Lifetime elision in closures (captured)</span>
+<span class="keyword">fn</span> <span class="func">create_closure</span>&lt;<span class="param">'a</span>&gt;(<span class="param">s</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; <span class="keyword">impl</span> Fn() + <span class="param">'a</span> {
+    <span class="keyword">move</span> || <span class="func">println!</span>(<span class="string">"{}"</span>, s)
+<span class="comment">// Higher-ranked trait bounds (for all lifetimes)</span>
+<span class="keyword">fn</span> <span class="func">higher_rank</span>&lt;<span class="param">F</span>&gt;(<span class="param">f</span>: <span class="param">F</span>)
+<span class="keyword">where</span>
+    <span class="param">F</span>: <span class="keyword">for</span>&lt;<span class="param">'a</span>&gt; Fn(&amp;<span class="param">'a</span> <span class="keyword">str</span>),
+{
+    <span class="func">f</span>(<span class="string">"hello"</span>);
+    <span class="func">f</span>(<span class="string">"world"</span>);
+<span class="comment">// Covariance example</span>
+<span class="keyword">fn</span> <span class="func">covariance_example</span>() {
+    <span class="keyword">fn</span> <span class="func">print_str</span>&lt;<span class="param">'a</span>&gt;(<span class="param">s</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) {
+        <span class="func">println!</span>(<span class="string">"{}"</span>, s);
+    }
+    <span class="keyword">let</span> s: &amp;<span class="keyword">'static</span> <span class="keyword">str</span> = <span class="string">"hello"</span>;
+    <span class="func">print_str</span>(s); <span class="comment">// 'static is valid where &amp;'a is needed</span>
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Higher-Ranked Trait Bounds (HRTBs)</h4>
+        <p>The <code>for&lt;'a&gt;</code> syntax means "for any lifetime 'a". This is used when a closure or function must work with references of <em>any</em> lifetime, not just a specific one. You'll encounter this most often with closures passed as arguments.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Common Lifetime Patterns and Pitfalls</h2>
+    </div>
+    <p>
+      Understanding common patterns and mistakes helps you write correct lifetime annotations quickly and avoid frustrating compiler errors.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Pattern 1: Longest reference</span>
+<span class="keyword">fn</span> <span class="func">longest</span>&lt;<span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() { x } <span class="keyword">else</span> { y }
+<span class="keyword">let</span> s1 = String::<span class="func">from</span>(<span class="string">"long"</span>);
+<span class="keyword">let</span> s2 = String::<span class="func">from</span>(<span class="string">"short"</span>);
+<span class="keyword">let</span> result = <span class="func">longest</span>(&amp;s1, &amp;s2);
+<span class="func">println!</span>(<span class="string">"{}"</span>, result);
+<span class="comment">// Pattern 2: Return reference from struct</span>
+<span class="keyword">struct</span> <span class="func">Document</span>&lt;<span class="param">'a</span>&gt; {
+    content: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Document&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">first_line</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+        <span class="keyword">self</span>.content.<span class="func">lines</span>().<span class="func">next</span>().<span class="func">unwrap</span>()
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Pitfall 1: Returning reference to local data</span>
+<span class="comment">// fn pitfall1() -&gt; &amp;str {</span>
+<span class="comment">//     let s = String::from("hello");</span>
+<span class="comment">//     &amp;s  // ERROR: s dropped at end of function</span>
+<span class="comment">// }</span>
+<span class="comment">// Solution: return owned value</span>
+<span class="keyword">fn</span> <span class="func">solution1</span>() -&gt; String {
+    String::<span class="func">from</span>(<span class="string">"hello"</span>)
+<span class="comment">// Pitfall 2: Unclear lifetime relationships</span>
+<span class="comment">// fn unclear&lt;'a, 'b&gt;(x: &amp;'a str, y: &amp;'b str) -&gt; &amp;'a str {</span>
+<span class="comment">//     if x.len() &gt; y.len() {</span>
+<span class="comment">//         x</span>
+<span class="comment">//     } else {</span>
+<span class="comment">//         y  // ERROR: y's lifetime 'b != 'a</span>
+<span class="comment">//     }</span>
+<span class="comment">// }</span>
+<span class="comment">// Solution: bound lifetimes</span>
+<span class="keyword">fn</span> <span class="func">clear</span>&lt;<span class="param">'a</span>, <span class="param">'b</span>: <span class="param">'a</span>&gt;(<span class="param">x</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>, <span class="param">y</span>: &amp;<span class="param">'b</span> <span class="keyword">str</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+    <span class="keyword">if</span> x.<span class="func">len</span>() &gt; y.<span class="func">len</span>() {
+        x
+    } <span class="keyword">else</span> {
+        y
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Pattern 3: Parser with input lifetime</span>
+<span class="keyword">struct</span> <span class="func">Parser</span>&lt;<span class="param">'a</span>&gt; {
+    input: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    position: <span class="keyword">usize</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Parser&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">input</span>: &amp;<span class="param">'a</span> <span class="keyword">str</span>) -&gt; <span class="keyword">Self</span> {
+        Parser { input, position: <span class="number">0</span> }
+    }
+    <span class="keyword">fn</span> <span class="func">peek</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+        &amp;<span class="keyword">self</span>.input[<span class="keyword">self</span>.position..]
+    }
+    <span class="keyword">fn</span> <span class="func">take</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, <span class="param">count</span>: <span class="keyword">usize</span>) -&gt; &amp;<span class="param">'a</span> <span class="keyword">str</span> {
+        <span class="keyword">let</span> result = &amp;<span class="keyword">self</span>.input[<span class="keyword">self</span>.position..<span class="keyword">self</span>.position + count];
+        <span class="keyword">self</span>.position += count;
+        result
+    }
+<span class="comment">// Pattern 4: Reference to multiple fields</span>
+<span class="keyword">struct</span> <span class="func">Window</span>&lt;<span class="param">'a</span>&gt; {
+    title: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+    content: &amp;<span class="param">'a</span> <span class="keyword">str</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Window&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">fn</span> <span class="func">render</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        <span class="func">format!</span>(<span class="string">"{}: {}"</span>, <span class="keyword">self</span>.title, <span class="keyword">self</span>.content)
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Lifetime Best Practices</h4>
+        <p>
+          Use <code>'a</code> for the primary lifetime, <code>'b</code>, <code>'c</code> for additional ones. Keep lifetime annotations minimal and clear. Prefer <strong>owned types</strong> when possible to avoid lifetime complexity. Use <code>'static</code> only for truly long-lived data.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-08-iterators-closures.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 9 of 17</span>
+  <a href="ch-10-smart-pointers.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

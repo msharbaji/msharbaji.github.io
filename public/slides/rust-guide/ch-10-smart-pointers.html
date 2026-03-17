@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 10, Smart Pointers | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 59%"></div></div>
+    <span class="progress-label">10 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🧠</div>
+    <h1>Smart Pointers</h1>
+    <p>Box, Rc, Arc, and RefCell, heap allocation, reference counting, and interior mutability.</p>
+  </div>
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Box&lt;T&gt; for Heap Allocation</h2>
+    </div>
+    <p>
+      <code>Box&lt;T&gt;</code> is the simplest smart pointer. It allocates data on the heap and stores a pointer on the stack. Use it when you need a value with a known size at compile time to live on the heap, or when you have a recursive type whose size can't be known at compile time.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Basic Box: allocate on heap</span>
+<span class="keyword">let</span> b = <span class="func">Box::new</span>(<span class="number">5</span>);
+<span class="func">println!</span>(<span class="string">"b = {}"</span>, b);
+<span class="comment">// Boxing values into a Vec</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> list: Vec&lt;Box&lt;i32&gt;&gt; = <span class="func">vec!</span>[
+    <span class="func">Box::new</span>(<span class="number">1</span>),
+    <span class="func">Box::new</span>(<span class="number">2</span>),
+    <span class="func">Box::new</span>(<span class="number">3</span>),
+];</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Recursive type with Box</span>
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">enum</span> <span class="func">List</span> {
+    Cons(i32, Box&lt;List&gt;),
+    Nil,
+<span class="keyword">use</span> List::{Cons, Nil};
+<span class="keyword">let</span> list = <span class="func">Cons</span>(<span class="number">1</span>, <span class="func">Box::new</span>(<span class="func">Cons</span>(<span class="number">2</span>, <span class="func">Box::new</span>(<span class="func">Cons</span>(<span class="number">3</span>, <span class="func">Box::new</span>(Nil))))));
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, list);</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Deref Coercion</h4>
+        <p><code>Box&lt;T&gt;</code> implements <code>Deref</code>, so a <code>&amp;Box&lt;String&gt;</code> automatically coerces to <code>&amp;str</code>. This means you can pass a boxed value anywhere a reference is expected.</p>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Box with trait objects for dynamic dispatch</span>
+<span class="keyword">trait</span> <span class="func">Animal</span> {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String;
+<span class="keyword">struct</span> Dog;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Dog {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        String::<span class="func">from</span>(<span class="string">"Woof!"</span>)
+    }
+<span class="keyword">struct</span> Cat;
+<span class="keyword">impl</span> Animal <span class="keyword">for</span> Cat {
+    <span class="keyword">fn</span> <span class="func">speak</span>(&amp;<span class="keyword">self</span>) -&gt; String {
+        String::<span class="func">from</span>(<span class="string">"Meow!"</span>)
+    }
+<span class="keyword">let</span> animals: Vec&lt;Box&lt;<span class="keyword">dyn</span> Animal&gt;&gt; = <span class="func">vec!</span>[
+    <span class="func">Box::new</span>(Dog),
+    <span class="func">Box::new</span>(Cat),
+];
+<span class="keyword">for</span> animal <span class="keyword">in</span> animals {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, animal.<span class="func">speak</span>());
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Box size: only a pointer on the stack</span>
+<span class="keyword">struct</span> Large {
+    data: [u8; <span class="number">1024</span>],
+<span class="comment">// Without Box: 1 KB on the stack</span>
+<span class="comment">// With Box: only 8 bytes (pointer) on the stack</span>
+<span class="keyword">let</span> large = <span class="func">Box::new</span>(Large { data: [<span class="number">0</span>; <span class="number">1024</span>] });
+<span class="comment">// Deref to get the inner value</span>
+<span class="keyword">let</span> b = <span class="func">Box::new</span>(<span class="number">5</span>);
+<span class="func">println!</span>(<span class="string">"{}"</span>, *b);  <span class="comment">// dereference</span>
+<span class="keyword">let</span> b = <span class="func">Box::new</span>(String::<span class="func">from</span>(<span class="string">"hello"</span>));
+<span class="func">println!</span>(<span class="string">"{}"</span>, &amp;b[<span class="number">0</span>..<span class="number">3</span>]);  <span class="comment">// auto-deref: "hel"</span></code></pre>
+    </div>
+  </div>
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Rc&lt;T&gt; for Reference Counting</h2>
+    </div>
+    <p>
+      <code>Rc&lt;T&gt;</code> (Reference Counted) enables <strong>multiple ownership</strong> of the same heap data in single-threaded scenarios. Each call to <code>Rc::clone</code> increments a reference count; when the last <code>Rc</code> is dropped, the data is freed.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="comment">// Basic Rc: multiple ownership</span>
+<span class="keyword">let</span> a = <span class="func">Rc::new</span>(<span class="number">5</span>);
+<span class="keyword">let</span> b = <span class="func">Rc::clone</span>(&amp;a);
+<span class="keyword">let</span> c = <span class="func">Rc::clone</span>(&amp;a);
+<span class="func">println!</span>(<span class="string">"a: {}, b: {}, c: {}"</span>, a, b, c);
+<span class="func">println!</span>(<span class="string">"Reference count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;a));  <span class="comment">// 3</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="comment">// Reference counting demo</span>
+<span class="keyword">let</span> data = <span class="func">Rc::new</span>(String::<span class="func">from</span>(<span class="string">"shared data"</span>));
+<span class="keyword">let</span> owner1 = <span class="func">Rc::clone</span>(&amp;data);
+<span class="keyword">let</span> owner2 = <span class="func">Rc::clone</span>(&amp;data);
+<span class="func">println!</span>(<span class="string">"Count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;data)); <span class="comment">// 3</span>
+<span class="func">drop</span>(owner1);
+<span class="func">println!</span>(<span class="string">"Count after drop: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;data)); <span class="comment">// 2</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="comment">// Tracking the reference count through scopes</span>
+<span class="keyword">let</span> rc_vec = <span class="func">Rc::new</span>(<span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+<span class="func">println!</span>(<span class="string">"Initial count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;rc_vec)); <span class="comment">// 1</span>
+{
+    <span class="keyword">let</span> _temp = <span class="func">Rc::clone</span>(&amp;rc_vec);
+    <span class="func">println!</span>(<span class="string">"Inner count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;rc_vec)); <span class="comment">// 2</span>
+<span class="func">println!</span>(<span class="string">"After scope: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;rc_vec)); <span class="comment">// 1</span></code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Rc is NOT Thread-Safe</h4>
+        <p><code>Rc&lt;T&gt;</code> does not implement <code>Send</code>. It uses non-atomic reference counting and must only be used in single-threaded code. For multi-threaded scenarios, use <code>Arc&lt;T&gt;</code> instead.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Arc&lt;T&gt; for Thread-Safe Reference Counting</h2>
+    </div>
+    <p>
+      <code>Arc&lt;T&gt;</code> (Atomically Reference Counted) is the thread-safe counterpart to <code>Rc&lt;T&gt;</code>. It uses atomic operations for its reference count, making it safe to share across threads at a small performance cost.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Basic Arc: atomic reference counting</span>
+<span class="keyword">let</span> data = <span class="func">Arc::new</span>(<span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+<span class="keyword">let</span> data2 = <span class="func">Arc::clone</span>(&amp;data);
+<span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+    <span class="func">println!</span>(<span class="string">"Thread sees: {:?}"</span>, *data2);
+});
+<span class="func">println!</span>(<span class="string">"Main: {:?}"</span>, *data);
+handle.<span class="func">join</span>().<span class="func">unwrap</span>();</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Multiple threads sharing a counter</span>
+<span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>));
+<span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">10</span> {
+    <span class="keyword">let</span> counter = <span class="func">Arc::clone</span>(&amp;counter);
+    <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        <span class="keyword">let</span> <span class="keyword">mut</span> num = counter.<span class="func">lock</span>().<span class="func">unwrap</span>();
+        *num += <span class="number">1</span>;
+    });
+    handles.<span class="func">push</span>(handle);
+<span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+    handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+<span class="func">println!</span>(<span class="string">"Result: {}"</span>, *counter.<span class="func">lock</span>().<span class="func">unwrap</span>()); <span class="comment">// 10</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Weak};
+<span class="comment">// Weak references in Arc (prevent cycles)</span>
+<span class="keyword">let</span> strong = <span class="func">Arc::new</span>(<span class="number">42</span>);
+<span class="keyword">let</span> weak = <span class="func">Arc::downgrade</span>(&amp;strong);
+<span class="keyword">match</span> weak.<span class="func">upgrade</span>() {
+    Some(strong_ref) =&gt; <span class="func">println!</span>(<span class="string">"Value: {}"</span>, strong_ref),
+    None =&gt; <span class="func">println!</span>(<span class="string">"Value was dropped"</span>),
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Arc vs Rc</h4>
+        <p><code>Rc</code> is faster because it uses non-atomic operations. <code>Arc</code> uses atomic operations for thread safety at a slight performance cost. Use <code>Rc</code> in single-threaded code, <code>Arc</code> when sharing across threads.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>RefCell&lt;T&gt; and Interior Mutability</h2>
+    </div>
+    <p>
+      <code>RefCell&lt;T&gt;</code> enforces Rust's borrowing rules <strong>at runtime</strong> instead of compile time. This enables <em>interior mutability</em>, mutating data even when there are immutable references to it. Violating the rules causes a panic instead of a compile error.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::cell::RefCell;
+<span class="comment">// Interior mutability: mutate behind an immutable reference</span>
+<span class="keyword">let</span> data = <span class="func">RefCell::new</span>(<span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+<span class="comment">// Immutable borrow for reading</span>
+{
+    <span class="keyword">let</span> borrowed = data.<span class="func">borrow</span>();
+    <span class="func">println!</span>(<span class="string">"Data: {:?}"</span>, *borrowed);
+}  <span class="comment">// borrow ends here</span>
+<span class="comment">// Mutable borrow for modifying</span>
+{
+    <span class="keyword">let</span> <span class="keyword">mut</span> borrowed_mut = data.<span class="func">borrow_mut</span>();
+    borrowed_mut.<span class="func">push</span>(<span class="number">4</span>);
+}  <span class="comment">// mutable borrow ends here</span>
+<span class="func">println!</span>(<span class="string">"After mutation: {:?}"</span>, *data.<span class="func">borrow</span>());</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::cell::RefCell;
+<span class="comment">// RefCell with structs</span>
+<span class="keyword">struct</span> Person {
+    name: String,
+    age: RefCell&lt;u32&gt;,
+<span class="keyword">let</span> person = Person {
+    name: String::<span class="func">from</span>(<span class="string">"Alice"</span>),
+    age: <span class="func">RefCell::new</span>(<span class="number">30</span>),
+};
+<span class="func">println!</span>(<span class="string">"Age: {}"</span>, person.age.<span class="func">borrow</span>());
+*person.age.<span class="func">borrow_mut</span>() += <span class="number">1</span>;
+<span class="func">println!</span>(<span class="string">"New age: {}"</span>, person.age.<span class="func">borrow</span>());</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Runtime Panics</h4>
+        <p><code>RefCell</code> panics if you try to borrow mutably while an immutable borrow is active (or vice versa). Always drop borrows before creating new ones. Use <code>try_borrow()</code> and <code>try_borrow_mut()</code> for safe, non-panicking alternatives.</p>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::cell::RefCell;
+<span class="comment">// Mock object pattern with RefCell</span>
+<span class="keyword">trait</span> <span class="func">Logger</span> {
+    <span class="keyword">fn</span> <span class="func">log</span>(&amp;<span class="keyword">self</span>, <span class="param">msg</span>: &amp;str);
+<span class="keyword">struct</span> MockLogger {
+    messages: RefCell&lt;Vec&lt;String&gt;&gt;,
+<span class="keyword">impl</span> Logger <span class="keyword">for</span> MockLogger {
+    <span class="keyword">fn</span> <span class="func">log</span>(&amp;<span class="keyword">self</span>, <span class="param">msg</span>: &amp;str) {
+        <span class="comment">// Mutate through &amp;self thanks to RefCell</span>
+        <span class="keyword">self</span>.messages.<span class="func">borrow_mut</span>().<span class="func">push</span>(msg.<span class="func">to_string</span>());
+    }
+<span class="keyword">let</span> logger = MockLogger {
+    messages: <span class="func">RefCell::new</span>(Vec::<span class="func">new</span>()),
+};
+logger.<span class="func">log</span>(<span class="string">"Event 1"</span>);
+logger.<span class="func">log</span>(<span class="string">"Event 2"</span>);
+<span class="func">println!</span>(<span class="string">"Logs: {:?}"</span>, logger.messages.<span class="func">borrow</span>());</code></pre>
+    </div>
+  </div>
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Weak&lt;T&gt; to Prevent Cycles</h2>
+    </div>
+    <p>
+      <code>Weak&lt;T&gt;</code> is a non-owning reference that doesn't prevent the data from being dropped. It breaks reference cycles that would otherwise cause memory leaks when using <code>Rc</code> or <code>Arc</code>.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::{Rc, Weak};
+<span class="keyword">use</span> std::cell::RefCell;
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">struct</span> Node {
+    value: i32,
+    parent: RefCell&lt;Weak&lt;Node&gt;&gt;,
+    children: RefCell&lt;Vec&lt;Rc&lt;Node&gt;&gt;&gt;,
+<span class="keyword">let</span> parent = <span class="func">Rc::new</span>(Node {
+    value: <span class="number">1</span>,
+    parent: <span class="func">RefCell::new</span>(<span class="func">Weak::new</span>()),
+    children: <span class="func">RefCell::new</span>(<span class="func">vec!</span>[]),
+});
+<span class="keyword">let</span> child = <span class="func">Rc::new</span>(Node {
+    value: <span class="number">2</span>,
+    parent: <span class="func">RefCell::new</span>(<span class="func">Weak::new</span>()),
+    children: <span class="func">RefCell::new</span>(<span class="func">vec!</span>[]),
+});
+<span class="comment">// Child points back to parent with Weak (doesn't prevent cleanup)</span>
+*child.parent.<span class="func">borrow_mut</span>() = <span class="func">Rc::downgrade</span>(&amp;parent);
+parent.children.<span class="func">borrow_mut</span>().<span class="func">push</span>(<span class="func">Rc::clone</span>(&amp;child));
+<span class="func">println!</span>(<span class="string">"Parent strong count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;parent)); <span class="comment">// 1</span>
+<span class="func">println!</span>(<span class="string">"Child strong count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;child));   <span class="comment">// 2</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="comment">// Downgrade and upgrade pattern</span>
+<span class="keyword">let</span> strong = <span class="func">Rc::new</span>(<span class="number">42</span>);
+<span class="keyword">let</span> weak = <span class="func">Rc::downgrade</span>(&amp;strong);
+<span class="func">println!</span>(<span class="string">"Strong count: {}"</span>, <span class="func">Rc::strong_count</span>(&amp;strong)); <span class="comment">// 1</span>
+<span class="func">println!</span>(<span class="string">"Weak count: {}"</span>, <span class="func">Rc::weak_count</span>(&amp;strong));     <span class="comment">// 1</span>
+<span class="comment">// strong exists, upgrade succeeds</span>
+<span class="keyword">if</span> <span class="keyword">let</span> Some(value) = weak.<span class="func">upgrade</span>() {
+    <span class="func">println!</span>(<span class="string">"Upgraded successfully: {}"</span>, value);
+<span class="func">drop</span>(strong);
+<span class="func">println!</span>(<span class="string">"After drop: {:?}"</span>, weak.<span class="func">upgrade</span>()); <span class="comment">// None</span></code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>When to Use Weak</h4>
+        <p>Use <code>Weak</code> for parent-child relationships in trees (children own strong refs; parent back-pointers use Weak), observer patterns where observers can be dropped, and cache entries that should be evictable.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Deref and Drop Traits</h2>
+    </div>
+    <p>
+      The <code>Deref</code> trait lets you customise the <code>*</code> dereference operator, enabling smart pointers to behave like regular references. The <code>Drop</code> trait runs cleanup code when a value goes out of scope.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::ops::Deref;
+<span class="comment">// Custom smart pointer with Deref</span>
+<span class="keyword">struct</span> MyBox&lt;T&gt;(T);
+<span class="keyword">impl</span>&lt;T&gt; Deref <span class="keyword">for</span> MyBox&lt;T&gt; {
+    <span class="keyword">type</span> Target = T;
+    <span class="keyword">fn</span> <span class="func">deref</span>(&amp;<span class="keyword">self</span>) -&gt; &amp;Self::Target {
+        &amp;<span class="keyword">self</span>.<span class="number">0</span>
+    }
+<span class="keyword">let</span> b = MyBox(<span class="number">5</span>);
+<span class="func">println!</span>(<span class="string">"Value: {}"</span>, *b);  <span class="comment">// Uses Deref</span>
+<span class="comment">// Deref coercion: MyBox&lt;String&gt; -&gt; &amp;String -&gt; &amp;str</span>
+<span class="keyword">fn</span> <span class="func">print_length</span>(<span class="param">s</span>: &amp;str) {
+    <span class="func">println!</span>(<span class="string">"Length: {}"</span>, s.<span class="func">len</span>());
+<span class="keyword">let</span> my_string = MyBox(String::<span class="func">from</span>(<span class="string">"hello"</span>));
+<span class="func">print_length</span>(&amp;my_string);  <span class="comment">// Deref coercion chain</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Drop trait: cleanup when a value goes out of scope</span>
+<span class="keyword">struct</span> Resource {
+    id: u32,
+<span class="keyword">impl</span> Drop <span class="keyword">for</span> Resource {
+    <span class="keyword">fn</span> <span class="func">drop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"Releasing resource {}"</span>, <span class="keyword">self</span>.id);
+    }
+{
+    <span class="keyword">let</span> r1 = Resource { id: <span class="number">1</span> };
+    <span class="keyword">let</span> r2 = Resource { id: <span class="number">2</span> };
+    <span class="func">println!</span>(<span class="string">"Resources created"</span>);
+<span class="comment">// Output:</span>
+<span class="comment">//   Resources created</span>
+<span class="comment">//   Releasing resource 2  (dropped in reverse order)</span>
+<span class="comment">//   Releasing resource 1</span>
+<span class="comment">// Manual early drop with std::mem::drop</span>
+<span class="keyword">let</span> resource = Resource { id: <span class="number">5</span> };
+<span class="func">println!</span>(<span class="string">"Created resource"</span>);
+<span class="func">drop</span>(resource);  <span class="comment">// Explicitly drop early</span>
+<span class="func">println!</span>(<span class="string">"Resource dropped"</span>);</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Drop Order</h4>
+        <p>Values are dropped in reverse order of creation. You cannot call <code>.drop()</code> directly, use <code>std::mem::drop(value)</code> to force an early drop.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>When to Use Which Smart Pointer</h2>
+    </div>
+    <p>
+      Choosing the right smart pointer depends on your ownership and threading requirements. Here is a concise decision guide.
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Scenario</th><th>Smart Pointer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Single owner, heap allocation</td><td><code>Box&lt;T&gt;</code></td></tr>
+        <tr><td>Multiple owners (single-thread)</td><td><code>Rc&lt;T&gt;</code></td></tr>
+        <tr><td>Multiple owners (multi-thread)</td><td><code>Arc&lt;T&gt;</code></td></tr>
+        <tr><td>Mutate through <code>&amp;</code></td><td><code>RefCell&lt;T&gt;</code></td></tr>
+        <tr><td>Thread-safe mutation</td><td><code>Mutex&lt;T&gt;</code> / <code>RwLock&lt;T&gt;</code></td></tr>
+        <tr><td>Shared + mutable (single-thread)</td><td><code>Rc&lt;RefCell&lt;T&gt;&gt;</code></td></tr>
+        <tr><td>Shared + mutable (multi-thread)</td><td><code>Arc&lt;Mutex&lt;T&gt;&gt;</code></td></tr>
+        <tr><td>Prevent reference cycles</td><td><code>Weak&lt;T&gt;</code></td></tr>
+      </tbody>
+    </table>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="keyword">use</span> std::cell::RefCell;
+<span class="comment">// Pattern 1: Rc + RefCell, shared mutable state (single-threaded)</span>
+<span class="keyword">let</span> data = <span class="func">Rc::new</span>(<span class="func">RefCell::new</span>(<span class="number">42</span>));
+<span class="keyword">let</span> d2 = <span class="func">Rc::clone</span>(&amp;data);
+*d2.<span class="func">borrow_mut</span>() = <span class="number">100</span>;
+<span class="func">println!</span>(<span class="string">"{}"</span>, data.<span class="func">borrow</span>()); <span class="comment">// 100</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Pattern 2: Arc + Mutex, shared mutable state (multi-threaded)</span>
+<span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>));
+<span class="keyword">let</span> c = <span class="func">Arc::clone</span>(&amp;counter);
+thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+    *c.<span class="func">lock</span>().<span class="func">unwrap</span>() += <span class="number">1</span>;
+});</code></pre>
+    </div>
+  </div>
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Putting It Together: A Linked List</h2>
+    </div>
+    <p>
+      Building a linked list in Rust is a classic exercise that combines <code>Rc</code>, <code>RefCell</code>, and <code>Option</code>. This example demonstrates shared ownership, interior mutability, and recursive data structures.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::rc::Rc;
+<span class="keyword">use</span> std::cell::RefCell;
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">struct</span> LinkedListNode {
+    value: i32,
+    next: Option&lt;Rc&lt;RefCell&lt;LinkedListNode&gt;&gt;&gt;,
+<span class="keyword">impl</span> LinkedListNode {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">value</span>: i32) -&gt; Self {
+        LinkedListNode { value, next: None }
+    }
+<span class="keyword">#[derive(Debug)]</span>
+<span class="keyword">struct</span> LinkedList {
+    head: Option&lt;Rc&lt;RefCell&lt;LinkedListNode&gt;&gt;&gt;,
+    length: usize,
+<span class="keyword">impl</span> LinkedList {
+    <span class="keyword">fn</span> <span class="func">new</span>() -&gt; Self {
+        LinkedList { head: None, length: <span class="number">0</span> }
+    }
+    <span class="keyword">fn</span> <span class="func">push_front</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, <span class="param">value</span>: i32) {
+        <span class="keyword">let</span> <span class="keyword">mut</span> new_node = <span class="func">LinkedListNode::new</span>(value);
+        new_node.next = <span class="keyword">self</span>.head.<span class="func">take</span>();
+        <span class="keyword">self</span>.head = Some(<span class="func">Rc::new</span>(<span class="func">RefCell::new</span>(new_node)));
+        <span class="keyword">self</span>.length += <span class="number">1</span>;
+    }
+    <span class="keyword">fn</span> <span class="func">pop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;i32&gt; {
+        <span class="keyword">self</span>.head.<span class="func">take</span>().<span class="func">map</span>(|head| {
+            <span class="keyword">self</span>.head = head.<span class="func">borrow_mut</span>().next.<span class="func">take</span>();
+            <span class="keyword">self</span>.length -= <span class="number">1</span>;
+            head.<span class="func">borrow</span>().value
+        })
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> list = <span class="func">LinkedList::new</span>();
+    list.<span class="func">push_front</span>(<span class="number">1</span>);
+    list.<span class="func">push_front</span>(<span class="number">2</span>);
+    list.<span class="func">push_front</span>(<span class="number">3</span>);
+    <span class="comment">// List: 3 -&gt; 2 -&gt; 1 -&gt; None</span>
+    <span class="func">println!</span>(<span class="string">"Length: {}"</span>, list.length); <span class="comment">// 3</span>
+    <span class="func">println!</span>(<span class="string">"Popped: {:?}"</span>, list.<span class="func">pop</span>()); <span class="comment">// Some(3)</span>
+    <span class="comment">// List: 2 -&gt; 1 -&gt; None</span>
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Smart Pointers in Practice</h4>
+        <p>Real-world Rust rarely needs hand-rolled linked lists. The standard library provides <code>Vec</code>, <code>VecDeque</code>, and <code>LinkedList</code>. However, building one yourself is the best way to internalise how <code>Rc</code>, <code>RefCell</code>, and <code>Option</code> compose together.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-09-lifetimes.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 10 of 17</span>
+  <a href="ch-11-concurrency.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

@@ -31,10 +31,9 @@ export default function Header() {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   useEffect(() => {
+    if (!menuOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && menuOpen) {
-        closeMenu();
-      }
+      if (e.key === "Escape") closeMenu();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);

@@ -1,0 +1,134 @@
+/*
+ * Arabic / RTL overrides for Prompt-Engineering course slides.
+ * Loaded AFTER slides.css for <html lang="ar" dir="rtl"> pages.
+ * ─────────────────────────────────────────────────────────── */
+
+/* ── Font & Line Height ── */
+body {
+  font-family: 'Noto Kufi Arabic', 'Inter', -apple-system, sans-serif;
+  line-height: 1.9;
+}
+
+/* ── Section Num ── */
+.section-num {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Progress Label ── */
+.progress-label {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Progress Bar ── */
+.progress-bar-container {
+  direction: ltr;
+}
+
+/* ── Code Blocks (always LTR) ── */
+.code-block {
+  direction: ltr;
+  text-align: left;
+  border-left: 3px solid var(--accent);
+  border-right: 1px solid var(--border);
+}
+.code-lang {
+  font-family: 'Inter', sans-serif;
+}
+.code-copy {
+  font-family: 'Inter', sans-serif;
+}
+pre {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ── Demo Inputs (always LTR for code) ── */
+.demo-input, .demo-textarea {
+  direction: ltr;
+  text-align: left;
+}
+.demo-output {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ── Buttons with Arabic text ── */
+.demo-btn {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+}
+.nav-btn {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+}
+.quiz-option {
+  text-align: right;
+  font-family: 'Noto Kufi Arabic', 'Inter', sans-serif;
+}
+
+/* ── Table headers aligned right ── */
+.param-table th {
+  text-align: right;
+}
+.param-table code {
+  direction: ltr;
+  display: inline-block;
+}
+.compare-table th {
+  text-align: right;
+}
+
+/* ── Slider (always LTR) ── */
+input[type="range"] {
+  direction: ltr;
+}
+
+/* ── Pipeline (always LTR) ── */
+.pipeline {
+  direction: ltr;
+}
+
+/* ── Context bar (always LTR) ── */
+.context-bar-wrapper {
+  direction: ltr !important;
+}
+
+/* ── Anatomy Labels ── */
+.anatomy-label {
+  border-right: none;
+  border-left: 3px solid var(--accent);
+}
+@media (max-width: 600px) {
+  .anatomy-label {
+    border-left: none;
+    border-bottom: 3px solid var(--accent);
+  }
+}
+
+/* ── Concept Card Line Height ── */
+.concept-card p {
+  line-height: 1.7;
+}
+
+/* ── Pipe Step Labels ── */
+.pipe-step .label,
+.pipe-step .desc,
+.pipeline-step .label,
+.pipeline-step .desc {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Badge ── */
+.topbar-badge {
+  font-family: 'Noto Kufi Arabic', sans-serif;
+  letter-spacing: 0;
+}
+
+/* ── Hero H1 size slightly smaller for Arabic ── */
+.hero h1 {
+  font-size: 34px;
+}
+@media (max-width: 768px) {
+  .hero h1 { font-size: 26px; }
+}
+@media (max-width: 600px) {
+  .hero h1 { font-size: 22px; }
+}

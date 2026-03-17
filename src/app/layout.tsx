@@ -34,13 +34,13 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Mohamad Alsharbaji — Platform Engineer",
+    default: "Mohamad Alsharbaji | Platform Engineer",
     template: "%s | Mohamad Alsharbaji",
   },
   description:
     "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
   openGraph: {
-    title: "Mohamad Alsharbaji — Platform Engineer",
+    title: "Mohamad Alsharbaji | Platform Engineer",
     description:
       "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
     url: SITE_URL,
@@ -52,13 +52,13 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/images/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Mohamad Alsharbaji — Platform Engineer",
+        alt: "Mohamad Alsharbaji | Platform Engineer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mohamad Alsharbaji — Platform Engineer",
+    title: "Mohamad Alsharbaji | Platform Engineer",
     description:
       "Platform Engineer with 10+ years of experience in cloud platforms, Kubernetes, and building reliable distributed systems.",
     images: [`${SITE_URL}/images/og-image.png`],

@@ -36,9 +36,9 @@ export default function Hero() {
 
           <p
             className="animate-slide-up stagger-1 mt-2 text-xl font-600 text-foreground/40 sm:text-2xl"
-            dir={locale === "en" ? "rtl" : "ltr"}
-            lang={locale === "en" ? "ar" : "en"}
-            style={{ fontFamily: locale === "en" ? "var(--font-arabic)" : "var(--font-display)" }}
+            dir={locale === "ar" ? "ltr" : "rtl"}
+            lang={locale === "ar" ? "en" : "ar"}
+            style={{ fontFamily: locale === "ar" ? "var(--font-display)" : "var(--font-arabic)" }}
           >
             {t.hero.arabicName}
           </p>

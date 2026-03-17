@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 8, Iterators وClosures | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 2</span>
+    <a href="/ar/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 47%"></div></div>
+    <span class="progress-label">8 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل الـ Trait"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🔄</div>
+    <h1>Iterators وClosures</h1>
+    <p>البرمجة الوظيفية في Rust, Closures وIterator Adaptors وZero-cost Abstractions.</p>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>صيغة Closures والالتقاط</h2>
+    </div>
+    <p>
+      <strong>Closures</strong> هي دوال مجهولة يمكنها التقاط Variables من نطاقها المحيط. تستخدم صيغة مختصرة <code>|params| body</code> ويمكنها استنتاج أنواع المعاملات والقيم المُرجعة من السياق.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Basic closure syntax</span>
+<span class="keyword">let</span> add_one = |x| x + <span class="number">1</span>;
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">add_one</span>(<span class="number">5</span>)); <span class="comment">// 6</span>
+<span class="comment">// Closure with explicit types</span>
+<span class="keyword">let</span> add = |x: <span class="keyword">i32</span>, y: <span class="keyword">i32</span>| -&gt; <span class="keyword">i32</span> { x + y };
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">add</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 5</span>
+<span class="comment">// Capturing by reference (immutable)</span>
+<span class="keyword">let</span> x = <span class="number">5</span>;
+<span class="keyword">let</span> add_x = |y| x + y; <span class="comment">// Borrows x immutably</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">add_x</span>(<span class="number">3</span>));           <span class="comment">// 8</span>
+<span class="func">println!</span>(<span class="string">"x is still: {}"</span>, x); <span class="comment">// x is still valid</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Capturing by mutable reference</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> counter = <span class="number">0</span>;
+<span class="keyword">let</span> <span class="keyword">mut</span> increment = || {
+    counter += <span class="number">1</span>;
+    counter
+};
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">increment</span>()); <span class="comment">// 1</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">increment</span>()); <span class="comment">// 2</span>
+<span class="comment">// Taking ownership (move)</span>
+<span class="keyword">let</span> s = String::<span class="func">from</span>(<span class="string">"hello"</span>);
+<span class="keyword">let</span> take_ownership = <span class="keyword">move</span> || <span class="func">println!</span>(<span class="string">"String: {}"</span>, s);
+<span class="comment">// println!("{}", s); // Error: s moved into closure</span>
+<span class="func">take_ownership</span>();
+<span class="comment">// Complex capturing example</span>
+<span class="keyword">let</span> x = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> y = <span class="func">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>];
+<span class="keyword">let</span> use_x = || <span class="func">println!</span>(<span class="string">"{:?}"</span>, x); <span class="comment">// Borrows x immutably</span>
+<span class="keyword">let</span> use_y = <span class="keyword">move</span> || <span class="func">println!</span>(<span class="string">"{:?}"</span>, y); <span class="comment">// Moves y</span>
+<span class="func">use_x</span>();
+<span class="func">use_y</span>();
+<span class="comment">// Returning closures</span>
+<span class="keyword">fn</span> <span class="func">returns_closure</span>() -&gt; Box&lt;<span class="keyword">dyn</span> Fn(<span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>&gt; {
+    <span class="keyword">let</span> num = <span class="number">5</span>;
+    Box::<span class="func">new</span>(<span class="keyword">move</span> |x| x + num)
+<span class="keyword">let</span> f = <span class="func">returns_closure</span>();
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">f</span>(<span class="number">10</span>)); <span class="comment">// 15</span></code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>أوضاع الالتقاط</h4>
+        <p>تلتقط Closures Variables بأقل طريقة تقييداً ممكنة: <strong>استعارة Immutable</strong> أولاً، ثم <strong>استعارة Mutable</strong>، وأخيراً <strong>نقل الـ Ownership (move)</strong>. استخدم الكلمة المفتاحية <code>move</code> لفرض نقل الـ Ownership، وهو أمر أساسي عند إرجاع Closures أو إرسالها إلى Threads أخرى.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>سمات Fn و FnMut و FnOnce</h2>
+    </div>
+    <p>
+      كل إغلاق في Rust يُطبّق واحدة أو أكثر من ثلاث سمات، حسب كيفية التقاطه للـ Variableات:
+      <strong>FnOnce</strong> (يستهلك القيم المُلتقطة)، و <strong>FnMut</strong> (يُعدّل القيم المُلتقطة)، و <strong>Fn</strong> (يستعير بشكل Immutable).
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// FnOnce: consumes captured values (can be called only once)</span>
+<span class="keyword">let</span> s = String::<span class="func">from</span>(<span class="string">"hello"</span>);
+<span class="keyword">let</span> fn_once = <span class="keyword">move</span> || <span class="func">println!</span>(<span class="string">"String: {}"</span>, s);
+<span class="func">fn_once</span>(); <span class="comment">// Takes ownership of s</span>
+<span class="comment">// fn_once(); // Error: already called</span>
+<span class="comment">// FnMut: can mutate captured values</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> counter = <span class="number">0</span>;
+<span class="keyword">let</span> <span class="keyword">mut</span> fn_mut = || {
+    counter += <span class="number">1</span>;
+    counter
+};
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">fn_mut</span>()); <span class="comment">// 1</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">fn_mut</span>()); <span class="comment">// 2</span>
+<span class="func">println!</span>(<span class="string">"Counter: {}"</span>, counter); <span class="comment">// 2</span>
+<span class="comment">// Fn: cannot mutate, borrows immutably</span>
+<span class="keyword">let</span> x = <span class="number">5</span>;
+<span class="keyword">let</span> fn_trait = || <span class="func">println!</span>(<span class="string">"x: {}"</span>, x);
+<span class="func">fn_trait</span>();
+<span class="func">fn_trait</span>();
+<span class="func">println!</span>(<span class="string">"x: {}"</span>, x); <span class="comment">// Still accessible</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Using function traits as bounds</span>
+<span class="keyword">fn</span> <span class="func">apply_once</span>&lt;<span class="param">F</span>&gt;(<span class="param">f</span>: <span class="param">F</span>)
+<span class="keyword">where</span>
+    <span class="param">F</span>: FnOnce(),
+{
+    <span class="func">f</span>();
+<span class="keyword">fn</span> <span class="func">apply_twice</span>&lt;<span class="param">F</span>&gt;(<span class="keyword">mut</span> <span class="param">f</span>: <span class="param">F</span>)
+<span class="keyword">where</span>
+    <span class="param">F</span>: FnMut(),
+{
+    <span class="func">f</span>();
+    <span class="func">f</span>();
+<span class="keyword">fn</span> <span class="func">apply_thrice</span>&lt;<span class="param">F</span>&gt;(<span class="param">f</span>: <span class="param">F</span>)
+<span class="keyword">where</span>
+    <span class="param">F</span>: Fn(),
+{
+    <span class="func">f</span>();
+    <span class="func">f</span>();
+    <span class="func">f</span>();
+<span class="keyword">let</span> s = String::<span class="func">from</span>(<span class="string">"move me"</span>);
+<span class="func">apply_once</span>(<span class="keyword">move</span> || <span class="func">println!</span>(<span class="string">"{}"</span>, s));
+<span class="keyword">let</span> <span class="keyword">mut</span> n = <span class="number">0</span>;
+<span class="func">apply_twice</span>(|| n += <span class="number">1</span>);
+<span class="func">println!</span>(<span class="string">"n: {}"</span>, n); <span class="comment">// 2</span>
+<span class="func">apply_thrice</span>(|| <span class="func">println!</span>(<span class="string">"Hello"</span>));</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Real-world example: event handler</span>
+<span class="keyword">struct</span> <span class="func">Button</span> {
+    click_handlers: Vec&lt;Box&lt;<span class="keyword">dyn</span> Fn()&gt;&gt;,
+<span class="keyword">impl</span> Button {
+    <span class="keyword">fn</span> <span class="func">new</span>() -&gt; <span class="keyword">Self</span> {
+        Button { click_handlers: Vec::<span class="func">new</span>() }
+    }
+    <span class="keyword">fn</span> <span class="func">on_click</span>&lt;<span class="param">F</span>&gt;(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, <span class="param">handler</span>: <span class="param">F</span>)
+    <span class="keyword">where</span>
+        <span class="param">F</span>: Fn() + <span class="keyword">'static</span>,
+    {
+        <span class="keyword">self</span>.click_handlers.<span class="func">push</span>(Box::<span class="func">new</span>(handler));
+    }
+    <span class="keyword">fn</span> <span class="func">click</span>(&amp;<span class="keyword">self</span>) {
+        <span class="keyword">for</span> handler <span class="keyword">in</span> &amp;<span class="keyword">self</span>.click_handlers {
+            <span class="func">handler</span>();
+        }
+    }
+<span class="keyword">let</span> <span class="keyword">mut</span> button = Button::<span class="func">new</span>();
+button.<span class="func">on_click</span>(|| <span class="func">println!</span>(<span class="string">"Button clicked!"</span>));
+button.<span class="func">on_click</span>(|| <span class="func">println!</span>(<span class="string">"Second handler!"</span>));
+button.<span class="func">click</span>();</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Trait Hierarchy: Fn ⊂ FnMut ⊂ FnOnce</h4>
+        <p>كل إغلاق <code>Fn</code> يُطبّق أيضاً <code>FnMut</code> و <code>FnOnce</code>. وكل إغلاق <code>FnMut</code> يُطبّق أيضاً <code>FnOnce</code>. عند قبول Closures، استخدم الـ Trait <strong>الأقل تقييداً</strong> التي تعمل: فضّل <code>Fn</code> عند الإمكان، ثم <code>FnMut</code>، واستخدم <code>FnOnce</code> فقط عندما يجب على الـ Closure استهلاك القيم.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>سمة Iterator وIterator Adaptors</h2>
+    </div>
+    <p>
+      تتطلب سمة <code>Iterator</code> تطبيق Function واحدة فقط: <code>next()</code>. من خلال هذه الـ Function الواحدة، تحصل على عشرات <strong>دوال المحولات</strong> القوية مثل <code>map</code> و <code>filter</code> و <code>fold</code> والمزيد.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Iterator trait: implements next()</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> <span class="keyword">mut</span> iter = v.<span class="func">iter</span>();
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, iter.<span class="func">next</span>()); <span class="comment">// Some(&amp;1)</span>
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, iter.<span class="func">next</span>()); <span class="comment">// Some(&amp;2)</span>
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, iter.<span class="func">next</span>()); <span class="comment">// Some(&amp;3)</span>
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, iter.<span class="func">next</span>()); <span class="comment">// None</span>
+<span class="comment">// map() - transforms elements</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> doubled: Vec&lt;<span class="keyword">i32</span>&gt; = v.<span class="func">iter</span>().<span class="func">map</span>(|x| x * <span class="number">2</span>).<span class="func">collect</span>();
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, doubled); <span class="comment">// [2, 4, 6, 8, 10]</span>
+<span class="comment">// filter() - keeps matching elements</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>];
+<span class="keyword">let</span> evens: Vec&lt;&amp;<span class="keyword">i32</span>&gt; = numbers.<span class="func">iter</span>().<span class="func">filter</span>(|x| *x % <span class="number">2</span> == <span class="number">0</span>).<span class="func">collect</span>();
+<span class="comment">// Chaining adaptors</span>
+<span class="keyword">let</span> result: Vec&lt;<span class="keyword">i32</span>&gt; = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
+    .<span class="func">iter</span>()
+    .<span class="func">filter</span>(|x| x % <span class="number">2</span> == <span class="number">0</span>)
+    .<span class="func">map</span>(|x| x * x)
+    .<span class="func">collect</span>();
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, result); <span class="comment">// [4, 16]</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// zip() - combines iterators</span>
+<span class="keyword">let</span> a = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> b = <span class="func">vec!</span>[<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>];
+<span class="keyword">let</span> zipped: Vec&lt;(<span class="keyword">i32</span>, &amp;<span class="keyword">str</span>)&gt; = a.<span class="func">iter</span>()
+    .<span class="func">cloned</span>()
+    .<span class="func">zip</span>(b.<span class="func">iter</span>().<span class="func">cloned</span>())
+    .<span class="func">collect</span>();
+<span class="comment">// chain() - combines sequences</span>
+<span class="keyword">let</span> a = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> b = <span class="func">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>];
+<span class="keyword">let</span> combined: Vec&lt;<span class="keyword">i32</span>&gt; = a.<span class="func">iter</span>().<span class="func">chain</span>(b.<span class="func">iter</span>()).<span class="func">cloned</span>().<span class="func">collect</span>();
+<span class="comment">// enumerate() - adds indices</span>
+<span class="keyword">for</span> (idx, val) <span class="keyword">in</span> <span class="func">vec!</span>[<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>].<span class="func">iter</span>().<span class="func">enumerate</span>() {
+    <span class="func">println!</span>(<span class="string">"{}: {}"</span>, idx, val);
+<span class="comment">// take() and skip()</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> first_three: Vec&lt;<span class="keyword">i32</span>&gt; = numbers.<span class="func">iter</span>().<span class="func">take</span>(<span class="number">3</span>).<span class="func">cloned</span>().<span class="func">collect</span>();
+<span class="keyword">let</span> skip_two: Vec&lt;<span class="keyword">i32</span>&gt; = numbers.<span class="func">iter</span>().<span class="func">skip</span>(<span class="number">2</span>).<span class="func">cloned</span>().<span class="func">collect</span>();
+<span class="comment">// rev() - reverse iterator</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">for</span> n <span class="keyword">in</span> numbers.<span class="func">iter</span>().<span class="func">rev</span>() {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, n); <span class="comment">// 3, 2, 1</span>
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// fold() - accumulate values</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+<span class="keyword">let</span> sum = numbers.<span class="func">iter</span>().<span class="func">fold</span>(<span class="number">0</span>, |acc, x| acc + x);
+<span class="func">println!</span>(<span class="string">"{}"</span>, sum); <span class="comment">// 10</span>
+<span class="comment">// sum() and product()</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+<span class="keyword">let</span> sum: <span class="keyword">i32</span> = numbers.<span class="func">iter</span>().<span class="func">sum</span>();
+<span class="keyword">let</span> product: <span class="keyword">i32</span> = numbers.<span class="func">iter</span>().<span class="func">product</span>();
+<span class="comment">// any() and all()</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> has_even = numbers.<span class="func">iter</span>().<span class="func">any</span>(|x| x % <span class="number">2</span> == <span class="number">0</span>);
+<span class="keyword">let</span> all_positive = numbers.<span class="func">iter</span>().<span class="func">all</span>(|x| x &gt; &amp;<span class="number">0</span>);
+<span class="comment">// find() - returns first matching element</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> found = numbers.<span class="func">iter</span>().<span class="func">find</span>(|x| *x &gt; <span class="number">3</span>);
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, found); <span class="comment">// Some(&amp;4)</span></code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>التقييم الكسول</h4>
+        <p>Iterator Adaptors مثل <code>map</code> و <code>filter</code> هي <strong>كسولة</strong>, لا تفعل شيئاً حتى تقوم Function مستهلكة مثل <code>collect()</code> أو <code>sum()</code> أو <code>for_each()</code> بتشغيل التكرار. هذا يعني أنه يمكنك ربط العديد من المحولات دون إنشاء مجموعات وسيطة.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>إنشاء مكررات مخصصة</h2>
+    </div>
+    <p>
+      يمكن لأي نوع أن يصبح مكرراً من خلال تطبيق سمة <code>Iterator</code> مع دالتها الوحيدة المطلوبة: <code>next()</code>. هذا يفتح جميع دوال المحولات المدمجة تلقائياً.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Custom iterator: count up to n</span>
+<span class="keyword">struct</span> <span class="func">Counter</span> {
+    count: <span class="keyword">u32</span>,
+    max: <span class="keyword">u32</span>,
+<span class="keyword">impl</span> Counter {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">max</span>: <span class="keyword">u32</span>) -&gt; Counter {
+        Counter { count: <span class="number">0</span>, max }
+    }
+<span class="keyword">impl</span> Iterator <span class="keyword">for</span> Counter {
+    <span class="keyword">type</span> Item = <span class="keyword">u32</span>;
+    <span class="keyword">fn</span> <span class="func">next</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">self</span>.count += <span class="number">1</span>;
+        <span class="keyword">if</span> <span class="keyword">self</span>.count &lt;= <span class="keyword">self</span>.max {
+            Some(<span class="keyword">self</span>.count)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">let</span> counter = Counter::<span class="func">new</span>(<span class="number">5</span>);
+<span class="keyword">for</span> value <span class="keyword">in</span> counter {
+    <span class="func">println!</span>(<span class="string">"{}"</span>, value); <span class="comment">// 1, 2, 3, 4, 5</span>
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Custom iterator: range</span>
+<span class="keyword">struct</span> <span class="func">MyRange</span> {
+    start: <span class="keyword">i32</span>,
+    end: <span class="keyword">i32</span>,
+<span class="keyword">impl</span> Iterator <span class="keyword">for</span> MyRange {
+    <span class="keyword">type</span> Item = <span class="keyword">i32</span>;
+    <span class="keyword">fn</span> <span class="func">next</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">if</span> <span class="keyword">self</span>.start &lt; <span class="keyword">self</span>.end {
+            <span class="keyword">let</span> value = <span class="keyword">self</span>.start;
+            <span class="keyword">self</span>.start += <span class="number">1</span>;
+            Some(value)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">let</span> range = MyRange { start: <span class="number">1</span>, end: <span class="number">5</span> };
+<span class="keyword">let</span> values: Vec&lt;<span class="keyword">i32</span>&gt; = range.<span class="func">collect</span>();
+<span class="comment">// Custom iterator: pairs from vec</span>
+<span class="keyword">struct</span> <span class="func">Pairs</span>&lt;<span class="param">'a</span>&gt; {
+    items: &amp;<span class="param">'a</span> [<span class="keyword">i32</span>],
+    index: <span class="keyword">usize</span>,
+<span class="keyword">impl</span>&lt;<span class="param">'a</span>&gt; Iterator <span class="keyword">for</span> Pairs&lt;<span class="param">'a</span>&gt; {
+    <span class="keyword">type</span> Item = (<span class="keyword">i32</span>, <span class="keyword">i32</span>);
+    <span class="keyword">fn</span> <span class="func">next</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">if</span> <span class="keyword">self</span>.index + <span class="number">1</span> &lt; <span class="keyword">self</span>.items.<span class="func">len</span>() {
+            <span class="keyword">let</span> pair = (<span class="keyword">self</span>.items[<span class="keyword">self</span>.index], <span class="keyword">self</span>.items[<span class="keyword">self</span>.index + <span class="number">1</span>]);
+            <span class="keyword">self</span>.index += <span class="number">2</span>;
+            Some(pair)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">let</span> nums = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> pairs = Pairs { items: &amp;nums, index: <span class="number">0</span> };
+<span class="keyword">for</span> (a, b) <span class="keyword">in</span> pairs {
+    <span class="func">println!</span>(<span class="string">"{}, {}"</span>, a, b);
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Double-ended iterator (DoubleEndedIterator)</span>
+<span class="keyword">struct</span> <span class="func">BiCounter</span> {
+    start: <span class="keyword">u32</span>,
+    end: <span class="keyword">u32</span>,
+<span class="keyword">impl</span> Iterator <span class="keyword">for</span> BiCounter {
+    <span class="keyword">type</span> Item = <span class="keyword">u32</span>;
+    <span class="keyword">fn</span> <span class="func">next</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">if</span> <span class="keyword">self</span>.start &lt;= <span class="keyword">self</span>.end {
+            <span class="keyword">let</span> val = <span class="keyword">self</span>.start;
+            <span class="keyword">self</span>.start += <span class="number">1</span>;
+            Some(val)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">impl</span> DoubleEndedIterator <span class="keyword">for</span> BiCounter {
+    <span class="keyword">fn</span> <span class="func">next_back</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) -&gt; Option&lt;<span class="keyword">Self</span>::Item&gt; {
+        <span class="keyword">if</span> <span class="keyword">self</span>.start &lt;= <span class="keyword">self</span>.end {
+            <span class="keyword">let</span> val = <span class="keyword">self</span>.end;
+            <span class="keyword">self</span>.end -= <span class="number">1</span>;
+            Some(val)
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+<span class="keyword">let</span> bi = BiCounter { start: <span class="number">1</span>, end: <span class="number">5</span> };
+<span class="keyword">let</span> values: Vec&lt;<span class="keyword">u32</span>&gt; = bi.<span class="func">collect</span>();
+<span class="func">println!</span>(<span class="string">"{:?}"</span>, values); <span class="comment">// [1, 2, 3, 4, 5]</span></code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>DoubleEndedIterator</h4>
+        <p>تطبيق <code>DoubleEndedIterator</code> يضيف Function <code>next_back()</code>، مما يُمكّن <code>rev()</code> من التكرار من النهاية. هذا مفيد للتصفح ثنائي الاتجاه دون الحاجة لجمع العناصر في Vec أولاً.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>الأداء: Iterators مقابل الـ Loops</h2>
+    </div>
+    <p>
+      مكررات Rust هي <strong>تجريد بدون تكلفة</strong>. يُحسّن الـ Compiler سلاسل Iterators إلى نفس كود الآلة الذي تنتجه الـ Loops المكتوبة يدوياً، فتحصل على Expressionية الـ Pattern الوظيفي بدون أي عقوبة في Runtime.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Zero-cost abstraction: iterators compile to same code as loops</span>
+<span class="comment">// Method 1: For loop</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> <span class="keyword">mut</span> sum = <span class="number">0</span>;
+<span class="keyword">for</span> i <span class="keyword">in</span> v {
+    sum += i;
+<span class="comment">// Method 2: Iterator</span>
+<span class="keyword">let</span> sum: <span class="keyword">i32</span> = v.<span class="func">iter</span>().<span class="func">sum</span>();
+<span class="comment">// Both produce identical machine code!</span>
+<span class="comment">// Closure example: both compile to same code</span>
+<span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="comment">// Using iterator adaptor</span>
+<span class="keyword">let</span> result1: Vec&lt;<span class="keyword">i32</span>&gt; = numbers.<span class="func">iter</span>()
+    .<span class="func">map</span>(|x| x * <span class="number">2</span>)
+    .<span class="func">filter</span>(|x| x &gt; &amp;<span class="number">4</span>)
+    .<span class="func">collect</span>();
+<span class="comment">// Using explicit loop</span>
+<span class="keyword">let</span> <span class="keyword">mut</span> result2 = Vec::<span class="func">new</span>();
+<span class="keyword">for</span> x <span class="keyword">in</span> &amp;numbers {
+    <span class="keyword">let</span> doubled = x * <span class="number">2</span>;
+    <span class="keyword">if</span> doubled &gt; <span class="number">4</span> {
+        result2.<span class="func">push</span>(doubled);
+    }
+<span class="func">assert_eq!</span>(result1, result2);</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Example: data processing pipeline</span>
+<span class="keyword">struct</span> <span class="func">User</span> {
+    id: <span class="keyword">u32</span>,
+    name: String,
+    age: <span class="keyword">u32</span>,
+<span class="keyword">let</span> users = <span class="func">vec!</span>[
+    User { id: <span class="number">1</span>, name: String::<span class="func">from</span>(<span class="string">"Alice"</span>), age: <span class="number">30</span> },
+    User { id: <span class="number">2</span>, name: String::<span class="func">from</span>(<span class="string">"Bob"</span>), age: <span class="number">25</span> },
+    User { id: <span class="number">3</span>, name: String::<span class="func">from</span>(<span class="string">"Charlie"</span>), age: <span class="number">35</span> },
+];
+<span class="comment">// Iterator approach: clear and efficient</span>
+<span class="keyword">let</span> adult_names: Vec&lt;String&gt; = users.<span class="func">iter</span>()
+    .<span class="func">filter</span>(|u| u.age &gt; <span class="number">30</span>)
+    .<span class="func">map</span>(|u| u.name.<span class="func">clone</span>())
+    .<span class="func">collect</span>();
+<span class="comment">// Real-world processing pipeline</span>
+<span class="keyword">fn</span> <span class="func">process_data</span>(<span class="param">numbers</span>: Vec&lt;<span class="keyword">i32</span>&gt;) -&gt; <span class="keyword">i32</span> {
+    numbers.<span class="func">iter</span>()
+        .<span class="func">filter</span>(|x| *x % <span class="number">2</span> == <span class="number">0</span>) <span class="comment">// Keep evens</span>
+        .<span class="func">map</span>(|x| x * x)             <span class="comment">// Square them</span>
+        .<span class="func">take</span>(<span class="number">3</span>)                     <span class="comment">// Take first 3</span>
+        .<span class="func">sum</span>()                       <span class="comment">// Sum them</span>
+<span class="func">println!</span>(<span class="string">"{}"</span>, <span class="func">process_data</span>(<span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])); <span class="comment">// 4 + 16 + 36 = 56</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Lazy evaluation advantage</span>
+<span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+<span class="keyword">let</span> iter = v.<span class="func">iter</span>()
+    .<span class="func">map</span>(|x| {
+        <span class="func">println!</span>(<span class="string">"Mapping {}"</span>, x);
+        x * <span class="number">2</span>
+    });
+<span class="comment">// Nothing printed yet - iterator is lazy!</span>
+<span class="keyword">let</span> collected: Vec&lt;<span class="keyword">i32</span>&gt; = iter.<span class="func">collect</span>();
+<span class="comment">// Now "Mapping 1 2 3 4 5" is printed</span></code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Zero-cost Abstractions</h4>
+        <p>تُحسَّن سلاسل Iterators في Rust في Compile-time من خلال <strong>التخصيص أحادي الشكل (monomorphization)</strong> و<strong>التضمين (inlining)</strong>. كود الآلة الناتج مطابق للLoops المكتوبة يدوياً. لن تدفع أبداً تكلفة في Runtime مقابل الـ Pattern الوظيفي.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>مثال عملي: خط أنابيب معالجة البيانات</h2>
+    </div>
+    <p>
+      يتيح الجمع بين Closures وIterators إنشاء خطوط أنابيب معالجة بيانات معبّرة. فيما يلي مثال كامل يعرض Patterns خطوط أنابيب متعددة على مجموعة من السجلات.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">struct</span> <span class="func">Record</span> {
+    id: <span class="keyword">u32</span>,
+    name: String,
+    value: <span class="keyword">f64</span>,
+    category: String,
+<span class="keyword">impl</span> Record {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">id</span>: <span class="keyword">u32</span>, <span class="param">name</span>: &amp;<span class="keyword">str</span>, <span class="param">value</span>: <span class="keyword">f64</span>, <span class="param">category</span>: &amp;<span class="keyword">str</span>) -&gt; <span class="keyword">Self</span> {
+        Record {
+            id,
+            name: String::<span class="func">from</span>(name),
+            value,
+            category: String::<span class="func">from</span>(category),
+        }
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> records = <span class="func">vec!</span>[
+        Record::<span class="func">new</span>(<span class="number">1</span>, <span class="string">"Item A"</span>, <span class="number">100.5</span>, <span class="string">"Electronics"</span>),
+        Record::<span class="func">new</span>(<span class="number">2</span>, <span class="string">"Item B"</span>, <span class="number">50.0</span>, <span class="string">"Books"</span>),
+        Record::<span class="func">new</span>(<span class="number">3</span>, <span class="string">"Item C"</span>, <span class="number">200.0</span>, <span class="string">"Electronics"</span>),
+        Record::<span class="func">new</span>(<span class="number">4</span>, <span class="string">"Item D"</span>, <span class="number">75.5</span>, <span class="string">"Clothes"</span>),
+        Record::<span class="func">new</span>(<span class="number">5</span>, <span class="string">"Item E"</span>, <span class="number">150.0</span>, <span class="string">"Electronics"</span>),
+    ];
+    <span class="comment">// Pipeline 1: Get high-value items</span>
+    <span class="keyword">let</span> high_value: Vec&lt;&amp;Record&gt; = records.<span class="func">iter</span>()
+        .<span class="func">filter</span>(|r| r.value &gt; <span class="number">100.0</span>)
+        .<span class="func">collect</span>();
+    <span class="comment">// Pipeline 2: Group by category and sum values</span>
+    <span class="keyword">use</span> std::collections::HashMap;
+    <span class="keyword">let</span> by_category: HashMap&lt;String, <span class="keyword">f64</span>&gt; = records.<span class="func">iter</span>()
+        .<span class="func">fold</span>(HashMap::<span class="func">new</span>(), |<span class="keyword">mut</span> map, r| {
+            *map.<span class="func">entry</span>(r.category.<span class="func">clone</span>()).<span class="func">or_insert</span>(<span class="number">0.0</span>) += r.value;
+            map
+        });
+    <span class="comment">// Pipeline 3: Electronics total using filter + map + fold</span>
+    <span class="keyword">let</span> electronics_total: <span class="keyword">f64</span> = records.<span class="func">iter</span>()
+        .<span class="func">filter</span>(|r| r.category == <span class="string">"Electronics"</span>)
+        .<span class="func">map</span>(|r| r.value)
+        .<span class="func">fold</span>(<span class="number">0.0</span>, |acc, v| acc + v);
+    <span class="func">println!</span>(<span class="string">"Electronics total: {}"</span>, electronics_total);
+    <span class="comment">// Pipeline 4: Create formatted report</span>
+    <span class="keyword">let</span> report: String = records.<span class="func">iter</span>()
+        .<span class="func">enumerate</span>()
+        .<span class="func">map</span>(|(idx, r)| <span class="func">format!</span>(<span class="string">"{}. {} - ${:.2}"</span>, idx + <span class="number">1</span>, r.name, r.value))
+        .<span class="func">collect</span>::&lt;Vec&lt;String&gt;&gt;()
+        .<span class="func">join</span>(<span class="string">"\n"</span>);
+    <span class="func">println!</span>(<span class="string">"{}"</span>, report);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>أفضل ممارسات خطوط الأنابيب</h4>
+        <p>استخدم <code>fold</code> للتجميعات مثل التصنيف، و <code>filter</code> + <code>map</code> + <code>collect</code> للتحويلات، و <code>enumerate</code> عندما تحتاج الفهارس. صيغة turbofish مثل <code>collect::&lt;Vec&lt;String&gt;&gt;()</code> تُخبر Rust بالنوع الذي يجب الجمع فيه عندما لا يمكن استنتاجه.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-07-traits-generics.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 8 من 17</span>
+  <a href="ch-09-lifetimes.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

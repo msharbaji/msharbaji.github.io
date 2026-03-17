@@ -6,13 +6,6 @@ import BackLink from "@/components/BackLink";
 import PhaseTabs from "@/components/PhaseTabs";
 import AnimateIn from "@/components/AnimateIn";
 
-const learnPoints = [
-  "learnPoint1",
-  "learnPoint2",
-  "learnPoint3",
-  "learnPoint4",
-] as const;
-
 export default function CourseDetail({ course }: { course: Course }) {
   const { locale, t } = useLanguage();
   const firstTopic = course.topics[0];
@@ -66,18 +59,10 @@ export default function CourseDetail({ course }: { course: Course }) {
               </div>
               <div>
                 <span className="block font-display text-lg font-700 text-foreground">
-                  {new Set(course.topics.map((t) => t.phase)).size}
+                  {course.phases.length}
                 </span>
                 <span className="text-xs uppercase tracking-wider text-muted">
                   {t.courses.phases}
-                </span>
-              </div>
-              <div>
-                <span className="block font-display text-lg font-700 text-foreground">
-                  100+
-                </span>
-                <span className="text-xs uppercase tracking-wider text-muted">
-                  {t.courses.concepts}
                 </span>
               </div>
             </div>
@@ -111,8 +96,8 @@ export default function CourseDetail({ course }: { course: Course }) {
             {t.courses.whatYouLearn}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {learnPoints.map((key) => (
-              <div key={key} className="flex gap-2.5">
+            {course.learnPoints[locale].map((point, i) => (
+              <div key={i} className="flex gap-2.5">
                 <svg
                   className="mt-0.5 size-4 shrink-0 text-accent"
                   viewBox="0 0 20 20"
@@ -126,7 +111,7 @@ export default function CourseDetail({ course }: { course: Course }) {
                   />
                 </svg>
                 <span className="text-sm leading-snug text-muted">
-                  {t.courses[key]}
+                  {point}
                 </span>
               </div>
             ))}

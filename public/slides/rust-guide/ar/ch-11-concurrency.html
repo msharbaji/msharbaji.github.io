@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 11, التزامن | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/ar/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 65%"></div></div>
+    <span class="progress-label">11 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل الـ Trait"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🔀</div>
+    <h1>التزامن</h1>
+    <p>التزامن بدون خوف, Threads وMessage Passing عبر Channels وShared State مع Mutex.</p>
+  </div>
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>إنشاء Threads باستخدام std::thread</h2>
+    </div>
+    <p>
+      نموذج Threads في Rust مبني على نظام Ownership. Threads خفيفة وآمنة للإنشاء بفضل الـ Borrow Checker الذي يكتشف Data Race وقت التجميع.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::thread;
+<span class="keyword">use</span> std::time::Duration;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Spawning a simple thread</span>
+    <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(|| {
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1</span>..<span class="number">5</span> {
+            <span class="func">println!</span>(<span class="string">"Thread says: {}"</span>, i);
+            thread::<span class="func">sleep</span>(Duration::<span class="func">from_millis</span>(<span class="number">100</span>));
+        }
+    });
+    <span class="comment">// Main thread continues</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1</span>..<span class="number">3</span> {
+        <span class="func">println!</span>(<span class="string">"Main says: {}"</span>, i);
+        thread::<span class="func">sleep</span>(Duration::<span class="func">from_millis</span>(<span class="number">150</span>));
+    }
+    <span class="comment">// Wait for the thread to complete</span>
+    handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="comment">// Using the move keyword to transfer ownership</span>
+    <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        <span class="func">println!</span>(<span class="string">"Vector in thread: {:?}"</span>, v);
+        <span class="comment">// v is owned by the thread now</span>
+    });
+    <span class="comment">// This won't compile: v has been moved</span>
+    <span class="comment">// println!("{:?}", v);</span>
+    handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>الكلمة المفتاحية move</h4>
+        <p>استخدم <code>move</code> قبل الـ Closure (closure) لنقل ملكية Variables الملتقطة إلى الخيط. بدونها، سيرفض الـ Compiler الكود إذا كان الخيط المُنشأ قد يعيش أطول من البيانات التي يشير إليها.</p>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> data = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="comment">// Spawn multiple threads, each processing a chunk</span>
+    <span class="keyword">for</span> chunk <span class="keyword">in</span> data.<span class="func">chunks</span>(<span class="number">2</span>) {
+        <span class="keyword">let</span> data = chunk.<span class="func">to_vec</span>();
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            <span class="keyword">let</span> sum: i32 = data.<span class="func">iter</span>().<span class="func">sum</span>();
+            <span class="func">println!</span>(<span class="string">"Chunk sum: {}"</span>, sum);
+            sum
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="comment">// Collect results</span>
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        <span class="keyword">match</span> handle.<span class="func">join</span>() {
+            Ok(_) =&gt; <span class="func">println!</span>(<span class="string">"Thread completed successfully"</span>),
+            Err(_) =&gt; <span class="func">println!</span>(<span class="string">"Thread panicked"</span>),
+        }
+    }
+}</code></pre>
+    </div>
+  </div>
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Message Passing عبر Channels (mpsc)</h2>
+    </div>
+    <p>
+      Channels توفر اتصالًا آمنًا بين Threads دون مشاركة الـ Memory. نمط <code>mpsc</code> (متعدد المنتجين، مستهلك واحد) هو الأسلوب الأكثر شيوعًا. المرسل ينقل ملكية كل قيمة إلى المستقبل.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::mpsc;
+<span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Create a channel</span>
+    <span class="keyword">let</span> (tx, rx) = mpsc::<span class="func">channel</span>();
+    thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        <span class="keyword">let</span> val = String::<span class="func">from</span>(<span class="string">"hello from thread"</span>);
+        tx.<span class="func">send</span>(val).<span class="func">unwrap</span>();
+        <span class="comment">// val is moved by send, can't use it here</span>
+    });
+    <span class="comment">// Receive the message (blocks until available)</span>
+    <span class="keyword">let</span> received = rx.<span class="func">recv</span>().<span class="func">unwrap</span>();
+    <span class="func">println!</span>(<span class="string">"Got: {}"</span>, received);
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::mpsc;
+<span class="keyword">use</span> std::thread;
+<span class="keyword">use</span> std::time::Duration;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> (tx, rx) = mpsc::<span class="func">channel</span>();
+    thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        <span class="keyword">let</span> vals = <span class="func">vec!</span>[
+            String::<span class="func">from</span>(<span class="string">"hi"</span>),
+            String::<span class="func">from</span>(<span class="string">"from"</span>),
+            String::<span class="func">from</span>(<span class="string">"the"</span>),
+            String::<span class="func">from</span>(<span class="string">"thread"</span>),
+        ];
+        <span class="keyword">for</span> val <span class="keyword">in</span> vals {
+            tx.<span class="func">send</span>(val).<span class="func">unwrap</span>();
+            thread::<span class="func">sleep</span>(Duration::<span class="func">from_secs</span>(<span class="number">1</span>));
+        }
+    });
+    <span class="comment">// Iterate over received messages (blocks on each)</span>
+    <span class="keyword">for</span> received <span class="keyword">in</span> rx {
+        <span class="func">println!</span>(<span class="string">"Got: {}"</span>, received);
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::mpsc;
+<span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> (tx, rx) = mpsc::<span class="func">channel</span>();
+    <span class="comment">// Multiple producers via clone</span>
+    <span class="keyword">let</span> tx1 = tx.<span class="func">clone</span>();
+    <span class="keyword">let</span> tx2 = tx.<span class="func">clone</span>();
+    thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        tx1.<span class="func">send</span>(<span class="string">"msg from thread 1"</span>).<span class="func">unwrap</span>();
+    });
+    thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        tx2.<span class="func">send</span>(<span class="string">"msg from thread 2"</span>).<span class="func">unwrap</span>();
+    });
+    <span class="func">drop</span>(tx); <span class="comment">// Drop original sender</span>
+    <span class="keyword">for</span> received <span class="keyword">in</span> rx {
+        <span class="func">println!</span>(<span class="string">"{}"</span>, received);
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Ownership عبر Channels</h4>
+        <p><code>send()</code> تأخذ ملكية القيمة، لذا لا يمكن لخيط الإرسال استخدامها بعد ذلك أبدًا. هكذا يمنع Rust Data Race من خلال Type System بدلاً من فحوصات Runtime.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Shared State مع Mutex&lt;T&gt; و Arc&lt;T&gt;</h2>
+    </div>
+    <p>
+      <code>Mutex</code> (Mutex) يحمي البيانات المشتركة بقفل. مع <code>Arc</code> (Reference Counting الذري) للملكية المشتركة الآمنة للThreads، يتيح حالة Mutable وآمنة عبر Threads.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::Mutex;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> counter = <span class="func">Mutex::new</span>(<span class="number">0</span>);
+    {
+        <span class="keyword">let</span> <span class="keyword">mut</span> num = counter.<span class="func">lock</span>().<span class="func">unwrap</span>();
+        *num += <span class="number">1</span>;
+    } <span class="comment">// Lock is released here</span>
+    <span class="func">println!</span>(<span class="string">"Result: {}"</span>, *counter.<span class="func">lock</span>().<span class="func">unwrap</span>());
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>));
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">10</span> {
+        <span class="keyword">let</span> counter = <span class="func">Arc::clone</span>(&amp;counter);
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            <span class="keyword">let</span> <span class="keyword">mut</span> num = counter.<span class="func">lock</span>().<span class="func">unwrap</span>();
+            *num += <span class="number">1</span>;
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+    }
+    <span class="func">println!</span>(<span class="string">"Result: {}"</span>, *counter.<span class="func">lock</span>().<span class="func">unwrap</span>()); <span class="comment">// 10</span>
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Practical example: thread-safe bank account</span>
+<span class="keyword">struct</span> BankAccount {
+    balance: Arc&lt;Mutex&lt;f64&gt;&gt;,
+<span class="keyword">impl</span> BankAccount {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">initial</span>: f64) -&gt; Self {
+        BankAccount {
+            balance: <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(initial)),
+        }
+    }
+    <span class="keyword">fn</span> <span class="func">deposit</span>(&amp;<span class="keyword">self</span>, <span class="param">amount</span>: f64) {
+        <span class="keyword">let</span> <span class="keyword">mut</span> balance = <span class="keyword">self</span>.balance.<span class="func">lock</span>().<span class="func">unwrap</span>();
+        *balance += amount;
+    }
+    <span class="keyword">fn</span> <span class="func">withdraw</span>(&amp;<span class="keyword">self</span>, <span class="param">amount</span>: f64) -&gt; bool {
+        <span class="keyword">let</span> <span class="keyword">mut</span> balance = <span class="keyword">self</span>.balance.<span class="func">lock</span>().<span class="func">unwrap</span>();
+        <span class="keyword">if</span> *balance &gt;= amount {
+            *balance -= amount;
+            <span class="keyword">true</span>
+        } <span class="keyword">else</span> {
+            <span class="keyword">false</span>
+        }
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> account = <span class="func">Arc::new</span>(<span class="func">BankAccount::new</span>(<span class="number">100.0</span>));
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..<span class="number">5</span> {
+        <span class="keyword">let</span> account = <span class="func">Arc::clone</span>(&amp;account);
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            account.<span class="func">deposit</span>(<span class="number">10.0</span>);
+            <span class="func">println!</span>(<span class="string">"Thread {} deposited 10"</span>, i);
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>نطاق قفل Mutex</h4>
+        <p>يتم تحرير القفل تلقائيًا عندما يخرج <code>MutexGuard</code> من الـ Scope. اجعل الأقسام الحرجة قصيرة قدر الإمكان لتقليل التنافس بين Threads.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>سمتا Send و Sync</h2>
+    </div>
+    <p>
+      <code>Send</code> و <code>Sync</code> هما سمتان علامة تشيران إلى أنواع آمنة للThreads. <code>Send</code> تعني أنه يمكن نقل الـ Ownership بين Threads. <code>Sync</code> تعني أنه يمكن مشاركة الـ References بأمان بين Threads.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::cell::RefCell;
+<span class="keyword">use</span> std::rc::Rc;
+<span class="comment">// Rc&lt;T&gt; is not Send (not thread-safe)</span>
+<span class="comment">// RefCell&lt;T&gt; is not Sync (interior mutability without locking)</span>
+<span class="keyword">fn</span> <span class="func">is_send</span>&lt;T: Send&gt;() {}
+<span class="keyword">fn</span> <span class="func">is_sync</span>&lt;T: Sync&gt;() {}
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// These work</span>
+    <span class="func">is_send</span>::&lt;String&gt;();
+    <span class="func">is_sync</span>::&lt;i32&gt;();
+    <span class="comment">// This would NOT compile:</span>
+    <span class="comment">// is_send::&lt;Rc&lt;i32&gt;&gt;();</span>
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Custom struct that is Send + Sync</span>
+<span class="keyword">#[derive(Clone)]</span>
+<span class="keyword">struct</span> Counter {
+    value: Arc&lt;Mutex&lt;i32&gt;&gt;,
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> counter = Counter {
+        value: <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>)),
+    };
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">5</span> {
+        <span class="keyword">let</span> counter = counter.<span class="func">clone</span>();
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            <span class="keyword">let</span> <span class="keyword">mut</span> val = counter.value.<span class="func">lock</span>().<span class="func">unwrap</span>();
+            *val += <span class="number">1</span>;
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+    }
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>الأمان وقت التجميع</h4>
+        <p>إذا حاولت إرسال <code>Rc&lt;T&gt;</code> أو <code>RefCell&lt;T&gt;</code> عبر حدود Threads، فسيمنعك الـ Compiler. هذا هو "التزامن بدون خوف" في Rust, يتم منع Data Race وقت التجميع، وليس اكتشافها Runtime.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>تجنب Deadlock</h2>
+    </div>
+    <p>
+      يحدث Deadlock (Deadlock) عندما تحتفظ Threads بأقفال وتنتظر بعضها البعض. من أفضل الممارسات إبقاء الأقسام الحرجة صغيرة والحصول على Locks دائمًا بترتيب متسق.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="keyword">use</span> std::time::Duration;
+<span class="comment">// DEADLOCK EXAMPLE (do not run)</span>
+<span class="comment">//</span>
+<span class="comment">// Thread A: locks lock1, then waits for lock2</span>
+<span class="comment">// Thread B: locks lock2, then waits for lock1</span>
+<span class="comment">//</span>
+<span class="comment">// Both threads wait forever!</span>
+<span class="comment">//</span>
+<span class="comment">// let lock1 = Arc::new(Mutex::new(0));</span>
+<span class="comment">// let lock2 = Arc::new(Mutex::new(0));</span>
+<span class="comment">//</span>
+<span class="comment">// thread::spawn(move || {</span>
+<span class="comment">//     let _a = l1.lock().unwrap();</span>
+<span class="comment">//     thread::sleep(Duration::from_secs(1));</span>
+<span class="comment">//     let _b = l2.lock().unwrap(); // waits for lock2</span>
+<span class="comment">// });</span>
+<span class="comment">//</span>
+<span class="comment">// let _a = lock2.lock().unwrap();</span>
+<span class="comment">// let _b = lock1.lock().unwrap(); // waits for lock1 - DEADLOCK!</span></code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="keyword">use</span> std::time::Duration;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// SAFE: keep critical sections small</span>
+    <span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>));
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> id <span class="keyword">in</span> <span class="number">0</span>..<span class="number">5</span> {
+        <span class="keyword">let</span> counter = <span class="func">Arc::clone</span>(&amp;counter);
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            <span class="comment">// Do expensive work WITHOUT holding the lock</span>
+            thread::<span class="func">sleep</span>(Duration::<span class="func">from_millis</span>(<span class="number">10</span>));
+            <span class="comment">// Only lock for the critical operation</span>
+            {
+                <span class="keyword">let</span> <span class="keyword">mut</span> num = counter.<span class="func">lock</span>().<span class="func">unwrap</span>();
+                *num += <span class="number">1</span>;
+            } <span class="comment">// Lock released immediately</span>
+            <span class="comment">// Continue work without the lock</span>
+            thread::<span class="func">sleep</span>(Duration::<span class="func">from_millis</span>(<span class="number">10</span>));
+            <span class="func">println!</span>(<span class="string">"Thread {} done"</span>, id);
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>نصائح لمنع Deadlock</h4>
+        <p>احصل دائمًا على Locks بنفس الترتيب عبر جميع Threads. اجعل الأقسام الحرجة صغيرة قدر الإمكان. فضّل Message Passing (Channels) على Shared State عندما تستطيع. استخدم <code>try_lock()</code> لمحاولات القفل غير المحجوبة.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>مثال عملي: معالجة البيانات بالتوازي</h2>
+    </div>
+    <p>
+      نمط شائع هو تقسيم البيانات إلى أجزاء، ومعالجتها بالتوازي عبر Threads، وجمع النتائج عبر Channels.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::mpsc;
+<span class="keyword">use</span> std::thread;
+<span class="keyword">fn</span> <span class="func">process_chunk</span>(<span class="param">data</span>: Vec&lt;i32&gt;) -&gt; i32 {
+    data.<span class="func">iter</span>().<span class="func">sum</span>()
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> data = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>];
+    <span class="keyword">let</span> chunk_size = <span class="number">3</span>;
+    <span class="keyword">let</span> (tx, rx) = mpsc::<span class="func">channel</span>();
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> chunk <span class="keyword">in</span> data.<span class="func">chunks</span>(chunk_size) {
+        <span class="keyword">let</span> chunk = chunk.<span class="func">to_vec</span>();
+        <span class="keyword">let</span> tx = tx.<span class="func">clone</span>();
+        <span class="keyword">let</span> handle = thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+            <span class="keyword">let</span> result = <span class="func">process_chunk</span>(chunk);
+            tx.<span class="func">send</span>(result).<span class="func">unwrap</span>();
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="func">drop</span>(tx); <span class="comment">// Drop original sender so rx iterator ends</span>
+    <span class="keyword">let</span> total: i32 = rx.<span class="func">iter</span>().<span class="func">sum</span>();
+    <span class="func">println!</span>(<span class="string">"Total: {}"</span>, total); <span class="comment">// 55</span>
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        handle.<span class="func">join</span>().<span class="func">unwrap</span>();
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::sync::{Arc, Mutex};
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Simple thread pool sketch</span>
+<span class="keyword">struct</span> ThreadPool {
+    size: usize,
+<span class="keyword">impl</span> ThreadPool {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">size</span>: usize) -&gt; ThreadPool {
+        ThreadPool { size }
+    }
+    <span class="keyword">fn</span> <span class="func">execute</span>&lt;F&gt;(&amp;<span class="keyword">self</span>, <span class="param">f</span>: F)
+    <span class="keyword">where</span>
+        F: FnOnce() + Send + <span class="keyword">'static</span>,
+    {
+        thread::<span class="func">spawn</span>(f);
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> pool = <span class="func">ThreadPool::new</span>(<span class="number">4</span>);
+    <span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">Mutex::new</span>(<span class="number">0</span>));
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..<span class="number">10</span> {
+        <span class="keyword">let</span> counter = <span class="func">Arc::clone</span>(&amp;counter);
+        pool.<span class="func">execute</span>(<span class="keyword">move</span> || {
+            <span class="keyword">let</span> <span class="keyword">mut</span> num = counter.<span class="func">lock</span>().<span class="func">unwrap</span>();
+            *num += i;
+            <span class="func">println!</span>(<span class="string">"Processing item {}"</span>, i);
+        });
+    }
+    thread::<span class="func">sleep</span>(std::time::Duration::<span class="func">from_secs</span>(<span class="number">1</span>));
+    <span class="func">println!</span>(<span class="string">"Final count: {}"</span>, *counter.<span class="func">lock</span>().<span class="func">unwrap</span>());
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>التزامن بدون خوف</h4>
+        <p>نظام Ownership والأنواع في Rust يضمن وقت التجميع أن الكود المتزامن خالٍ من Data Race. إذا تم تجميعه، فهو آمن. لمجمعات Threads في الإنتاج، فكّر في مكتبة <code>rayon</code> التي توفر مُكرّرات متوازية بأقل قدر من الكود المعياري.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-10-smart-pointers.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 11 من 17</span>
+  <a href="ch-12-async-await.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

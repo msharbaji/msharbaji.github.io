@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 12, Async/Await | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 3</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 71%"></div></div>
+    <span class="progress-label">12 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">⚡</div>
+    <h1>Async/Await</h1>
+    <p>Async Rust with Tokio, futures, async functions, and concurrent task execution.</p>
+  </div>
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What is Async Programming?</h2>
+    </div>
+    <p>
+      Async programming allows writing non-blocking code that can handle many concurrent operations with fewer threads. It is ideal for I/O-bound tasks like network requests, file reads, and database queries where the program spends most of its time waiting.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::future::Future;
+<span class="keyword">use</span> std::pin::Pin;
+<span class="keyword">use</span> std::task::{Context, Poll};
+<span class="comment">// A simple future that completes after one poll</span>
+<span class="keyword">struct</span> SimpleFuture {
+    done: bool,
+<span class="keyword">impl</span> Future <span class="keyword">for</span> SimpleFuture {
+    <span class="keyword">type</span> Output = String;
+    <span class="keyword">fn</span> <span class="func">poll</span>(
+        <span class="keyword">mut</span> <span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> Self&gt;,
+        <span class="param">_cx</span>: &amp;<span class="keyword">mut</span> Context&lt;<span class="keyword">'_</span>&gt;,
+    ) -&gt; Poll&lt;Self::Output&gt; {
+        <span class="keyword">if</span> <span class="keyword">self</span>.done {
+            Poll::<span class="func">Ready</span>(String::<span class="func">from</span>(<span class="string">"Done!"</span>))
+        } <span class="keyword">else</span> {
+            <span class="keyword">self</span>.done = <span class="keyword">true</span>;
+            Poll::Pending
+        }
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Futures are Lazy</h4>
+        <p>A <code>Future</code> does nothing until it is polled. The <code>poll()</code> method returns <code>Poll::Pending</code> when the operation is not yet complete, and <code>Poll::Ready(value)</code> when it is. The <code>async/await</code> syntax hides this machinery.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Futures and the async/await Syntax</h2>
+    </div>
+    <p>
+      The <code>async/await</code> syntax makes writing asynchronous code look like synchronous code. An <code>async fn</code> returns an <code>impl Future</code>, and <code>.await</code> suspends execution until the future completes.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::time::Duration;
+<span class="keyword">use</span> std::thread;
+<span class="comment">// Without async: verbose callback style</span>
+<span class="keyword">fn</span> <span class="func">fetch_data_callback</span>&lt;F: Fn(String)&gt;(<span class="param">callback</span>: F) {
+    thread::<span class="func">spawn</span>(<span class="keyword">move</span> || {
+        thread::<span class="func">sleep</span>(Duration::<span class="func">from_secs</span>(<span class="number">1</span>));
+        <span class="func">callback</span>(<span class="string">"Data from server"</span>.<span class="func">to_string</span>());
+    });
+<span class="comment">// With async: clean and readable</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">fetch_data_async</span>() -&gt; String {
+    <span class="func">println!</span>(<span class="string">"Fetching data..."</span>);
+    <span class="string">"Data from server"</span>.<span class="func">to_string</span>()
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Async functions return impl Future</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">example</span>() {
+    <span class="func">println!</span>(<span class="string">"Start"</span>);
+    <span class="keyword">let</span> result = <span class="string">"completed"</span>.<span class="func">to_string</span>();
+    <span class="func">println!</span>(<span class="string">"Result: {}"</span>, result);
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">example</span>().<span class="keyword">await</span>;
+    <span class="func">println!</span>(<span class="string">"Async main completed"</span>);
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>async fn is Syntactic Sugar</h4>
+        <p>Writing <code>async fn foo() -&gt; i32</code> is equivalent to <code>fn foo() -&gt; impl Future&lt;Output = i32&gt;</code>. The compiler transforms the function body into a state machine that implements <code>Future</code>.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Tokio Runtime Basics</h2>
+    </div>
+    <p>
+      Tokio is the most popular async runtime for Rust, providing task spawning, timers, I/O utilities, and more. You need a runtime to execute futures, Rust's standard library does not include one.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Using the #[tokio::main] macro</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Tokio runtime is running"</span>);
+    <span class="comment">// Spawn an async task</span>
+    <span class="keyword">let</span> handle = tokio::<span class="func">spawn</span>(<span class="keyword">async</span> {
+        <span class="func">println!</span>(<span class="string">"Task running"</span>);
+        <span class="string">"Result"</span>.<span class="func">to_string</span>()
+    });
+    <span class="comment">// Wait for task completion</span>
+    <span class="keyword">match</span> handle.<span class="keyword">await</span> {
+        Ok(result) =&gt; <span class="func">println!</span>(<span class="string">"Got: {}"</span>, result),
+        Err(_) =&gt; <span class="func">println!</span>(<span class="string">"Task panicked"</span>),
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> tokio::runtime::Runtime;
+<span class="comment">// Manual runtime creation (useful in non-async main)</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> rt = Runtime::<span class="func">new</span>().<span class="func">unwrap</span>();
+    rt.<span class="func">block_on</span>(<span class="keyword">async</span> {
+        <span class="func">println!</span>(<span class="string">"Running in async context"</span>);
+        <span class="keyword">let</span> result = <span class="func">async_operation</span>().<span class="keyword">await</span>;
+        <span class="func">println!</span>(<span class="string">"Result: {}"</span>, result);
+    });
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">async_operation</span>() -&gt; i32 {
+    <span class="number">42</span>
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Cargo.toml Setup</h4>
+        <p>Add <code>tokio = { version = "1", features = ["full"] }</code> to your <code>[dependencies]</code>. The <code>"full"</code> feature enables all Tokio components including timers, I/O, and the multi-threaded runtime.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Spawning Async Tasks</h2>
+    </div>
+    <p>
+      <code>tokio::spawn</code> runs a future concurrently on the Tokio runtime. Each spawned task is an independent unit of work that the runtime schedules cooperatively.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..<span class="number">5</span> {
+        <span class="keyword">let</span> handle = tokio::<span class="func">spawn</span>(<span class="keyword">async</span> <span class="keyword">move</span> {
+            <span class="func">println!</span>(<span class="string">"Task {} starting"</span>, i);
+            tokio::time::<span class="func">sleep</span>(
+                tokio::time::Duration::<span class="func">from_millis</span>(<span class="number">100</span> * i <span class="keyword">as</span> u64)
+            ).<span class="keyword">await</span>;
+            <span class="func">println!</span>(<span class="string">"Task {} done"</span>, i);
+            i * <span class="number">2</span>
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="comment">// Wait for all tasks</span>
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        <span class="keyword">match</span> handle.<span class="keyword">await</span> {
+            Ok(result) =&gt; <span class="func">println!</span>(<span class="string">"Result: {}"</span>, result),
+            Err(_) =&gt; <span class="func">println!</span>(<span class="string">"Task panicked"</span>),
+        }
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Tracking concurrent tasks with AtomicUsize</span>
+<span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> std::sync::atomic::{AtomicUsize, Ordering};
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> counter = <span class="func">Arc::new</span>(<span class="func">AtomicUsize::new</span>(<span class="number">0</span>));
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">10</span> {
+        <span class="keyword">let</span> counter = counter.<span class="func">clone</span>();
+        tokio::<span class="func">spawn</span>(<span class="keyword">async</span> <span class="keyword">move</span> {
+            counter.<span class="func">fetch_add</span>(<span class="number">1</span>, Ordering::Relaxed);
+            tokio::time::<span class="func">sleep</span>(
+                tokio::time::Duration::<span class="func">from_millis</span>(<span class="number">100</span>)
+            ).<span class="keyword">await</span>;
+            counter.<span class="func">fetch_sub</span>(<span class="number">1</span>, Ordering::Relaxed);
+        });
+    }
+    tokio::time::<span class="func">sleep</span>(tokio::time::Duration::<span class="func">from_secs</span>(<span class="number">1</span>)).<span class="keyword">await</span>;
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Spawned Tasks Must Be 'static</h4>
+        <p>Tasks passed to <code>tokio::spawn</code> must own all their data (be <code>'static</code>). Use <code>move</code> closures and <code>Arc</code> to share data across tasks, just like with threads.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Async Channels</h2>
+    </div>
+    <p>
+      Tokio provides async-aware channels for inter-task communication. Unlike <code>std::sync::mpsc</code>, these channels suspend the task (instead of blocking the thread) when waiting for messages.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> (tx, <span class="keyword">mut</span> rx) = tokio::sync::mpsc::<span class="func">channel</span>(<span class="number">100</span>);
+    tokio::<span class="func">spawn</span>(<span class="keyword">async</span> <span class="keyword">move</span> {
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..<span class="number">5</span> {
+            tx.<span class="func">send</span>(i).<span class="keyword">await</span>.<span class="func">unwrap</span>();
+            tokio::time::<span class="func">sleep</span>(
+                tokio::time::Duration::<span class="func">from_millis</span>(<span class="number">100</span>)
+            ).<span class="keyword">await</span>;
+        }
+    });
+    <span class="keyword">while</span> <span class="keyword">let</span> Some(value) = rx.<span class="func">recv</span>().<span class="keyword">await</span> {
+        <span class="func">println!</span>(<span class="string">"Received: {}"</span>, value);
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Async producer-consumer pattern</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> (tx, <span class="keyword">mut</span> rx) = tokio::sync::mpsc::<span class="func">channel</span>(<span class="number">10</span>);
+    <span class="comment">// Producer task</span>
+    tokio::<span class="func">spawn</span>(<span class="keyword">async</span> <span class="keyword">move</span> {
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..<span class="number">10</span> {
+            <span class="keyword">match</span> tx.<span class="func">send</span>(<span class="func">format!</span>(<span class="string">"Message {}"</span>, i)).<span class="keyword">await</span> {
+                Ok(_) =&gt; {},
+                Err(_) =&gt; <span class="keyword">break</span>,
+            }
+            tokio::time::<span class="func">sleep</span>(
+                tokio::time::Duration::<span class="func">from_millis</span>(<span class="number">50</span>)
+            ).<span class="keyword">await</span>;
+        }
+    });
+    <span class="comment">// Consumer</span>
+    <span class="keyword">let</span> <span class="keyword">mut</span> count = <span class="number">0</span>;
+    <span class="keyword">while</span> <span class="keyword">let</span> Some(msg) = rx.<span class="func">recv</span>().<span class="keyword">await</span> {
+        <span class="func">println!</span>(<span class="string">"{}"</span>, msg);
+        count += <span class="number">1</span>;
+    }
+    <span class="func">println!</span>(<span class="string">"Processed {} messages"</span>, count);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Bounded vs Unbounded Channels</h4>
+        <p><code>tokio::sync::mpsc::channel(n)</code> creates a bounded channel with capacity <code>n</code>. When full, <code>send().await</code> suspends until space is available. This provides natural back-pressure to prevent producers from overwhelming consumers.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>select! and join! Macros</h2>
+    </div>
+    <p>
+      Tokio's <code>select!</code> races multiple futures and runs the branch of whichever completes first. <code>join!</code> waits for all futures to complete concurrently.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// select! races multiple futures</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    tokio::<span class="func">select!</span> {
+        _ = tokio::time::<span class="func">sleep</span>(
+            tokio::time::Duration::<span class="func">from_secs</span>(<span class="number">1</span>)
+        ) =&gt; {
+            <span class="func">println!</span>(<span class="string">"Timeout reached"</span>);
+        }
+        result = <span class="func">async_operation</span>() =&gt; {
+            <span class="func">println!</span>(<span class="string">"Operation completed: {}"</span>, result);
+        }
+    }
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">async_operation</span>() -&gt; String {
+    <span class="string">"Done"</span>.<span class="func">to_string</span>()
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// join! waits for all futures concurrently</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> result = tokio::<span class="func">join!</span>(
+        <span class="func">operation1</span>(),
+        <span class="func">operation2</span>(),
+        <span class="func">operation3</span>()
+    );
+    <span class="func">println!</span>(<span class="string">"Results: {:?}"</span>, result);
+    <span class="comment">// (1, 2, 3)</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">operation1</span>() -&gt; i32 { <span class="number">1</span> }
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">operation2</span>() -&gt; i32 { <span class="number">2</span> }
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">operation3</span>() -&gt; i32 { <span class="number">3</span> }</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>select! vs join!</h4>
+        <p>Use <code>join!</code> when you need all results (e.g., fetching data from multiple APIs). Use <code>select!</code> when you want to act on whichever completes first (e.g., implementing timeouts, or cancelling a slow operation).</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Error Handling in Async Code</h2>
+    </div>
+    <p>
+      Error handling in async code follows the same <code>Result</code> and <code>?</code> operator patterns as synchronous Rust. The <code>?</code> operator works inside <code>async fn</code> just as you would expect.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">potentially_failing_operation</span>() -&gt; Result&lt;String, String&gt; {
+    <span class="keyword">if</span> <span class="keyword">true</span> {
+        Ok(<span class="string">"Success"</span>.<span class="func">to_string</span>())
+    } <span class="keyword">else</span> {
+        Err(<span class="string">"Failed"</span>.<span class="func">to_string</span>())
+    }
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">potentially_failing_operation</span>().<span class="keyword">await</span> {
+        Ok(value) =&gt; <span class="func">println!</span>(<span class="string">"Success: {}"</span>, value),
+        Err(e) =&gt; <span class="func">println!</span>(<span class="string">"Error: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Using the ? operator in async functions</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">run_async_operations</span>() -&gt; Result&lt;(), String&gt; {
+    <span class="keyword">let</span> result1 = <span class="func">operation1</span>().<span class="keyword">await</span>?;
+    <span class="keyword">let</span> result2 = <span class="func">operation2</span>().<span class="keyword">await</span>?;
+    <span class="func">println!</span>(<span class="string">"Results: {}, {}"</span>, result1, result2);
+    Ok(())
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">operation1</span>() -&gt; Result&lt;i32, String&gt; { Ok(<span class="number">42</span>) }
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">operation2</span>() -&gt; Result&lt;i32, String&gt; { Ok(<span class="number">43</span>) }
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">run_async_operations</span>().<span class="keyword">await</span> {
+        Ok(_) =&gt; <span class="func">println!</span>(<span class="string">"All operations succeeded"</span>),
+        Err(e) =&gt; <span class="func">println!</span>(<span class="string">"Error: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Error Propagation</h4>
+        <p>The <code>?</code> operator in async functions works identically to synchronous code. If an awaited future returns an <code>Err</code>, the error is propagated immediately. Combine with <code>anyhow</code> or <code>thiserror</code> crates for ergonomic error handling.</p>
+      </div>
+    </div>
+  </div>
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Practical Example: Async HTTP Client</h2>
+    </div>
+    <p>
+      The <code>reqwest</code> crate provides a popular async HTTP client that integrates seamlessly with Tokio. This example shows sequential and concurrent HTTP requests.
+    </p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Cargo.toml:</span>
+<span class="comment">// [dependencies]</span>
+<span class="comment">// reqwest = { version = "0.11", features = ["json"] }</span>
+<span class="comment">// tokio = { version = "1", features = ["full"] }</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> client = reqwest::Client::<span class="func">new</span>();
+    <span class="keyword">match</span> client
+        .<span class="func">get</span>(<span class="string">"https://api.github.com/repos/rust-lang/rust"</span>)
+        .<span class="func">send</span>()
+        .<span class="keyword">await</span>
+    {
+        Ok(response) =&gt; {
+            <span class="keyword">match</span> response.<span class="func">text</span>().<span class="keyword">await</span> {
+                Ok(text) =&gt; <span class="func">println!</span>(<span class="string">"Response: {}"</span>,
+                    &amp;text[<span class="number">0</span>..<span class="number">100</span>.<span class="func">min</span>(text.<span class="func">len</span>())]),
+                Err(e) =&gt; <span class="func">println!</span>(<span class="string">"Failed to read body: {}"</span>, e),
+            }
+        }
+        Err(e) =&gt; <span class="func">println!</span>(<span class="string">"Request failed: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="comment">// Concurrent HTTP requests</span>
+<span class="keyword">#[tokio::main]</span>
+<span class="keyword">async</span> <span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> client = reqwest::Client::<span class="func">new</span>();
+    <span class="keyword">let</span> urls = <span class="func">vec!</span>[
+        <span class="string">"https://example.com"</span>,
+        <span class="string">"https://example.com/page2"</span>,
+        <span class="string">"https://example.com/page3"</span>,
+    ];
+    <span class="keyword">let</span> <span class="keyword">mut</span> handles = <span class="func">vec!</span>[];
+    <span class="keyword">for</span> url <span class="keyword">in</span> urls {
+        <span class="keyword">let</span> client = client.<span class="func">clone</span>();
+        <span class="keyword">let</span> handle = tokio::<span class="func">spawn</span>(<span class="keyword">async</span> <span class="keyword">move</span> {
+            <span class="keyword">match</span> client.<span class="func">get</span>(url).<span class="func">send</span>().<span class="keyword">await</span> {
+                Ok(resp) =&gt; <span class="func">println!</span>(<span class="string">"Status: {}"</span>, resp.<span class="func">status</span>()),
+                Err(e) =&gt; <span class="func">println!</span>(<span class="string">"Error: {}"</span>, e),
+            }
+        });
+        handles.<span class="func">push</span>(handle);
+    }
+    <span class="keyword">for</span> handle <span class="keyword">in</span> handles {
+        <span class="keyword">let</span> _ = handle.<span class="keyword">await</span>;
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Async vs Threads</h4>
+        <p>Async tasks are much cheaper than OS threads. You can spawn thousands of async tasks on a single thread pool. Use async for I/O-bound work (network, disk) and threads for CPU-bound work (computation, image processing).</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-11-concurrency.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 12 of 17</span>
+  <a href="ch-13-macros.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

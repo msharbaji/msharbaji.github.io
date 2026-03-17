@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 16, Testing and Best Practices | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 4</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 94%"></div></div>
+    <span class="progress-label">16 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">✅</div>
+    <h1>Testing and Best Practices</h1>
+    <p>Write reliable code, unit tests, integration tests, documentation, and idiomatic Rust patterns.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Unit Tests (<code>#[test]</code>, <code>#[cfg(test)]</code>)</h2>
+    </div>
+    <p>Unit tests verify individual components in isolation. They live alongside your code inside a <code>#[cfg(test)]</code> module and are compiled only when running <code>cargo test</code>.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Basic unit test structure</span>
+<span class="keyword">fn</span> <span class="func">add</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + b
+<span class="keyword">fn</span> <span class="func">divide</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; Result&lt;<span class="keyword">i32</span>, String&gt; {
+    <span class="keyword">if</span> b == <span class="number">0</span> {
+        Err(<span class="string">"Division by zero"</span>.<span class="func">to_string</span>())
+    } <span class="keyword">else</span> {
+        Ok(a / b)
+    }
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests {
+    <span class="keyword">use</span> <span class="keyword">super</span>::*;
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_add</span>() {
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">2</span>, <span class="number">2</span>), <span class="number">4</span>);
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(-<span class="number">1</span>, <span class="number">1</span>), <span class="number">0</span>);
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">0</span>, <span class="number">0</span>), <span class="number">0</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_divide_success</span>() {
+        <span class="func">assert_eq!</span>(<span class="func">divide</span>(<span class="number">10</span>, <span class="number">2</span>).<span class="func">unwrap</span>(), <span class="number">5</span>);
+        <span class="func">assert_eq!</span>(<span class="func">divide</span>(<span class="number">7</span>, <span class="number">2</span>).<span class="func">unwrap</span>(), <span class="number">3</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_divide_by_zero</span>() {
+        <span class="func">assert!</span>(<span class="func">divide</span>(<span class="number">5</span>, <span class="number">0</span>).<span class="func">is_err</span>());
+        <span class="keyword">match</span> <span class="func">divide</span>(<span class="number">10</span>, <span class="number">0</span>) {
+            Err(msg) =&gt; <span class="func">assert_eq!</span>(msg, <span class="string">"Division by zero"</span>),
+            Ok(_) =&gt; <span class="func">panic!</span>(<span class="string">"Should have errored"</span>),
+        }
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">#[should_panic(expected = "attempt to subtract with overflow")]</span>
+    <span class="keyword">fn</span> <span class="func">test_overflow</span>() {
+        <span class="keyword">let</span> _ = <span class="keyword">i32</span>::MIN - <span class="number">1</span>;
+    }
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Testing with custom messages and assertions</span>
+<span class="keyword">struct</span> Calculator;
+<span class="keyword">impl</span> Calculator {
+    <span class="keyword">fn</span> <span class="func">factorial</span>(<span class="param">n</span>: <span class="keyword">u32</span>) -&gt; <span class="keyword">u32</span> {
+        <span class="keyword">match</span> n {
+            <span class="number">0</span> | <span class="number">1</span> =&gt; <span class="number">1</span>,
+            n =&gt; n * <span class="keyword">Self</span>::<span class="func">factorial</span>(n - <span class="number">1</span>),
+        }
+    }
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests {
+    <span class="keyword">use</span> <span class="keyword">super</span>::*;
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_factorial</span>() {
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">0</span>), <span class="number">1</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">1</span>), <span class="number">1</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">5</span>), <span class="number">120</span>,
+            <span class="string">"5! should equal 120"</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">10</span>), <span class="number">3628800</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_factorial_properties</span>() {
+        <span class="keyword">let</span> n = <span class="number">6</span>;
+        <span class="keyword">let</span> result = Calculator::<span class="func">factorial</span>(n);
+        <span class="func">assert!</span>(
+            result &gt; <span class="number">0</span>,
+            <span class="string">"Factorial of {} should be positive, got {}"</span>,
+            n, result
+        );
+    }
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Key Test Macros</h4>
+        <p><code>assert!</code> checks a boolean. <code>assert_eq!</code> and <code>assert_ne!</code> compare values with helpful diff output on failure. All accept an optional format string as the last arguments for custom error messages.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Integration Tests</h2>
+    </div>
+    <p>Integration tests verify multiple components working together. They live in the <code>tests/</code> directory and import your library as an external consumer would.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Integration test file: tests/integration_test.rs</span>
+<span class="comment">// Tests go in the tests/ directory</span>
+<span class="comment">// They import the library like external code would</span>
+<span class="keyword">fn</span> <span class="func">add_two</span>(<span class="param">a</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + <span class="number">2</span>
+<span class="keyword">fn</span> <span class="func">multiply_by_three</span>(<span class="param">a</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a * <span class="number">3</span>
+<span class="keyword">fn</span> <span class="func">complex_operation</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="func">multiply_by_three</span>(<span class="func">add_two</span>(x))
+<span class="keyword">#[test]</span>
+<span class="keyword">fn</span> <span class="func">integration_test_complex_operation</span>() {
+    <span class="comment">// Test that multiple functions work together</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(<span class="number">3</span>), <span class="number">15</span>);  <span class="comment">// (3 + 2) * 3 = 15</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(<span class="number">0</span>), <span class="number">6</span>);   <span class="comment">// (0 + 2) * 3 = 6</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(-<span class="number">2</span>), <span class="number">0</span>); <span class="comment">// (-2 + 2) * 3 = 0</span>
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Unit vs Integration Tests</h4>
+        <p><strong>Unit tests</strong> live inside <code>src/</code> in <code>#[cfg(test)]</code> modules and can test private functions. <strong>Integration tests</strong> live in <code>tests/</code> and can only access your public API, just like a real consumer of your crate.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Doc Tests</h2>
+    </div>
+    <p>Documentation examples that double as executable tests. Write them in <code>///</code> doc comments using fenced code blocks, <code>cargo test</code> runs them automatically.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">/// Adds two numbers together.</span>
+<span class="comment">///</span>
+<span class="comment">/// # Examples</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = add_docs(2, 3);</span>
+<span class="comment">/// assert_eq!(result, 5);</span>
+<span class="comment">/// ```</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// assert_eq!(add_docs(-1, 1), 0);</span>
+<span class="comment">/// ```</span>
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">add_docs</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + b
+<span class="comment">/// Demonstrates error handling in doc tests.</span>
+<span class="comment">///</span>
+<span class="comment">/// # Examples</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = divide_docs(10, 2);</span>
+<span class="comment">/// assert!(result.is_ok());</span>
+<span class="comment">/// assert_eq!(result.unwrap(), 5);</span>
+<span class="comment">/// ```</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = divide_docs(5, 0);</span>
+<span class="comment">/// assert!(result.is_err());</span>
+<span class="comment">/// ```</span>
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">divide_docs</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; Result&lt;<span class="keyword">i32</span>, String&gt; {
+    <span class="keyword">if</span> b == <span class="number">0</span> {
+        Err(<span class="string">"Cannot divide by zero"</span>.<span class="func">to_string</span>())
+    } <span class="keyword">else</span> {
+        Ok(a / b)
+    }
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Doc Tests Keep Examples Honest</h4>
+        <p>Because doc tests are compiled and executed, your documentation examples never go stale. If you refactor an API, failing doc tests immediately flag outdated examples.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Test Organisation</h2>
+    </div>
+    <p>Organise tests into modules that mirror your source structure. Each module can have its own <code>#[cfg(test)]</code> block with focused, well-named tests.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// src/lib.rs - organising tests in modules</span>
+<span class="keyword">pub</span> <span class="keyword">mod</span> math {
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">add</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> { a + b }
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">subtract</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> { a - b }
+    <span class="keyword">#[cfg(test)]</span>
+    <span class="keyword">mod</span> tests {
+        <span class="keyword">use</span> <span class="keyword">super</span>::*;
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_add</span>() { <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">2</span>, <span class="number">2</span>), <span class="number">4</span>); }
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_subtract</span>() { <span class="func">assert_eq!</span>(<span class="func">subtract</span>(<span class="number">5</span>, <span class="number">3</span>), <span class="number">2</span>); }
+    }
+<span class="keyword">pub</span> <span class="keyword">mod</span> string_utils {
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">reverse</span>(<span class="param">s</span>: &amp;<span class="keyword">str</span>) -&gt; String {
+        s.<span class="func">chars</span>().<span class="func">rev</span>().<span class="func">collect</span>()
+    }
+    <span class="keyword">#[cfg(test)]</span>
+    <span class="keyword">mod</span> tests {
+        <span class="keyword">use</span> <span class="keyword">super</span>::*;
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_reverse</span>() {
+            <span class="func">assert_eq!</span>(<span class="func">reverse</span>(<span class="string">"hello"</span>), <span class="string">"olleh"</span>);
+            <span class="func">assert_eq!</span>(<span class="func">reverse</span>(<span class="string">""</span>), <span class="string">""</span>);
+        }
+    }
+}</code></pre></div>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Benchmarking Basics</h2>
+    </div>
+    <p>Measure performance with Criterion.rs. Benchmarks live in the <code>benches/</code> directory and help you track regressions.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Benchmarks typically go in benches/ directory</span>
+<span class="comment">// [dev-dependencies]</span>
+<span class="comment">// criterion = "0.5"</span>
+<span class="keyword">fn</span> <span class="func">fibonacci</span>(<span class="param">n</span>: <span class="keyword">u32</span>) -&gt; <span class="keyword">u32</span> {
+    <span class="keyword">match</span> n {
+        <span class="number">0</span> =&gt; <span class="number">0</span>,
+        <span class="number">1</span> =&gt; <span class="number">1</span>,
+        n =&gt; <span class="func">fibonacci</span>(n - <span class="number">1</span>) + <span class="func">fibonacci</span>(n - <span class="number">2</span>),
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Quick local benchmark without criterion</span>
+    <span class="keyword">let</span> start = std::time::Instant::<span class="func">now</span>();
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">1000</span> {
+        <span class="keyword">let</span> _ = <span class="func">fibonacci</span>(<span class="number">20</span>);
+    }
+    <span class="keyword">let</span> duration = start.<span class="func">elapsed</span>();
+    <span class="func">println!</span>(<span class="string">"Fibonacci(20) x1000: {:?}"</span>, duration);
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>Use Criterion for Real Benchmarks</h4>
+        <p>Criterion.rs provides statistical analysis, warm-up iterations, and comparison against previous runs. It generates HTML reports with charts, far more reliable than manual timing with <code>Instant</code>.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Clippy and rustfmt</h2>
+    </div>
+    <p>Clippy is Rust's official linter that catches common mistakes and suggests idiomatic improvements. rustfmt enforces consistent formatting across your codebase.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Clippy warnings and fixes</span>
+<span class="comment">// BAD: unnecessary else block</span>
+<span class="keyword">fn</span> <span class="func">bad_style</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">if</span> x &gt; <span class="number">0</span> {
+        <span class="keyword">return</span> x;
+    } <span class="keyword">else</span> {
+        <span class="keyword">return</span> -x;
+    }
+<span class="comment">// GOOD: idiomatic Rust</span>
+<span class="keyword">fn</span> <span class="func">good_style</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">if</span> x &gt; <span class="number">0</span> { x } <span class="keyword">else</span> { -x }
+<span class="comment">// BAD: overly complex single-element Vec</span>
+<span class="keyword">fn</span> <span class="func">inefficient</span>() {
+    <span class="keyword">let</span> v: Vec&lt;_&gt; = std::iter::<span class="func">once</span>(<span class="number">42</span>).<span class="func">collect</span>();
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, v);
+<span class="comment">// GOOD: simple and direct</span>
+<span class="keyword">fn</span> <span class="func">efficient</span>() {
+    <span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">42</span>];
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, v);
+<span class="comment">// Run: cargo clippy -- -D warnings</span>
+<span class="comment">// Format: cargo fmt</span>
+<span class="comment">// Check formatting: cargo fmt -- --check</span></code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>Add to CI</h4>
+        <p>Run <code>cargo clippy -- -D warnings</code> and <code>cargo fmt -- --check</code> in your CI pipeline. This catches style issues and common bugs before they reach code review.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Project Structure Best Practices</h2>
+    </div>
+    <p>A well-organised project layout makes navigation, testing, and collaboration easier. Follow Cargo's conventions.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Recommended project structure:</span>
+<span class="comment">//</span>
+<span class="comment">// my_project/</span>
+<span class="comment">// ├── Cargo.toml              # Project manifest</span>
+<span class="comment">// ├── Cargo.lock              # Locked dependencies</span>
+<span class="comment">// ├── src/</span>
+<span class="comment">// │   ├── lib.rs             # Library root</span>
+<span class="comment">// │   ├── main.rs            # Binary entry point</span>
+<span class="comment">// │   ├── module1.rs         # Public modules</span>
+<span class="comment">// │   └── subdir/</span>
+<span class="comment">// │       └── module2.rs</span>
+<span class="comment">// ├── tests/                  # Integration tests</span>
+<span class="comment">// │   ├── integration_test.rs</span>
+<span class="comment">// │   └── common.rs          # Shared test utilities</span>
+<span class="comment">// ├── benches/               # Benchmarks</span>
+<span class="comment">// │   └── my_bench.rs</span>
+<span class="comment">// └── examples/              # Runnable examples</span>
+<span class="comment">//     └── example1.rs</span></code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">TOML</span></div><pre><code><span class="comment"># Cargo.toml best practices</span>
+[package]
+name = <span class="string">"my_project"</span>
+version = <span class="string">"0.1.0"</span>
+edition = <span class="string">"2021"</span>
+authors = [<span class="string">"Your Name"</span>]
+license = <span class="string">"MIT OR Apache-2.0"</span>
+description = <span class="string">"A brief description"</span>
+repository = <span class="string">"https://github.com/user/project"</span>
+keywords = [<span class="string">"keyword1"</span>, <span class="string">"keyword2"</span>]
+categories = [<span class="string">"command-line-utilities"</span>]</code></pre></div>
+  </div>
+  <!-- Section 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Recommended Crates Ecosystem</h2>
+    </div>
+    <p>The Rust ecosystem has excellent crates for nearly every use case. Here are the most popular and battle-tested options organised by category.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Essential crates ecosystem</span>
+<span class="comment">// Serialisation: serde, serde_json, toml, bincode</span>
+<span class="comment">// Web frameworks: axum, actix-web, rocket, warp</span>
+<span class="comment">// Async runtime: tokio, async-std</span>
+<span class="comment">// Database: sqlx, diesel, rusqlite, mongodb</span>
+<span class="comment">// CLI tools: clap, structopt, argh</span>
+<span class="comment">// Error handling: anyhow, thiserror, color-eyre</span>
+<span class="comment">// Logging: tracing, log, env_logger</span>
+<span class="comment">// Testing: proptest, quickcheck, rstest</span>
+<span class="comment">// Performance: rayon (parallelism), parking_lot (Mutex)</span>
+<span class="comment">// Utilities: itertools, regex, uuid, chrono, rand</span>
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> crate_examples {
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">common_patterns</span>() {
+        <span class="comment">// Using rayon for parallelism</span>
+        <span class="keyword">let</span> nums: Vec&lt;<span class="keyword">i32</span>&gt; = (<span class="number">1</span>..<span class="number">100</span>).<span class="func">collect</span>();
+        <span class="keyword">let</span> sum: <span class="keyword">i32</span> = nums.<span class="func">iter</span>().<span class="func">sum</span>();
+        <span class="func">assert!</span>(sum &gt; <span class="number">0</span>);
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Start with the Essentials</h4>
+        <p>For any new project, consider starting with <code>serde</code> (serialisation), <code>anyhow</code> + <code>thiserror</code> (error handling), <code>tracing</code> (logging), and <code>clap</code> (CLI). These form a solid foundation for almost any Rust application.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-15-web-development.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 16 of 17</span>
+  <a href="ch-17-where-to-go-next.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

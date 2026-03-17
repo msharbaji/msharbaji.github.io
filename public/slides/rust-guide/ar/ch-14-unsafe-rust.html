@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 14, Rust غير الآمن | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 3</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 82%"></div></div>
+    <span class="progress-label">14 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">⚠️</div>
+    <h1>Rust غير الآمن (unsafe)</h1>
+    <p>متى وكيف تستخدم unsafe, Raw Pointers و FFI وتجاوز الـ Borrow Checker بأمان.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>متى ولماذا تستخدم unsafe</h2>
+    </div>
+    <p>يتجاوز Rust غير الآمن (unsafe) ضمانات وقت التجميع عندما يكون ذلك ضرورياً للأداء أو العمليات على مستوى النظام. استخدمه باعتدال ومع توثيق دقيق.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// When performance requires unsafe optimizations</span>
+<span class="keyword">fn</span> <span class="func">summing_without_bounds_checking</span>(<span class="param">slice</span>: &amp;[<span class="keyword">i32</span>]) -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">let</span> <span class="keyword">mut</span> sum = <span class="number">0</span>;
+    <span class="keyword">unsafe</span> {
+        <span class="comment">// Bypassing bounds checking when we know it's safe</span>
+        <span class="keyword">let</span> ptr = slice.<span class="func">as_ptr</span>();
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">0</span>..slice.<span class="func">len</span>() {
+            sum += *ptr.<span class="func">add</span>(i);
+        }
+    }
+    sum
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> numbers = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+    <span class="keyword">let</span> result = <span class="func">summing_without_bounds_checking</span>(&amp;numbers);
+    <span class="func">println!</span>(<span class="string">"Sum: {}"</span>, result);
+}</code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>عقد unsafe</h4>
+        <p>داخل كتلة <code>unsafe</code>، <strong>أنت</strong> المسؤول عن الحفاظ على ثوابت أمان Rust. الـ Compiler يثق بك, وإذا أخطأت، ستحصل على سلوك غير محدد.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Raw Pointers</h2>
+    </div>
+    <p>تتيح Raw Pointers (<code>*const T</code> و<code>*mut T</code>) الوصول المباشر للذاكرة بدون فحوصات أمان. إنشاؤها آمن، لكن إلغاء Referenceيتها يتطلب كتلة <code>unsafe</code>.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">5</span>;
+    <span class="keyword">let</span> raw_ptr = &amp;x <span class="keyword">as</span> *<span class="keyword">const</span> <span class="keyword">i32</span>;
+    <span class="comment">// Can only dereference in unsafe blocks</span>
+    <span class="keyword">unsafe</span> {
+        <span class="func">println!</span>(<span class="string">"Value at pointer: {}"</span>, *raw_ptr);
+    }
+    <span class="comment">// Mutable raw pointers</span>
+    <span class="keyword">let</span> <span class="keyword">mut</span> y = <span class="number">10</span>;
+    <span class="keyword">let</span> mut_ptr = &amp;<span class="keyword">mut</span> y <span class="keyword">as</span> *<span class="keyword">mut</span> <span class="keyword">i32</span>;
+    <span class="keyword">unsafe</span> {
+        *mut_ptr = <span class="number">20</span>;
+        <span class="func">println!</span>(<span class="string">"Modified value: {}"</span>, *mut_ptr);
+    }
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Pointer arithmetic - advanced usage</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> arr = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+    <span class="keyword">let</span> ptr = arr.<span class="func">as_ptr</span>();
+    <span class="keyword">unsafe</span> {
+        <span class="func">println!</span>(<span class="string">"First element: {}"</span>, *ptr);
+        <span class="func">println!</span>(<span class="string">"Third element: {}"</span>, *ptr.<span class="func">add</span>(<span class="number">2</span>));
+        <span class="comment">// Copy from pointer</span>
+        <span class="keyword">let</span> <span class="keyword">mut</span> dest = [<span class="number">0</span>; <span class="number">5</span>];
+        std::ptr::<span class="func">copy_nonoverlapping</span>(ptr, dest.<span class="func">as_mut_ptr</span>(), <span class="number">5</span>);
+        <span class="func">println!</span>(<span class="string">"Copied array: {:?}"</span>, dest);
+    }
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>الإنشاء مقابل إلغاء الـ Reference</h4>
+        <p>يمكنك <strong>إنشاء</strong> مؤشرات خام في كود آمن, وهذا مسموح تماماً. فقط <strong>إلغاء Reference</strong> المؤشر الخام هو ما يتطلب <code>unsafe</code>، لأن الـ Compiler لا يمكنه ضمان صلاحية المؤشر.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Functions والكتل غير الآمنة</h2>
+    </div>
+    <p>إنشاء واستدعاء Functions غير الآمنة يتطلب كتل <code>unsafe</code> صريحة. الـ Pattern الجيد هو تغليف العمليات الداخلية غير الآمنة خلف واجهة برمجية عامة آمنة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Unsafe function that splits a string at an arbitrary position</span>
+<span class="keyword">unsafe</span> <span class="keyword">fn</span> <span class="func">split_at_unsafe</span>(<span class="param">s</span>: &amp;<span class="keyword">str</span>, <span class="param">mid</span>: <span class="keyword">usize</span>) -&gt; (&amp;<span class="keyword">str</span>, &amp;<span class="keyword">str</span>) {
+    <span class="keyword">let</span> bytes = s.<span class="func">as_bytes</span>();
+    <span class="keyword">let</span> ptr = s.<span class="func">as_ptr</span>();
+    <span class="comment">// Assume mid is a valid UTF-8 boundary</span>
+    (
+        std::str::<span class="func">from_utf8_unchecked</span>(
+            std::slice::<span class="func">from_raw_parts</span>(ptr, mid)),
+        std::str::<span class="func">from_utf8_unchecked</span>(
+            std::slice::<span class="func">from_raw_parts</span>(ptr.<span class="func">add</span>(mid), bytes.<span class="func">len</span>() - mid)),
+    )
+<span class="keyword">fn</span> <span class="func">safe_split_wrapper</span>(<span class="param">s</span>: &amp;<span class="keyword">str</span>, <span class="param">mid</span>: <span class="keyword">usize</span>) -&gt; Option&lt;(&amp;<span class="keyword">str</span>, &amp;<span class="keyword">str</span>)&gt; {
+    <span class="keyword">if</span> mid &lt;= s.<span class="func">len</span>() &amp;&amp; s.<span class="func">is_char_boundary</span>(mid) {
+        <span class="keyword">unsafe</span> { Some(<span class="func">split_at_unsafe</span>(s, mid)) }
+    } <span class="keyword">else</span> {
+        None
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> text = <span class="string">"Hello, world!"</span>;
+    <span class="keyword">if</span> <span class="keyword">let</span> Some((left, right)) = <span class="func">safe_split_wrapper</span>(text, <span class="number">5</span>) {
+        <span class="func">println!</span>(<span class="string">"Left: {}, Right: {}"</span>, left, right);
+    }
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Unsafe traits</span>
+<span class="keyword">unsafe</span> <span class="keyword">trait</span> <span class="func">Dangerous</span> {
+    <span class="keyword">unsafe</span> <span class="keyword">fn</span> <span class="func">do_dangerous_thing</span>(&amp;<span class="keyword">self</span>);
+<span class="keyword">struct</span> UnsafeStruct;
+<span class="keyword">unsafe</span> <span class="keyword">impl</span> Dangerous <span class="keyword">for</span> UnsafeStruct {
+    <span class="keyword">unsafe</span> <span class="keyword">fn</span> <span class="func">do_dangerous_thing</span>(&amp;<span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"Doing something dangerous!"</span>);
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> obj = UnsafeStruct;
+    <span class="keyword">unsafe</span> {
+        obj.<span class="func">do_dangerous_thing</span>();
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>نمط الأغلفة الآمنة</h4>
+        <p>أفضل ممارسة هي التحقق من جميع الشروط المسبقة في Function غلاف آمنة، ثم استدعاء كود <code>unsafe</code> الأساسي فقط عندما تكون الثوابت مضمونة. هذا يبقي مساحة unsafe في حدها الأدنى.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Variables الثابتة القابلة للتعديل</h2>
+    </div>
+    <p>تتطلب Variables الثابتة القابلة للتعديل (mutable statics) وصولاً غير آمن بسبب احتمال حدوث سباقات بيانات في السياقات Multi-threaded.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="keyword">static</span> <span class="keyword">mut</span> COUNTER: <span class="keyword">i32</span> = <span class="number">0</span>;
+<span class="keyword">fn</span> <span class="func">increment_counter</span>() {
+    <span class="keyword">unsafe</span> {
+        COUNTER += <span class="number">1</span>;
+    }
+<span class="keyword">fn</span> <span class="func">get_counter</span>() -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">unsafe</span> {
+        COUNTER
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">increment_counter</span>();
+    <span class="func">increment_counter</span>();
+    <span class="func">println!</span>(<span class="string">"Counter: {}"</span>, <span class="func">get_counter</span>());
+}</code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>فضّل Atomics أو Mutex</h4>
+        <p>Variables الثابتة القابلة للتعديل غير آمنة بطبيعتها في الكود متعدد Threads. في الممارسة العملية، فضّل <code>AtomicI32</code> أو <code>Mutex&lt;T&gt;</code> أو <code>once_cell::sync::Lazy</code> لإدارة الحالة العامة بThread Safety.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>FFI (FFI): استدعاء C من Rust</h2>
+    </div>
+    <p>تتيح FFI (FFI) استدعاء كود C من Rust. جميع استدعاءات FFI هي <code>unsafe</code> لأن Rust Compiler لا يمكنه التحقق من صحة الكود الخارجي.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Using libc to call C functions</span>
+<span class="keyword">extern</span> <span class="string">"C"</span> {
+    <span class="keyword">fn</span> <span class="func">abs</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span>;
+    <span class="keyword">fn</span> <span class="func">sqrt</span>(<span class="param">x</span>: <span class="keyword">f64</span>) -&gt; <span class="keyword">f64</span>;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">unsafe</span> {
+        <span class="func">println!</span>(<span class="string">"abs(-42) = {}"</span>, <span class="func">abs</span>(-<span class="number">42</span>));
+        <span class="func">println!</span>(<span class="string">"sqrt(16.0) = {}"</span>, <span class="func">sqrt</span>(<span class="number">16.0</span>));
+    }
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Wrapping C functions with safe interfaces</span>
+<span class="keyword">extern</span> <span class="string">"C"</span> {
+    <span class="keyword">fn</span> <span class="func">strlen</span>(<span class="param">s</span>: *<span class="keyword">const</span> <span class="keyword">u8</span>) -&gt; <span class="keyword">usize</span>;
+<span class="keyword">fn</span> <span class="func">safe_strlen</span>(<span class="param">s</span>: &amp;<span class="keyword">str</span>) -&gt; <span class="keyword">usize</span> {
+    <span class="keyword">unsafe</span> {
+        <span class="func">strlen</span>(s.<span class="func">as_ptr</span>())
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> text = <span class="string">"Hello"</span>;
+    <span class="func">println!</span>(<span class="string">"Length: {}"</span>, <span class="func">safe_strlen</span>(text));
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>واجهة ABI من النوع <code>extern "C"</code></h4>
+        <p>حرف <code>"C"</code> في <code>extern "C"</code> يحدد اتفاقية الاستدعاء. هذا يخبر Rust باستخدام ABI لغة C، وهو المعيار للتوافق بين اللغات على معظم المنصات.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>تجريدات آمنة فوق كود unsafe</h2>
+    </div>
+    <p>أفضل ممارسة هي إخفاء العمليات غير الآمنة خلف واجهات برمجية آمنة. تحقق من المدخلات، وأدِر Lifetimes، ونفّذ <code>Drop</code> للتنظيف.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Safe abstraction over unsafe pointer operations</span>
+<span class="keyword">struct</span> <span class="func">SafeBuffer</span> {
+    ptr: *<span class="keyword">mut</span> <span class="keyword">u8</span>,
+    len: <span class="keyword">usize</span>,
+<span class="keyword">impl</span> SafeBuffer {
+    <span class="keyword">fn</span> <span class="func">new</span>(<span class="param">size</span>: <span class="keyword">usize</span>) -&gt; <span class="keyword">Self</span> {
+        <span class="keyword">unsafe</span> {
+            <span class="keyword">let</span> ptr = libc::<span class="func">malloc</span>(size) <span class="keyword">as</span> *<span class="keyword">mut</span> <span class="keyword">u8</span>;
+            SafeBuffer { ptr, len: size }
+        }
+    }
+    <span class="keyword">fn</span> <span class="func">get</span>(&amp;<span class="keyword">self</span>, <span class="param">index</span>: <span class="keyword">usize</span>) -&gt; Option&lt;<span class="keyword">u8</span>&gt; {
+        <span class="keyword">if</span> index &lt; <span class="keyword">self</span>.len {
+            <span class="keyword">unsafe</span> { Some(*<span class="keyword">self</span>.ptr.<span class="func">add</span>(index)) }
+        } <span class="keyword">else</span> {
+            None
+        }
+    }
+    <span class="keyword">fn</span> <span class="func">set</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, <span class="param">index</span>: <span class="keyword">usize</span>, <span class="param">value</span>: <span class="keyword">u8</span>) -&gt; <span class="keyword">bool</span> {
+        <span class="keyword">if</span> index &lt; <span class="keyword">self</span>.len {
+            <span class="keyword">unsafe</span> { *<span class="keyword">self</span>.ptr.<span class="func">add</span>(index) = value; }
+            <span class="keyword">true</span>
+        } <span class="keyword">else</span> {
+            <span class="keyword">false</span>
+        }
+    }
+<span class="keyword">impl</span> Drop <span class="keyword">for</span> SafeBuffer {
+    <span class="keyword">fn</span> <span class="func">drop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) {
+        <span class="keyword">unsafe</span> {
+            libc::<span class="func">free</span>(<span class="keyword">self</span>.ptr <span class="keyword">as</span> *<span class="keyword">mut</span> libc::c_void);
+        }
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> buf = SafeBuffer::<span class="func">new</span>(<span class="number">10</span>);
+    buf.<span class="func">set</span>(<span class="number">0</span>, <span class="number">42</span>);
+    <span class="keyword">if</span> <span class="keyword">let</span> Some(value) = buf.<span class="func">get</span>(<span class="number">0</span>) {
+        <span class="func">println!</span>(<span class="string">"Value: {}"</span>, value);
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>المبدأ الأساسي</h4>
+        <p>التجريد الآمن المصمم جيداً يجعل من <strong>المستحيل</strong> على المستدعين إثارة سلوك غير محدد من خلال الواجهة البرمجية العامة. جميع فحوصات الحدود وإثباتات الصلاحية تحدث داخل الغلاف.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Patterns unsafe الشائعة</h2>
+    </div>
+    <p>تتضمن عدة Patterns في برمجة الأنظمة كوداً غير آمن بشكل شائع، مثل تحويل الأنواع واستخدام هياكل <code>#[repr(C)]</code> للتوافق مع C.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Pattern 1: Transmute (with extreme caution)</span>
+<span class="keyword">fn</span> <span class="func">bytes_to_u32_unsafe</span>(<span class="param">bytes</span>: &amp;[<span class="keyword">u8</span>; <span class="number">4</span>]) -&gt; <span class="keyword">u32</span> {
+    <span class="keyword">unsafe</span> {
+        std::mem::<span class="func">transmute</span>::&lt;[<span class="keyword">u8</span>; <span class="number">4</span>], <span class="keyword">u32</span>&gt;(*bytes)
+    }
+<span class="comment">// Pattern 2: Accessing struct fields at offsets</span>
+<span class="keyword">#[repr(C)]</span>
+<span class="keyword">struct</span> <span class="func">CStruct</span> {
+    a: <span class="keyword">i32</span>,
+    b: <span class="keyword">f64</span>,
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> s = CStruct { a: <span class="number">42</span>, b: <span class="number">3.14</span> };
+    <span class="comment">// Safe approach: use normal field access</span>
+    <span class="func">println!</span>(<span class="string">"a: {}, b: {}"</span>, s.a, s.b);
+    <span class="comment">// Unsafe approach: raw pointer access</span>
+    <span class="keyword">unsafe</span> {
+        <span class="keyword">let</span> ptr = &amp;s <span class="keyword">as</span> *<span class="keyword">const</span> CStruct <span class="keyword">as</span> *<span class="keyword">const</span> <span class="keyword">u8</span>;
+        <span class="func">println!</span>(<span class="string">"Field a offset: {}"</span>,
+            std::mem::<span class="func">offset_of!</span>(CStruct, a));
+    }
+}</code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>transmute خطير</h4>
+        <p><code>std::mem::transmute</code> يعيد تفسير بتات القيمة كنوع مختلف. يمكن أن يسبب سلوكاً غير محدد بسهولة إذا كانت للأنواع المصدر والهدف ثوابت مختلفة. فضّل <code>from_ne_bytes</code> / <code>to_ne_bytes</code> للتحويلات الرقمية.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-13-macros.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 14 من 17</span>
+  <a href="ch-15-web-development.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

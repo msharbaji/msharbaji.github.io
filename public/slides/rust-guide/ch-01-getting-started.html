@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 1, Getting Started with Rust | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 6%"></div></div>
+    <span class="progress-label">1 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<!-- Main Content -->
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🚀</div>
+    <h1>Getting Started with Rust</h1>
+    <p>Install Rust, write your first program, and master Cargo, the gateway to systems programming.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>What is Rust and Why Use It?</h2>
+    </div>
+    <p>Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety. Released in 2010 and continuously developed by a vibrant open-source community, Rust combines the performance of languages like C and C++ with memory safety guarantees that prevent entire classes of bugs at compile-time.</p>
+    <h3>The Three Pillars of Rust</h3>
+    <ul>
+      <li><strong>Memory Safety</strong>: Rust prevents null pointer dereferences, buffer overflows, and use-after-free bugs through its ownership system. There's no garbage collector, Rust's compiler ensures memory is properly managed.</li>
+      <li><strong>Performance</strong>: With zero-cost abstractions and no runtime overhead, Rust code runs as fast as equivalent C code. You get high-level language features without sacrificing speed.</li>
+      <li><strong>Concurrency</strong>: Rust's ownership system eliminates data races at compile-time. Write concurrent code that's guaranteed to be thread-safe without relying on locks.</li>
+    </ul>
+    <p>These properties make Rust ideal for:</p>
+    <ul>
+      <li>Systems programming (operating systems, embedded systems)</li>
+      <li>Web servers and networked applications</li>
+      <li>Performance-critical applications</li>
+      <li>WebAssembly and browser-based applications</li>
+      <li>Blockchain and cryptocurrency projects</li>
+      <li>Game engines and graphics applications</li>
+    </ul>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Installing Rust</h2>
+    </div>
+    <p>The easiest way to install Rust is using <code>rustup</code>, which manages Rust versions and associated tools. Here's how to get started:</p>
+    <h3>Installation Steps</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code><span class="comment"># On macOS, Linux, or Windows (with WSL/Git Bash):</span>
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+<span class="comment"># This installs:</span>
+<span class="comment"># - rustc: The Rust compiler</span>
+<span class="comment"># - cargo: The package manager and build system</span>
+<span class="comment"># - rustup: The installer and version manager</span></code></pre>
+    </div>
+    <p>After installation, verify everything works correctly:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>rustc --version
+cargo --version</code></pre>
+    </div>
+    <p>You should see version information for both tools. If you're on Windows, you can also download and run the installer from <code>https://rustup.rs/</code>.</p>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Keep Rust Up to Date</h4><p>Rust updates frequently. To update your Rust installation, simply run <code>rustup update</code> from your terminal.</p></div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Your First Rust Program: Hello World</h2>
+    </div>
+    <p>Let's write your first Rust program. Create a new directory and a file called <code>main.rs</code>:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Hello, world!"</span>);
+}</code></pre>
+    </div>
+    <p>Now compile and run it:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>rustc main.rs
+./main</code></pre>
+    </div>
+    <p>You should see <code>Hello, world!</code> printed to your terminal. Congratulations! You've written your first Rust program.</p>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>First Program Complete!</h4><p>You've compiled and executed your first Rust program. The <code>fn</code> keyword declares a function, and <code>println!</code> is a macro that prints text to the console.</p></div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Cargo: Rust's Package Manager and Build System</h2>
+    </div>
+    <p>For anything beyond trivial programs, you'll want to use Cargo. Cargo is Rust's official package manager and build system that handles dependencies, compilation, testing, and documentation.</p>
+    <h3>Creating a New Project</h3>
+    <p>Create a new Cargo project with a single command:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>cargo new hello_world
+<span class="keyword">cd</span> hello_world</code></pre>
+    </div>
+    <p>This creates a directory structure:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code>hello_world/
+├── Cargo.toml          <span class="comment"># Project manifest with metadata and dependencies</span>
+└── src/
+    └── main.rs         <span class="comment"># Your source code</span></code></pre>
+    </div>
+    <h3>The Cargo.toml File</h3>
+    <p>This file contains your project metadata and dependencies. Here's a typical example:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">TOML</span>
+      </div>
+      <pre><code>[package]
+name = <span class="string">"hello_world"</span>
+version = <span class="string">"0.1.0"</span>
+edition = <span class="string">"2021"</span>
+[dependencies]
+<span class="comment"># Add dependencies here</span>
+serde = <span class="string">"1.0"</span>
+tokio = { version = <span class="string">"1.0"</span>, features = [<span class="string">"full"</span>] }</code></pre>
+    </div>
+    <h3>Cargo Commands</h3>
+    <p>The main Cargo commands you'll use daily:</p>
+    <ul>
+      <li><strong><code>cargo build</code></strong>: Compiles your project in debug mode. Creates a binary in <code>target/debug/</code>.</li>
+      <li><strong><code>cargo run</code></strong>: Compiles and runs your project immediately. Useful during development.</li>
+      <li><strong><code>cargo build --release</code></strong>: Compiles with optimizations enabled. Creates a binary in <code>target/release/</code>. Much slower to compile but significantly faster to run.</li>
+      <li><strong><code>cargo test</code></strong>: Runs all tests in your project.</li>
+      <li><strong><code>cargo check</code></strong>: Quickly checks if your code compiles without generating a binary. Great for fast feedback during development.</li>
+      <li><strong><code>cargo fmt</code></strong>: Automatically formats your code according to Rust style guidelines.</li>
+      <li><strong><code>cargo clippy</code></strong>: A linter that provides suggestions for improving your code.</li>
+      <li><strong><code>cargo doc --open</code></strong>: Generates and opens HTML documentation for your project and dependencies.</li>
+    </ul>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Building and Running a Cargo Project</h2>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code><span class="comment"># Create the project</span>
+cargo new my_app
+<span class="comment"># Navigate to the project</span>
+<span class="keyword">cd</span> my_app
+<span class="comment"># Edit src/main.rs with your code</span>
+<span class="comment"># Check if it compiles (fast, no binary)</span>
+cargo check
+<span class="comment"># Run during development (slower compile, good for debugging)</span>
+cargo run
+<span class="comment"># Build for production (much faster execution)</span>
+cargo build --release
+<span class="comment"># Run the release binary directly</span>
+./target/release/my_app</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Pro Tip</h4><p>Use <code>cargo check</code> while developing to get fast feedback. Only use <code>cargo build --release</code> when you're ready to deploy or performance-test your application.</p></div>
+    </div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Your First Real Cargo Project</h2>
+    </div>
+    <p>Let's create a slightly more interesting Cargo project that demonstrates key concepts:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="comment">// File: src/main.rs</span>
+<span class="keyword">use</span> std::io;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> input = String::new();
+    <span class="func">println!</span>(<span class="string">"Welcome to the Rust Guessing Game!"</span>);
+    <span class="func">println!</span>(<span class="string">"Enter a number between 1 and 100:"</span>);
+    io::stdin()
+        .read_line(&amp;<span class="keyword">mut</span> input)
+        .expect(<span class="string">"Failed to read line"</span>);
+    <span class="keyword">let</span> number<span class="param">: u32</span> = input
+        .trim()
+        .parse()
+        .expect(<span class="string">"Please enter a valid number"</span>);
+    <span class="func">println!</span>(<span class="string">"You entered: {}"</span>, number);
+    <span class="keyword">if</span> number &gt; <span class="number">50</span> {
+        <span class="func">println!</span>(<span class="string">"That's a high number!"</span>);
+    } <span class="keyword">else</span> {
+        <span class="func">println!</span>(<span class="string">"That's a low number!"</span>);
+    }
+}</code></pre>
+    </div>
+    <p>This program demonstrates several key Rust features:</p>
+    <ul>
+      <li>Using the <code>std::io</code> module from Rust's standard library</li>
+      <li>Mutable variables with <code>let mut</code></li>
+      <li>String parsing and error handling with <code>expect()</code></li>
+      <li>Control flow with <code>if/else</code></li>
+    </ul>
+    <p>Build and run it:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Shell</span>
+      </div>
+      <pre><code>cargo run</code></pre>
+    </div>
+  </div>
+</div>
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="/courses/rust-guide" class="nav-btn">← Course Home</a>
+  <span class="nav-info">Chapter 1 of 17</span>
+  <a href="ch-02-fundamentals.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

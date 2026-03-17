@@ -305,8 +305,10 @@ body::before {
   height: auto;
 }
 
-.dark .prose img {
+.dark .prose img[src$=".svg"] {
   filter: invert(1) hue-rotate(180deg);
+}
+.dark .prose img {
   border-color: var(--color-border);
 }
 

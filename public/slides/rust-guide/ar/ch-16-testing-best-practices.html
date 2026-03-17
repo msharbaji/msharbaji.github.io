@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 16, Testing وأفضل الممارسات | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 4</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 94%"></div></div>
+    <span class="progress-label">16 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">✅</div>
+    <h1>Testing وأفضل الممارسات</h1>
+    <p>اكتب كوداً موثوقاً, Unit Tests وIntegration Tests وDocumentation وPatterns Rust المثالية.</p>
+  </div>
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Unit Tests (<code>#[test]</code>، <code>#[cfg(test)]</code>)</h2>
+    </div>
+    <p>تتحقق Unit Tests من المكونات الفردية بمعزل عن بعضها. تقع بجانب كودك داخل وحدة <code>#[cfg(test)]</code> ويتم تجميعها فقط عند تشغيل <code>cargo test</code>.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Basic unit test structure</span>
+<span class="keyword">fn</span> <span class="func">add</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + b
+<span class="keyword">fn</span> <span class="func">divide</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; Result&lt;<span class="keyword">i32</span>, String&gt; {
+    <span class="keyword">if</span> b == <span class="number">0</span> {
+        Err(<span class="string">"Division by zero"</span>.<span class="func">to_string</span>())
+    } <span class="keyword">else</span> {
+        Ok(a / b)
+    }
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests {
+    <span class="keyword">use</span> <span class="keyword">super</span>::*;
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_add</span>() {
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">2</span>, <span class="number">2</span>), <span class="number">4</span>);
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(-<span class="number">1</span>, <span class="number">1</span>), <span class="number">0</span>);
+        <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">0</span>, <span class="number">0</span>), <span class="number">0</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_divide_success</span>() {
+        <span class="func">assert_eq!</span>(<span class="func">divide</span>(<span class="number">10</span>, <span class="number">2</span>).<span class="func">unwrap</span>(), <span class="number">5</span>);
+        <span class="func">assert_eq!</span>(<span class="func">divide</span>(<span class="number">7</span>, <span class="number">2</span>).<span class="func">unwrap</span>(), <span class="number">3</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_divide_by_zero</span>() {
+        <span class="func">assert!</span>(<span class="func">divide</span>(<span class="number">5</span>, <span class="number">0</span>).<span class="func">is_err</span>());
+        <span class="keyword">match</span> <span class="func">divide</span>(<span class="number">10</span>, <span class="number">0</span>) {
+            Err(msg) =&gt; <span class="func">assert_eq!</span>(msg, <span class="string">"Division by zero"</span>),
+            Ok(_) =&gt; <span class="func">panic!</span>(<span class="string">"Should have errored"</span>),
+        }
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">#[should_panic(expected = "attempt to subtract with overflow")]</span>
+    <span class="keyword">fn</span> <span class="func">test_overflow</span>() {
+        <span class="keyword">let</span> _ = <span class="keyword">i32</span>::MIN - <span class="number">1</span>;
+    }
+}</code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Testing with custom messages and assertions</span>
+<span class="keyword">struct</span> Calculator;
+<span class="keyword">impl</span> Calculator {
+    <span class="keyword">fn</span> <span class="func">factorial</span>(<span class="param">n</span>: <span class="keyword">u32</span>) -&gt; <span class="keyword">u32</span> {
+        <span class="keyword">match</span> n {
+            <span class="number">0</span> | <span class="number">1</span> =&gt; <span class="number">1</span>,
+            n =&gt; n * <span class="keyword">Self</span>::<span class="func">factorial</span>(n - <span class="number">1</span>),
+        }
+    }
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests {
+    <span class="keyword">use</span> <span class="keyword">super</span>::*;
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_factorial</span>() {
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">0</span>), <span class="number">1</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">1</span>), <span class="number">1</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">5</span>), <span class="number">120</span>,
+            <span class="string">"5! should equal 120"</span>);
+        <span class="func">assert_eq!</span>(Calculator::<span class="func">factorial</span>(<span class="number">10</span>), <span class="number">3628800</span>);
+    }
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">test_factorial_properties</span>() {
+        <span class="keyword">let</span> n = <span class="number">6</span>;
+        <span class="keyword">let</span> result = Calculator::<span class="func">factorial</span>(n);
+        <span class="func">assert!</span>(
+            result &gt; <span class="number">0</span>,
+            <span class="string">"Factorial of {} should be positive, got {}"</span>,
+            n, result
+        );
+    }
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>ماكرو Testing الأساسية</h4>
+        <p>ماكرو <code>assert!</code> يفحص قيمة منطقية. <code>assert_eq!</code> و<code>assert_ne!</code> يقارنان القيم مع إخراج فروقات مفيد عند الفشل. جميعها تقبل سلسلة تنسيق اختيارية كمعاملات أخيرة لرسائل خطأ مخصصة.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Integration Tests</h2>
+    </div>
+    <p>تتحقق Integration Tests من عمل عدة مكونات معاً. تقع في مجلد <code>tests/</code> وتستورد مكتبتك كما يفعل مستهلك خارجي.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Integration test file: tests/integration_test.rs</span>
+<span class="comment">// Tests go in the tests/ directory</span>
+<span class="comment">// They import the library like external code would</span>
+<span class="keyword">fn</span> <span class="func">add_two</span>(<span class="param">a</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + <span class="number">2</span>
+<span class="keyword">fn</span> <span class="func">multiply_by_three</span>(<span class="param">a</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a * <span class="number">3</span>
+<span class="keyword">fn</span> <span class="func">complex_operation</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="func">multiply_by_three</span>(<span class="func">add_two</span>(x))
+<span class="keyword">#[test]</span>
+<span class="keyword">fn</span> <span class="func">integration_test_complex_operation</span>() {
+    <span class="comment">// Test that multiple functions work together</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(<span class="number">3</span>), <span class="number">15</span>);  <span class="comment">// (3 + 2) * 3 = 15</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(<span class="number">0</span>), <span class="number">6</span>);   <span class="comment">// (0 + 2) * 3 = 6</span>
+    <span class="func">assert_eq!</span>(<span class="func">complex_operation</span>(-<span class="number">2</span>), <span class="number">0</span>); <span class="comment">// (-2 + 2) * 3 = 0</span>
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>Unit Tests مقابل Integration Tests</h4>
+        <p><strong>Unit Tests</strong> تقع داخل <code>src/</code> في وحدات <code>#[cfg(test)]</code> ويمكنها اختبار Functions الخاصة. <strong>Integration Tests</strong> تقع في <code>tests/</code> ويمكنها فقط الوصول إلى واجهتك البرمجية العامة, تماماً كمستهلك حقيقي لحزمتك.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>اختبارات Documentation</h2>
+    </div>
+    <p>أمثلة Documentation التي تعمل أيضاً كاختبارات قابلة للتنفيذ. اكتبها في تعليقات <code>///</code> باستخدام كتل الكود المسيّجة, يشغّلها <code>cargo test</code> تلقائياً.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">/// Adds two numbers together.</span>
+<span class="comment">///</span>
+<span class="comment">/// # Examples</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = add_docs(2, 3);</span>
+<span class="comment">/// assert_eq!(result, 5);</span>
+<span class="comment">/// ```</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// assert_eq!(add_docs(-1, 1), 0);</span>
+<span class="comment">/// ```</span>
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">add_docs</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    a + b
+<span class="comment">/// Demonstrates error handling in doc tests.</span>
+<span class="comment">///</span>
+<span class="comment">/// # Examples</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = divide_docs(10, 2);</span>
+<span class="comment">/// assert!(result.is_ok());</span>
+<span class="comment">/// assert_eq!(result.unwrap(), 5);</span>
+<span class="comment">/// ```</span>
+<span class="comment">///</span>
+<span class="comment">/// ```</span>
+<span class="comment">/// let result = divide_docs(5, 0);</span>
+<span class="comment">/// assert!(result.is_err());</span>
+<span class="comment">/// ```</span>
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">divide_docs</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; Result&lt;<span class="keyword">i32</span>, String&gt; {
+    <span class="keyword">if</span> b == <span class="number">0</span> {
+        Err(<span class="string">"Cannot divide by zero"</span>.<span class="func">to_string</span>())
+    } <span class="keyword">else</span> {
+        Ok(a / b)
+    }
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>اختبارات Documentation تبقي الأمثلة صادقة</h4>
+        <p>لأن اختبارات Documentation تُجمَّع وتُنفَّذ، فإن أمثلة Documentation لا تصبح قديمة أبداً. إذا أعدت هيكلة واجهة برمجية، فإن اختبارات Documentation الفاشلة تنبهك فوراً إلى الأمثلة المتقادمة.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>تنظيم Testingات</h2>
+    </div>
+    <p>نظّم Testingات في وحدات تعكس بنية الكود المصدري. يمكن لكل وحدة أن تحتوي على كتلة <code>#[cfg(test)]</code> خاصة بها مع اختبارات مركّزة وذات أسماء واضحة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// src/lib.rs - organising tests in modules</span>
+<span class="keyword">pub</span> <span class="keyword">mod</span> math {
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">add</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> { a + b }
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">subtract</span>(<span class="param">a</span>: <span class="keyword">i32</span>, <span class="param">b</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> { a - b }
+    <span class="keyword">#[cfg(test)]</span>
+    <span class="keyword">mod</span> tests {
+        <span class="keyword">use</span> <span class="keyword">super</span>::*;
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_add</span>() { <span class="func">assert_eq!</span>(<span class="func">add</span>(<span class="number">2</span>, <span class="number">2</span>), <span class="number">4</span>); }
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_subtract</span>() { <span class="func">assert_eq!</span>(<span class="func">subtract</span>(<span class="number">5</span>, <span class="number">3</span>), <span class="number">2</span>); }
+    }
+<span class="keyword">pub</span> <span class="keyword">mod</span> string_utils {
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="func">reverse</span>(<span class="param">s</span>: &amp;<span class="keyword">str</span>) -&gt; String {
+        s.<span class="func">chars</span>().<span class="func">rev</span>().<span class="func">collect</span>()
+    }
+    <span class="keyword">#[cfg(test)]</span>
+    <span class="keyword">mod</span> tests {
+        <span class="keyword">use</span> <span class="keyword">super</span>::*;
+        <span class="keyword">#[test]</span>
+        <span class="keyword">fn</span> <span class="func">test_reverse</span>() {
+            <span class="func">assert_eq!</span>(<span class="func">reverse</span>(<span class="string">"hello"</span>), <span class="string">"olleh"</span>);
+            <span class="func">assert_eq!</span>(<span class="func">reverse</span>(<span class="string">""</span>), <span class="string">""</span>);
+        }
+    }
+}</code></pre></div>
+  </div>
+  <!-- Section 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>أساسيات قياس الأداء</h2>
+    </div>
+    <p>قِس الأداء باستخدام Criterion.rs. تقع قياسات الأداء في مجلد <code>benches/</code> وتساعدك على تتبع التراجعات.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Benchmarks typically go in benches/ directory</span>
+<span class="comment">// [dev-dependencies]</span>
+<span class="comment">// criterion = "0.5"</span>
+<span class="keyword">fn</span> <span class="func">fibonacci</span>(<span class="param">n</span>: <span class="keyword">u32</span>) -&gt; <span class="keyword">u32</span> {
+    <span class="keyword">match</span> n {
+        <span class="number">0</span> =&gt; <span class="number">0</span>,
+        <span class="number">1</span> =&gt; <span class="number">1</span>,
+        n =&gt; <span class="func">fibonacci</span>(n - <span class="number">1</span>) + <span class="func">fibonacci</span>(n - <span class="number">2</span>),
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Quick local benchmark without criterion</span>
+    <span class="keyword">let</span> start = std::time::Instant::<span class="func">now</span>();
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="number">0</span>..<span class="number">1000</span> {
+        <span class="keyword">let</span> _ = <span class="func">fibonacci</span>(<span class="number">20</span>);
+    }
+    <span class="keyword">let</span> duration = start.<span class="func">elapsed</span>();
+    <span class="func">println!</span>(<span class="string">"Fibonacci(20) x1000: {:?}"</span>, duration);
+}</code></pre></div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div>
+        <h4>استخدم Criterion لقياسات الأداء الحقيقية</h4>
+        <p>يوفر Criterion.rs تحليلاً إحصائياً ودورات إحماء ومقارنة مع التشغيلات السابقة. يولّد تقارير HTML مع رسوم بيانية, أكثر موثوقية بكثير من القياس اليدوي باستخدام <code>Instant</code>.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>clippy و rustfmt</h2>
+    </div>
+    <p>clippy هو أداة الفحص الرسمية في Rust التي تكتشف الأخطاء الشائعة وتقترح تحسينات مثالية. rustfmt يفرض تنسيقاً متسقاً عبر قاعدة الكود.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Clippy warnings and fixes</span>
+<span class="comment">// BAD: unnecessary else block</span>
+<span class="keyword">fn</span> <span class="func">bad_style</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">if</span> x &gt; <span class="number">0</span> {
+        <span class="keyword">return</span> x;
+    } <span class="keyword">else</span> {
+        <span class="keyword">return</span> -x;
+    }
+<span class="comment">// GOOD: idiomatic Rust</span>
+<span class="keyword">fn</span> <span class="func">good_style</span>(<span class="param">x</span>: <span class="keyword">i32</span>) -&gt; <span class="keyword">i32</span> {
+    <span class="keyword">if</span> x &gt; <span class="number">0</span> { x } <span class="keyword">else</span> { -x }
+<span class="comment">// BAD: overly complex single-element Vec</span>
+<span class="keyword">fn</span> <span class="func">inefficient</span>() {
+    <span class="keyword">let</span> v: Vec&lt;_&gt; = std::iter::<span class="func">once</span>(<span class="number">42</span>).<span class="func">collect</span>();
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, v);
+<span class="comment">// GOOD: simple and direct</span>
+<span class="keyword">fn</span> <span class="func">efficient</span>() {
+    <span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">42</span>];
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, v);
+<span class="comment">// Run: cargo clippy -- -D warnings</span>
+<span class="comment">// Format: cargo fmt</span>
+<span class="comment">// Check formatting: cargo fmt -- --check</span></code></pre></div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div>
+        <h4>أضفه إلى CI</h4>
+        <p>شغّل <code>cargo clippy -- -D warnings</code> و<code>cargo fmt -- --check</code> في خط أنابيب CI الخاص بك. هذا يكتشف مشاكل الأسلوب والأخطاء الشائعة قبل وصولها إلى مراجعة الكود.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Section 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>أفضل ممارسات بنية المشروع</h2>
+    </div>
+    <p>تخطيط المشروع المنظم جيداً يسهّل التنقل وTesting والتعاون. اتبع اتفاقيات Cargo.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Recommended project structure:</span>
+<span class="comment">//</span>
+<span class="comment">// my_project/</span>
+<span class="comment">// ├── Cargo.toml              # Project manifest</span>
+<span class="comment">// ├── Cargo.lock              # Locked dependencies</span>
+<span class="comment">// ├── src/</span>
+<span class="comment">// │   ├── lib.rs             # Library root</span>
+<span class="comment">// │   ├── main.rs            # Binary entry point</span>
+<span class="comment">// │   ├── module1.rs         # Public modules</span>
+<span class="comment">// │   └── subdir/</span>
+<span class="comment">// │       └── module2.rs</span>
+<span class="comment">// ├── tests/                  # Integration tests</span>
+<span class="comment">// │   ├── integration_test.rs</span>
+<span class="comment">// │   └── common.rs          # Shared test utilities</span>
+<span class="comment">// ├── benches/               # Benchmarks</span>
+<span class="comment">// │   └── my_bench.rs</span>
+<span class="comment">// └── examples/              # Runnable examples</span>
+<span class="comment">//     └── example1.rs</span></code></pre></div>
+    <div class="code-block"><div class="code-header"><span class="code-lang">TOML</span></div><pre><code><span class="comment"># Cargo.toml best practices</span>
+[package]
+name = <span class="string">"my_project"</span>
+version = <span class="string">"0.1.0"</span>
+edition = <span class="string">"2021"</span>
+authors = [<span class="string">"Your Name"</span>]
+license = <span class="string">"MIT OR Apache-2.0"</span>
+description = <span class="string">"A brief description"</span>
+repository = <span class="string">"https://github.com/user/project"</span>
+keywords = [<span class="string">"keyword1"</span>, <span class="string">"keyword2"</span>]
+categories = [<span class="string">"command-line-utilities"</span>]</code></pre></div>
+  </div>
+  <!-- Section 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>الحزم (crates) الموصى بها في المنظومة</h2>
+    </div>
+    <p>تحتوي منظومة Rust على حزم ممتازة لكل حالة استخدام تقريباً. إليك أكثر الخيارات شهرة واختباراً مرتبة حسب الفئة.</p>
+    <div class="code-block"><div class="code-header"><span class="code-lang">Rust</span></div><pre><code><span class="comment">// Essential crates ecosystem</span>
+<span class="comment">// Serialisation: serde, serde_json, toml, bincode</span>
+<span class="comment">// Web frameworks: axum, actix-web, rocket, warp</span>
+<span class="comment">// Async runtime: tokio, async-std</span>
+<span class="comment">// Database: sqlx, diesel, rusqlite, mongodb</span>
+<span class="comment">// CLI tools: clap, structopt, argh</span>
+<span class="comment">// Error handling: anyhow, thiserror, color-eyre</span>
+<span class="comment">// Logging: tracing, log, env_logger</span>
+<span class="comment">// Testing: proptest, quickcheck, rstest</span>
+<span class="comment">// Performance: rayon (parallelism), parking_lot (Mutex)</span>
+<span class="comment">// Utilities: itertools, regex, uuid, chrono, rand</span>
+<span class="keyword">#[cfg(test)]</span>
+<span class="keyword">mod</span> crate_examples {
+    <span class="keyword">#[test]</span>
+    <span class="keyword">fn</span> <span class="func">common_patterns</span>() {
+        <span class="comment">// Using rayon for parallelism</span>
+        <span class="keyword">let</span> nums: Vec&lt;<span class="keyword">i32</span>&gt; = (<span class="number">1</span>..<span class="number">100</span>).<span class="func">collect</span>();
+        <span class="keyword">let</span> sum: <span class="keyword">i32</span> = nums.<span class="func">iter</span>().<span class="func">sum</span>();
+        <span class="func">assert!</span>(sum &gt; <span class="number">0</span>);
+    }
+}</code></pre></div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div>
+        <h4>ابدأ بالأساسيات</h4>
+        <p>لأي مشروع جديد، ضع في اعتبارك البدء بـ <code>serde</code> (التسلسل) و<code>anyhow</code> + <code>thiserror</code> (Error Handling) و<code>tracing</code> (التسجيل) و<code>clap</code> (واجهة سطر الأوامر). هذه تشكل أساساً متيناً لأي تطبيق Rust تقريباً.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-15-web-development.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 16 من 17</span>
+  <a href="ch-17-where-to-go-next.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>

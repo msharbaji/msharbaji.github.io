@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 4, Structs and Enums | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 24%"></div></div>
+    <span class="progress-label">4 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🏗️</div>
+    <h1>Structs and Enums</h1>
+    <p>Define custom types with structs, model variants with enums, and unlock Rust's powerful pattern matching.</p>
+  </div>
+  <!-- Section 1: Defining and Using Structs -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Defining and Using Structs</h2>
+    </div>
+    <p>A struct is a custom data type that groups together multiple related values. There are three types of structs in Rust.</p>
+    <h3>Struct Definition</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">struct</span> User {
+    username: <span class="param">String</span>,
+    email: <span class="param">String</span>,
+    sign_in_count: <span class="param">u64</span>,
+    active: <span class="param">bool</span>,
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> user = User {
+        username: String::from(<span class="string">"john_doe"</span>),
+        email: String::from(<span class="string">"john@example.com"</span>),
+        sign_in_count: <span class="number">1</span>,
+        active: <span class="keyword">true</span>,
+    };
+    user.sign_in_count += <span class="number">1</span>;
+    <span class="func">println!</span>(<span class="string">"User: {} ({})"</span>, user.username, user.email);
+    <span class="func">println!</span>(<span class="string">"Sign in count: {}"</span>, user.sign_in_count);
+}</code></pre>
+    </div>
+    <h3>Field Init Shorthand</h3>
+    <p>When variable names match field names, you can use shorthand syntax:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">create_user</span>(username: <span class="param">String</span>, email: <span class="param">String</span>) -&gt; User {
+    User {
+        username,     <span class="comment">// Same as username: username</span>
+        email,        <span class="comment">// Same as email: email</span>
+        sign_in_count: <span class="number">1</span>,
+        active: <span class="keyword">true</span>,
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> user = <span class="func">create_user</span>(
+        String::from(<span class="string">"jane_doe"</span>),
+        String::from(<span class="string">"jane@example.com"</span>),
+    );
+}</code></pre>
+    </div>
+    <h3>Struct Update Syntax</h3>
+    <p>Create a new struct from an existing one, changing only some fields:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> user1 = User {
+        username: String::from(<span class="string">"john"</span>),
+        email: String::from(<span class="string">"john@example.com"</span>),
+        sign_in_count: <span class="number">1</span>,
+        active: <span class="keyword">true</span>,
+    };
+    <span class="keyword">let</span> user2 = User {
+        username: String::from(<span class="string">"jane"</span>),
+        ..user1  <span class="comment">// Use remaining fields from user1</span>
+    };
+}</code></pre>
+    </div>
+    <h3>Tuple Structs</h3>
+    <p>Structs without named fields:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">struct</span> Color(<span class="param">i32</span>, <span class="param">i32</span>, <span class="param">i32</span>);
+<span class="keyword">struct</span> Point(<span class="param">i32</span>, <span class="param">i32</span>, <span class="param">i32</span>);
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> black = Color(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+    <span class="keyword">let</span> origin = Point(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+    <span class="func">println!</span>(<span class="string">"Color red: {}"</span>, black.<span class="number">0</span>);
+    <span class="func">println!</span>(<span class="string">"Point x: {}"</span>, origin.<span class="number">0</span>);
+}</code></pre>
+    </div>
+    <h3>Unit-like Structs</h3>
+    <p>Structs without any fields:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">struct</span> AlwaysEqual;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> subject = AlwaysEqual;
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>Use the struct update syntax (<code>..other_struct</code>) to create new instances that share most fields with an existing struct. This keeps code DRY and readable.</p></div>
+    </div>
+  </div>
+  <!-- Section 2: Method Syntax -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Method Syntax</h2>
+    </div>
+    <p>Methods are functions defined within the context of a struct (or enum, or trait). They take <code>self</code> as their first parameter.</p>
+    <h3>Defining Methods with impl</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">struct</span> Rectangle {
+    width: <span class="param">u32</span>,
+    height: <span class="param">u32</span>,
+<span class="keyword">impl</span> Rectangle {
+    <span class="keyword">fn</span> <span class="func">area</span>(&amp;<span class="keyword">self</span>) -&gt; <span class="param">u32</span> {
+        <span class="keyword">self</span>.width * <span class="keyword">self</span>.height
+    }
+    <span class="keyword">fn</span> <span class="func">can_hold</span>(&amp;<span class="keyword">self</span>, other: &amp;Rectangle) -&gt; <span class="param">bool</span> {
+        <span class="keyword">self</span>.width &gt; other.width &amp;&amp; <span class="keyword">self</span>.height &gt; other.height
+    }
+    <span class="keyword">fn</span> <span class="func">set_width</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, width: <span class="param">u32</span>) {
+        <span class="keyword">self</span>.width = width;
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> rect1 = Rectangle { width: <span class="number">30</span>, height: <span class="number">50</span> };
+    <span class="keyword">let</span> rect2 = Rectangle { width: <span class="number">20</span>, height: <span class="number">40</span> };
+    <span class="func">println!</span>(<span class="string">"Area: {}"</span>, rect1.<span class="func">area</span>());
+    <span class="func">println!</span>(<span class="string">"Can hold: {}"</span>, rect1.<span class="func">can_hold</span>(&amp;rect2));
+    rect1.<span class="func">set_width</span>(<span class="number">35</span>);
+}</code></pre>
+    </div>
+    <h3>Associated Functions</h3>
+    <p>Associated functions don't take <code>self</code> and are called using the <code>::</code> syntax:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">impl</span> Rectangle {
+    <span class="keyword">fn</span> <span class="func">square</span>(size: <span class="param">u32</span>) -&gt; Rectangle {
+        Rectangle { width: size, height: size }
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> sq = Rectangle::<span class="func">square</span>(<span class="number">10</span>);
+    <span class="func">println!</span>(<span class="string">"Square area: {}"</span>, sq.<span class="func">area</span>());
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>Key Insight</h4><p>Associated functions (like <code>Rectangle::square</code>) act as constructors. They are called with <code>::</code> instead of <code>.</code> because they don't operate on an instance.</p></div>
+    </div>
+  </div>
+  <!-- Section 3: Enums -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Enums</h2>
+    </div>
+    <p>Enums allow you to define a type with a set of possible variants. Each variant can have different data associated with it.</p>
+    <h3>Basic Enum</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> Direction {
+    North,
+    South,
+    East,
+    West,
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> direction = Direction::North;
+}</code></pre>
+    </div>
+    <h3>Enums with Associated Data</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> IpAddr {
+    V4(<span class="param">String</span>),
+    V6(<span class="param">String</span>),
+<span class="keyword">enum</span> Message {
+    Quit,
+    Move { x: <span class="param">i32</span>, y: <span class="param">i32</span> },
+    Write(<span class="param">String</span>),
+    ChangeColor(<span class="param">i32</span>, <span class="param">i32</span>, <span class="param">i32</span>),
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> ip1 = IpAddr::V4(String::from(<span class="string">"127.0.0.1"</span>));
+    <span class="keyword">let</span> ip2 = IpAddr::V6(String::from(<span class="string">"::1"</span>));
+    <span class="keyword">let</span> msg1 = Message::Quit;
+    <span class="keyword">let</span> msg2 = Message::Move { x: <span class="number">10</span>, y: <span class="number">20</span> };
+    <span class="keyword">let</span> msg3 = Message::Write(String::from(<span class="string">"hello"</span>));
+    <span class="keyword">let</span> msg4 = Message::ChangeColor(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>);
+}</code></pre>
+    </div>
+    <h3>Methods on Enums</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">impl</span> Message {
+    <span class="keyword">fn</span> <span class="func">call</span>(&amp;<span class="keyword">self</span>) {
+        <span class="func">println!</span>(<span class="string">"Calling message method"</span>);
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> msg = Message::Write(String::from(<span class="string">"hello"</span>));
+    msg.<span class="func">call</span>();
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>Rust enums are far more powerful than enums in most languages. Each variant can hold different types and amounts of data, making them ideal for modelling state machines and message passing.</p></div>
+    </div>
+  </div>
+  <!-- Section 4: The Option Enum -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>The Option Enum</h2>
+    </div>
+    <p>The <code>Option</code> enum is one of Rust's most powerful features. It represents an optional value:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> Option&lt;T&gt; {
+    <span class="keyword">Some</span>(T),
+    <span class="keyword">None</span>,
+}</code></pre>
+    </div>
+    <p>Rust uses <code>Option</code> to represent values that might not exist. This eliminates the need for null pointers:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> some_number = <span class="keyword">Some</span>(<span class="number">5</span>);
+    <span class="keyword">let</span> some_char = <span class="keyword">Some</span>(<span class="string">'e'</span>);
+    <span class="keyword">let</span> absent_number: <span class="param">Option</span>&lt;<span class="param">i32</span>&gt; = <span class="keyword">None</span>;
+    <span class="comment">// Extract the value with match</span>
+    <span class="keyword">match</span> some_number {
+        <span class="keyword">Some</span>(n) =&gt; <span class="func">println!</span>(<span class="string">"Number: {}"</span>, n),
+        <span class="keyword">None</span> =&gt; <span class="func">println!</span>(<span class="string">"No number"</span>),
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>Key Insight</h4><p>Rust has no null. Instead, <code>Option&lt;T&gt;</code> forces you to explicitly handle the case where a value might be absent. The compiler won't let you use an <code>Option&lt;T&gt;</code> as if it were a <code>T</code>, you must unwrap it first.</p></div>
+    </div>
+  </div>
+  <!-- Section 5: Pattern Matching with match -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Pattern Matching with match</h2>
+    </div>
+    <p>The <code>match</code> expression lets you compare a value against multiple patterns and execute code based on which pattern matches:</p>
+    <h3>Basic match</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+<span class="keyword">fn</span> <span class="func">value_in_cents</span>(coin: Coin) -&gt; <span class="param">u8</span> {
+    <span class="keyword">match</span> coin {
+        Coin::Penny =&gt; {
+            <span class="func">println!</span>(<span class="string">"Lucky penny!"</span>);
+            <span class="number">1</span>
+        }
+        Coin::Nickel =&gt; <span class="number">5</span>,
+        Coin::Dime =&gt; <span class="number">10</span>,
+        Coin::Quarter =&gt; <span class="number">25</span>,
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Penny value: {}"</span>, <span class="func">value_in_cents</span>(Coin::Penny));
+}</code></pre>
+    </div>
+    <h3>match with Enums Containing Data</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> UsState {
+    Alabama,
+    California,
+<span class="keyword">enum</span> Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+<span class="keyword">fn</span> <span class="func">value_in_cents</span>(coin: Coin) -&gt; <span class="param">u8</span> {
+    <span class="keyword">match</span> coin {
+        Coin::Quarter(state) =&gt; {
+            <span class="func">println!</span>(<span class="string">"State quarter from {:?}"</span>, state);
+            <span class="number">25</span>
+        }
+        _ =&gt; <span class="number">10</span>,  <span class="comment">// Catch-all pattern</span>
+    }
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>Warning</h4><p>A <code>match</code> must be <strong>exhaustive</strong>, every possible value must be covered. Use <code>_</code> as a catch-all pattern when you don't need to handle every variant individually.</p></div>
+    </div>
+  </div>
+  <!-- Section 6: The if let Syntax -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>The if let Syntax</h2>
+    </div>
+    <p>When you only care about one pattern, <code>if let</code> is more concise than <code>match</code>:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> config_max = <span class="keyword">Some</span>(<span class="number">3u8</span>);
+    <span class="comment">// Using match (verbose)</span>
+    <span class="keyword">match</span> config_max {
+        <span class="keyword">Some</span>(max) =&gt; <span class="func">println!</span>(<span class="string">"Maximum is: {}"</span>, max),
+        _ =&gt; {},
+    }
+    <span class="comment">// Using if let (concise)</span>
+    <span class="keyword">if</span> <span class="keyword">let</span> <span class="keyword">Some</span>(max) = config_max {
+        <span class="func">println!</span>(<span class="string">"Maximum is: {}"</span>, max);
+    }
+}</code></pre>
+    </div>
+    <p>You can also use <code>else</code> with <code>if let</code>:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> coin = Coin::Penny;
+    <span class="keyword">if</span> <span class="keyword">let</span> Coin::Quarter(state) = coin {
+        <span class="func">println!</span>(<span class="string">"State quarter from {:?}"</span>, state);
+    } <span class="keyword">else</span> {
+        <span class="func">println!</span>(<span class="string">"Not a quarter"</span>);
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Tip</h4><p>Use <code>if let</code> when you only need to match one pattern. Use <code>match</code> when you need to handle multiple patterns or want the compiler to verify exhaustiveness.</p></div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-03-ownership.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 4 of 17</span>
+  <a href="ch-05-error-handling.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

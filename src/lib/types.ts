@@ -47,10 +47,18 @@ export interface CourseTopic {
   phase: number;
 }
 
+export interface CoursePhase {
+  num: number;
+  name: Bilingual;
+  description?: Bilingual;
+}
+
 export interface Course {
   slug: string;
   title: Bilingual;
   description: Bilingual;
+  phases: CoursePhase[];
+  learnPoints: Bilingual<string[]>;
   topics: CourseTopic[];
 }
 

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>Chapter 2, Rust Fundamentals | Mohamad Alsharbaji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="slides.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">PHASE 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">← Back to Course</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 12%"></div></div>
+    <span class="progress-label">2 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+</div>
+<!-- Main Content -->
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">📖</div>
+    <h1>Rust Fundamentals</h1>
+    <p>Variables, data types, functions, and control flow, the building blocks of every Rust program.</p>
+  </div>
+  <!-- Section 1: Variables and Mutability -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Variables and Mutability</h2>
+    </div>
+    <p>In Rust, variables are immutable by default. This is a key safety feature that prevents accidental modifications and makes code easier to reason about. To make a variable mutable, you explicitly use the <code>mut</code> keyword.</p>
+    <h3>Immutable Variables</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">5</span>;
+    <span class="func">println!</span>(<span class="string">"x = {}"</span>, x);
+    <span class="comment">// This will cause a compile error:</span>
+    <span class="comment">// x = 6;</span>
+}</code></pre>
+    </div>
+    <h3>Mutable Variables</h3>
+    <p>When you need to change a variable's value, explicitly declare it as mutable:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> x = <span class="number">5</span>;
+    <span class="func">println!</span>(<span class="string">"x = {}"</span>, x);
+    x = <span class="number">6</span>;
+    <span class="func">println!</span>(<span class="string">"x = {}"</span>, x);
+}</code></pre>
+    </div>
+    <h3>Constants</h3>
+    <p>Constants are always immutable and must be annotated with their type. They can be declared at module scope:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">const</span> MAX_POINTS<span class="param">: u32</span> = <span class="number">100_000</span>;
+<span class="keyword">const</span> PI<span class="param">: f64</span> = <span class="number">3.14159</span>;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">println!</span>(<span class="string">"Maximum points: {}"</span>, MAX_POINTS);
+    <span class="func">println!</span>(<span class="string">"Pi: {}"</span>, PI);
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>Constants vs Variables</h4><p>Constants cannot be shadowed, and they're evaluated at compile-time. Variables can be shadowed (redeclared with the same name), which allows changing a value and potentially its type.</p></div>
+    </div>
+    <h3>Shadowing</h3>
+    <p>Shadowing allows you to reuse variable names and even change types:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x = <span class="number">5</span>;
+    <span class="keyword">let</span> x = x + <span class="number">1</span>;  <span class="comment">// x is now 6</span>
+    <span class="keyword">let</span> x = x * <span class="number">2</span>;  <span class="comment">// x is now 12</span>
+    <span class="comment">// You can even change the type:</span>
+    <span class="keyword">let</span> spaces = <span class="string">"   "</span>;
+    <span class="keyword">let</span> spaces = spaces.len();  <span class="comment">// spaces is now a number (3)</span>
+    <span class="func">println!</span>(<span class="string">"x = {}, spaces = {}"</span>, x, spaces);
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 2: Data Types -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Data Types</h2>
+    </div>
+    <p>Rust is a statically typed language, meaning the compiler must know the type of every variable at compile-time. Rust can often infer types, but you can also annotate them explicitly.</p>
+    <h3>Scalar Types</h3>
+    <p>Scalar types represent single values. Rust has four primary scalar types.</p>
+    <h4>Integer Types</h4>
+    <p>Signed and unsigned integers of various sizes:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Signed integers (can be negative)</span>
+    <span class="keyword">let</span> a<span class="param">: i32</span> = -<span class="number">42</span>;     <span class="comment">// 32-bit signed</span>
+    <span class="keyword">let</span> b<span class="param">: i64</span> = -<span class="number">1000</span>;   <span class="comment">// 64-bit signed</span>
+    <span class="keyword">let</span> c<span class="param">: i8</span> = -<span class="number">5</span>;       <span class="comment">// 8-bit signed (range -128 to 127)</span>
+    <span class="comment">// Unsigned integers (always positive)</span>
+    <span class="keyword">let</span> d<span class="param">: u32</span> = <span class="number">42</span>;      <span class="comment">// 32-bit unsigned</span>
+    <span class="keyword">let</span> e<span class="param">: u64</span> = <span class="number">1000</span>;    <span class="comment">// 64-bit unsigned</span>
+    <span class="keyword">let</span> f<span class="param">: u8</span> = <span class="number">255</span>;      <span class="comment">// 8-bit unsigned (range 0 to 255)</span>
+    <span class="comment">// Without annotation, integers default to i32</span>
+    <span class="keyword">let</span> g = <span class="number">100</span>;
+    <span class="func">println!</span>(<span class="string">"a={}, b={}, c={}, d={}, e={}, f={}, g={}"</span>, a, b, c, d, e, f, g);
+}</code></pre>
+    </div>
+    <h4>Floating-Point Types</h4>
+    <p>IEEE 754 standard floating-point numbers:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> x<span class="param">: f64</span> = <span class="number">3.14159</span>;    <span class="comment">// 64-bit float (default)</span>
+    <span class="keyword">let</span> y<span class="param">: f32</span> = <span class="number">2.71828</span>;    <span class="comment">// 32-bit float</span>
+    <span class="comment">// Operations on floats</span>
+    <span class="keyword">let</span> sum = x + y <span class="keyword">as</span> f64;
+    <span class="keyword">let</span> product = x * y <span class="keyword">as</span> f64;
+    <span class="func">println!</span>(<span class="string">"sum = {}, product = {}"</span>, sum, product);
+}</code></pre>
+    </div>
+    <h4>Boolean Type</h4>
+    <p>Logical true/false values:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> is_active<span class="param">: bool</span> = <span class="keyword">true</span>;
+    <span class="keyword">let</span> is_ready = <span class="keyword">false</span>;  <span class="comment">// Type inferred as bool</span>
+    <span class="comment">// Booleans are used in conditionals</span>
+    <span class="keyword">if</span> is_active &amp;&amp; !is_ready {
+        <span class="func">println!</span>(<span class="string">"Active but not ready"</span>);
+    }
+}</code></pre>
+    </div>
+    <h4>Character Type</h4>
+    <p>Unicode scalar values:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> c<span class="param">: char</span> = <span class="string">'z'</span>;
+    <span class="keyword">let</span> emoji<span class="param">: char</span> = <span class="string">'🦀'</span>;
+    <span class="keyword">let</span> greek<span class="param">: char</span> = <span class="string">'&#x03C0;'</span>;
+    <span class="func">println!</span>(<span class="string">"char: {}, emoji: {}, greek: {}"</span>, c, emoji, greek);
+}</code></pre>
+    </div>
+    <h3>Compound Types</h3>
+    <p>Compound types group multiple values into one type. The two primitive compound types are tuples and arrays.</p>
+    <h4>Tuples</h4>
+    <p>Fixed-length collections of values with potentially different types:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Tuple with mixed types</span>
+    <span class="keyword">let</span> tup<span class="param">: (i32, f64, u8)</span> = (<span class="number">500</span>, <span class="number">6.4</span>, <span class="number">1</span>);
+    <span class="comment">// Access tuple elements with destructuring</span>
+    <span class="keyword">let</span> (x, y, z) = tup;
+    <span class="func">println!</span>(<span class="string">"x = {}, y = {}, z = {}"</span>, x, y, z);
+    <span class="comment">// Access tuple elements with dot notation</span>
+    <span class="func">println!</span>(<span class="string">"First element: {}"</span>, tup.<span class="number">0</span>);
+    <span class="func">println!</span>(<span class="string">"Second element: {}"</span>, tup.<span class="number">1</span>);
+    <span class="comment">// Empty tuple (unit type)</span>
+    <span class="keyword">let</span> unit: () = ();
+}</code></pre>
+    </div>
+    <h4>Arrays</h4>
+    <p>Fixed-length collections of values of the same type:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Array with explicit type and length</span>
+    <span class="keyword">let</span> a<span class="param">: [i32; 5]</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];
+    <span class="comment">// Array with repeated value</span>
+    <span class="keyword">let</span> b = [<span class="number">3</span>; <span class="number">5</span>];  <span class="comment">// [3, 3, 3, 3, 3]</span>
+    <span class="comment">// Access array elements</span>
+    <span class="func">println!</span>(<span class="string">"First element: {}"</span>, a[<span class="number">0</span>]);
+    <span class="func">println!</span>(<span class="string">"Last element: {}"</span>, a[<span class="number">4</span>]);
+    <span class="comment">// Iterate over array</span>
+    <span class="keyword">for</span> element <span class="keyword">in</span> a.iter() {
+        <span class="func">println!</span>(<span class="string">"Element: {}"</span>, element);
+    }
+    <span class="comment">// Get array length</span>
+    <span class="func">println!</span>(<span class="string">"Array length: {}"</span>, a.len());
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 3: Functions -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Functions</h2>
+    </div>
+    <p>Functions are fundamental building blocks in Rust. They're declared with the <code>fn</code> keyword and can take parameters and return values.</p>
+    <h3>Basic Function Syntax</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">add</span>(a<span class="param">: i32</span>, b<span class="param">: i32</span>) -&gt; i32 {
+    a + b
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> result = <span class="func">add</span>(<span class="number">5</span>, <span class="number">3</span>);
+    <span class="func">println!</span>(<span class="string">"5 + 3 = {}"</span>, result);
+}</code></pre>
+    </div>
+    <h3>Return Values and Expressions</h3>
+    <p>In Rust, the last expression in a function is automatically returned. Note there's no semicolon on the final expression:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">multiply</span>(a<span class="param">: i32</span>, b<span class="param">: i32</span>) -&gt; i32 {
+    a * b  <span class="comment">// No semicolon - this is a return statement</span>
+<span class="keyword">fn</span> <span class="func">add_one</span>(x<span class="param">: i32</span>) -&gt; i32 {
+    x + <span class="number">1</span>  <span class="comment">// This will be returned</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> result1 = <span class="func">multiply</span>(<span class="number">4</span>, <span class="number">5</span>);
+    <span class="keyword">let</span> result2 = <span class="func">add_one</span>(<span class="number">10</span>);
+    <span class="func">println!</span>(<span class="string">"4 * 5 = {}"</span>, result1);
+    <span class="func">println!</span>(<span class="string">"10 + 1 = {}"</span>, result2);
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>Watch the Semicolons!</h4><p>Adding a semicolon after the last expression turns it into a statement, which means the function returns the unit type <code>()</code> instead of the expected value.</p></div>
+    </div>
+    <h3>Functions with Multiple Parameters</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">calculate_rectangle_area</span>(width<span class="param">: f64</span>, height<span class="param">: f64</span>) -&gt; f64 {
+    width * height
+<span class="keyword">fn</span> <span class="func">print_coordinates</span>(x<span class="param">: i32</span>, y<span class="param">: i32</span>) {
+    <span class="func">println!</span>(<span class="string">"Coordinates: ({}, {})"</span>, x, y);
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> area = <span class="func">calculate_rectangle_area</span>(<span class="number">15.5</span>, <span class="number">8.0</span>);
+    <span class="func">println!</span>(<span class="string">"Area: {}"</span>, area);
+    <span class="func">print_coordinates</span>(<span class="number">10</span>, <span class="number">20</span>);
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 4: Control Flow -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Control Flow</h2>
+    </div>
+    <p>Rust provides several ways to control the flow of your program: conditionals (<code>if/else</code>) and loops (<code>loop</code>, <code>while</code>, <code>for</code>).</p>
+    <h3>if and else Expressions</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">check_number</span>(n<span class="param">: i32</span>) {
+    <span class="keyword">if</span> n &gt; <span class="number">0</span> {
+        <span class="func">println!</span>(<span class="string">"{} is positive"</span>, n);
+    } <span class="keyword">else</span> <span class="keyword">if</span> n &lt; <span class="number">0</span> {
+        <span class="func">println!</span>(<span class="string">"{} is negative"</span>, n);
+    } <span class="keyword">else</span> {
+        <span class="func">println!</span>(<span class="string">"{} is zero"</span>, n);
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">check_number</span>(<span class="number">5</span>);
+    <span class="func">check_number</span>(-<span class="number">3</span>);
+    <span class="func">check_number</span>(<span class="number">0</span>);
+}</code></pre>
+    </div>
+    <p><strong>Using if as an Expression:</strong> Since <code>if</code> is an expression in Rust, you can use it to assign values:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> condition = <span class="keyword">true</span>;
+    <span class="keyword">let</span> number = <span class="keyword">if</span> condition { <span class="number">5</span> } <span class="keyword">else</span> { <span class="number">6</span> };
+    <span class="func">println!</span>(<span class="string">"The value is: {}"</span>, number);  <span class="comment">// Prints: The value is: 5</span>
+    <span class="comment">// Both branches must return the same type</span>
+    <span class="keyword">let</span> age = <span class="number">25</span>;
+    <span class="keyword">let</span> category = <span class="keyword">if</span> age &gt;= <span class="number">18</span> { <span class="string">"adult"</span> } <span class="keyword">else</span> { <span class="string">"minor"</span> };
+    <span class="func">println!</span>(<span class="string">"Category: {}"</span>, category);
+}</code></pre>
+    </div>
+    <h3>The loop Statement</h3>
+    <p>The <code>loop</code> keyword creates an infinite loop that runs until you explicitly break out:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> counter = <span class="number">0</span>;
+    <span class="keyword">loop</span> {
+        <span class="func">println!</span>(<span class="string">"Counter: {}"</span>, counter);
+        counter += <span class="number">1</span>;
+        <span class="keyword">if</span> counter == <span class="number">3</span> {
+            <span class="keyword">break</span>;  <span class="comment">// Exit the loop</span>
+        }
+    }
+    <span class="func">println!</span>(<span class="string">"Loop finished"</span>);
+}</code></pre>
+    </div>
+    <p><strong>Returning Values from Loops:</strong> You can return a value from a loop by using <code>break</code> with an expression:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> counter = <span class="number">0</span>;
+    <span class="keyword">let</span> result = <span class="keyword">loop</span> {
+        counter += <span class="number">1</span>;
+        <span class="keyword">if</span> counter == <span class="number">5</span> {
+            <span class="keyword">break</span> counter * <span class="number">2</span>;  <span class="comment">// Break with a value</span>
+        }
+    };
+    <span class="func">println!</span>(<span class="string">"Result: {}"</span>, result);  <span class="comment">// Prints: Result: 10</span>
+}</code></pre>
+    </div>
+    <h3>The while Loop</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> <span class="keyword">mut</span> number = <span class="number">3</span>;
+    <span class="keyword">while</span> number != <span class="number">0</span> {
+        <span class="func">println!</span>(<span class="string">"{}!"</span>, number);
+        number -= <span class="number">1</span>;
+    }
+    <span class="func">println!</span>(<span class="string">"LIFTOFF!"</span>);
+}</code></pre>
+    </div>
+    <h3>The for Loop</h3>
+    <p>The <code>for</code> loop is the most idiomatic way to iterate in Rust:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="comment">// Iterate over a range</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1</span>..<span class="number">4</span> {
+        <span class="func">println!</span>(<span class="string">"{}!"</span>, i);
+    }
+    <span class="comment">// Iterate with inclusive range (includes 5)</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1</span>..=<span class="number">5</span> {
+        <span class="func">println!</span>(<span class="string">"Number: {}"</span>, i);
+    }
+    <span class="comment">// Iterate over array</span>
+    <span class="keyword">let</span> arr = [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>];
+    <span class="keyword">for</span> element <span class="keyword">in</span> arr.iter() {
+        <span class="func">println!</span>(<span class="string">"Element: {}"</span>, element);
+    }
+    <span class="comment">// Reverse iteration</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> (<span class="number">1</span>..=<span class="number">3</span>).rev() {
+        <span class="func">println!</span>(<span class="string">"{}!"</span>, i);
+    }
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 5: Comments -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Comments</h2>
+    </div>
+    <p>Comments are notes in your code that the compiler ignores. Rust supports single-line and documentation comments:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Rust</span>
+      </div>
+      <pre><code><span class="comment">// This is a single-line comment</span>
+<span class="comment">/* This is a multi-line comment
+   that can span multiple lines */</span>
+<span class="comment">/// This is a documentation comment</span>
+<span class="comment">/// It documents the next item (function, struct, etc.)</span>
+<span class="comment">/// and appears in generated documentation.</span>
+<span class="keyword">fn</span> <span class="func">documented_function</span>() {
+    <span class="comment">// Implementation here</span>
+<span class="comment">//! This is a crate-level or module-level documentation comment</span>
+<span class="comment">//! It documents the item that contains it.</span></code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>Documentation Comments are Special</h4><p>Use <code>///</code> before functions and structs to generate HTML documentation with <code>cargo doc --open</code>. This is a cornerstone of Rust's excellent documentation ecosystem.</p></div>
+    </div>
+  </div>
+</div>
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a href="ch-01-getting-started.html" class="nav-btn">← Previous</a>
+  <span class="nav-info">Chapter 2 of 17</span>
+  <a href="ch-03-ownership.html" class="nav-btn primary">Next →</a>
+</div>
+<script src="slides.js"></script>
+</body>
+</html>

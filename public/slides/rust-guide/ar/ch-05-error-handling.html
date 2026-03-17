@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function(){var d=document.documentElement,t=localStorage.getItem("theme");if(t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches))d.classList.add("dark")})()</script>
+<title>الفصل 5, Error Handling | محمد الشربجي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../slides.css">
+<link rel="stylesheet" href="../slides-rtl.css">
+</head>
+<body>
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-badge">المرحلة 1</span>
+    <a href="/courses/rust-guide" class="topbar-title topbar-back">العودة للدورة →</a>
+  </div>
+  <div class="progress-bar-container">
+    <div class="progress-track"><div class="progress-fill" style="width: 29%"></div></div>
+    <span class="progress-label">5 / 17</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="تبديل المظهر"></button>
+</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🛡️</div>
+    <h1>Error Handling</h1>
+    <p>تعامل مع الأخطاء بأناقة باستخدام Result و Option وعامل ? وأنواع الأخطاء المخصصة.</p>
+  </div>
+  <!-- Section 1: panic! للأخطاء غير الRecoverable -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>panic! للأخطاء غير الRecoverable</h2>
+    </div>
+    <p>يتطلب منك Rust الاعتراف بإمكانية الفشل والتعامل معه. هذا النهج الصريح يمنع الأخطاء التي يتم تجاهلها بصمت. يقسّم Rust الأخطاء إلى فئتين: <strong>Recoverable</strong> و<strong>Unrecoverable</strong>.</p>
+    <p>عندما يحدث خطأ كارثي ولا توجد طريقة للاسترداد، استخدم <code>panic!</code>. ينهي البرنامج فوراً:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="func">panic!</span>(<span class="string">"crash and burn"</span>);  <span class="comment">// Program terminates here</span>
+}</code></pre>
+    </div>
+    <p>غالباً ما تنتج حالات panic من الوصول إلى فهارس مصفوفة خارج الحدود أو فك تغليف قيم <code>None</code>:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> v = <span class="func">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="comment">// This will panic - index out of bounds</span>
+    <span class="comment">// println!("{}", v[99]);</span>
+    <span class="comment">// This will panic - None value</span>
+    <span class="keyword">let</span> option: <span class="param">Option</span>&lt;<span class="param">i32</span>&gt; = <span class="keyword">None</span>;
+    <span class="comment">// let value = option.unwrap();  // Panic!</span>
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>متى تستخدم panic!</h4><p>استخدم <code>panic!</code> فقط في الحالات غير الRecoverable فعلاً. لمعظم حالات الأخطاء، استخدم <code>Result&lt;T, E&gt;</code> بدلاً من ذلك.</p></div>
+    </div>
+  </div>
+  <!-- Section 2: Result<T, E> للأخطاء الRecoverable -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Result&lt;T, E&gt; للأخطاء الRecoverable</h2>
+    </div>
+    <p>تعداد <code>Result</code> يحتوي على Variableين وهو الطريقة القياسية في Rust للتعامل مع الأخطاء الRecoverable:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">enum</span> Result&lt;T, E&gt; {
+    <span class="keyword">Ok</span>(T),     <span class="comment">// Operation succeeded with value T</span>
+    <span class="keyword">Err</span>(E),    <span class="comment">// Operation failed with error E</span>
+}</code></pre>
+    </div>
+    <h3>معالجة Result الأساسية</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fs::File;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> f = File::open(<span class="string">"hello.txt"</span>);
+    <span class="keyword">match</span> f {
+        <span class="keyword">Ok</span>(file) =&gt; <span class="func">println!</span>(<span class="string">"File opened successfully"</span>),
+        <span class="keyword">Err</span>(error) =&gt; <span class="func">println!</span>(<span class="string">"Error opening file: {:?}"</span>, error),
+    }
+}</code></pre>
+    </div>
+    <h3>unwrap و expect</h3>
+    <p><code>unwrap()</code> تُرجع قيمة Ok أو تسبب panic. أما <code>expect()</code> فتفعل الشيء نفسه لكن مع رسالة خطأ مخصصة:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fs::File;
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> f = File::open(<span class="string">"hello.txt"</span>)
+        .expect(<span class="string">"Failed to open hello.txt"</span>);  <span class="comment">// Panic with message if error</span>
+    <span class="comment">// Or use unwrap (less informative)</span>
+    <span class="comment">// let f = File::open("hello.txt").unwrap();</span>
+}</code></pre>
+    </div>
+    <div class="warning">
+      <div class="warning-icon">⚠️</div>
+      <div><h4>تحذير</h4><p>تجنب <code>unwrap()</code> في كود الإنتاج. ستُعطّل برنامجك بدون رسالة خطأ مفيدة. يُفضَّل استخدام <code>expect()</code> مع رسالة وصفية، أو معالجة الخطأ صراحةً.</p></div>
+    </div>
+  </div>
+  <!-- Section 3: تمرير الأخطاء باستخدام ? -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>تمرير الأخطاء باستخدام ?</h2>
+    </div>
+    <p>يُبسّط عامل <code>?</code> تمرير الأخطاء. إذا أرجعت الـ Function خطأً، فإن <code>?</code> يُعيد ذلك الخطأ من الـ Function الحالية:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fs::File;
+<span class="keyword">use</span> std::io;
+<span class="keyword">use</span> std::io::Read;
+<span class="keyword">fn</span> <span class="func">read_username_from_file</span>() -&gt; <span class="param">Result</span>&lt;<span class="param">String</span>, io::Error&gt; {
+    <span class="keyword">let</span> <span class="keyword">mut</span> f = File::open(<span class="string">"username.txt"</span>)?;  <span class="comment">// Propagate error</span>
+    <span class="keyword">let</span> <span class="keyword">mut</span> s = String::new();
+    f.read_to_string(&amp;<span class="keyword">mut</span> s)?;  <span class="comment">// Propagate error</span>
+    <span class="keyword">Ok</span>(s)
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">read_username_from_file</span>() {
+        <span class="keyword">Ok</span>(username) =&gt; <span class="func">println!</span>(<span class="string">"Username: {}"</span>, username),
+        <span class="keyword">Err</span>(error) =&gt; <span class="func">println!</span>(<span class="string">"Error: {:?}"</span>, error),
+    }
+}</code></pre>
+    </div>
+    <h3>تسلسل النتائج</h3>
+    <p>استخدم دوال مثل <code>and_then</code> و <code>map</code> للتعامل مع Result بأسلوب وظيفي:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">fn</span> <span class="func">parse_and_square</span>(s: &amp;<span class="param">str</span>) -&gt; <span class="param">Result</span>&lt;<span class="param">i32</span>, std::num::ParseIntError&gt; {
+    s.parse::&lt;<span class="param">i32</span>&gt;()
+        .map(|n| n * n)  <span class="comment">// Transform Ok value</span>
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">parse_and_square</span>(<span class="string">"5"</span>) {
+        <span class="keyword">Ok</span>(result) =&gt; <span class="func">println!</span>(<span class="string">"Result: {}"</span>, result),  <span class="comment">// Prints: 25</span>
+        <span class="keyword">Err</span>(e) =&gt; <span class="func">println!</span>(<span class="string">"Error: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>ملاحظة مهمة</h4><p>عامل <code>?</code> هو اختصار يُغني عن كتل <code>match</code> المطوّلة. يقوم تلقائياً بتحويل نوع الخطأ إذا كان trait الـ <code>From</code> مُنفَّذاً، مما يجعل تمرير الأخطاء نظيفاً وقابلاً للتركيب.</p></div>
+    </div>
+  </div>
+  <!-- Section 4: أنواع الأخطاء المخصصة -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>أنواع الأخطاء المخصصة</h2>
+    </div>
+    <p>للتطبيقات المعقدة، عرّف أنواع أخطاء مخصصة:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fmt;
+<span class="keyword">struct</span> CustomError {
+    message: <span class="param">String</span>,
+<span class="keyword">impl</span> fmt::Display <span class="keyword">for</span> CustomError {
+    <span class="keyword">fn</span> <span class="func">fmt</span>(&amp;<span class="keyword">self</span>, f: &amp;<span class="keyword">mut</span> fmt::Formatter) -&gt; fmt::Result {
+        <span class="func">write!</span>(f, <span class="string">"Custom Error: {}"</span>, <span class="keyword">self</span>.message)
+    }
+<span class="keyword">impl</span> fmt::Debug <span class="keyword">for</span> CustomError {
+    <span class="keyword">fn</span> <span class="func">fmt</span>(&amp;<span class="keyword">self</span>, f: &amp;<span class="keyword">mut</span> fmt::Formatter) -&gt; fmt::Result {
+        <span class="func">write!</span>(f, <span class="string">"{{ file: {}, line: {} }}"</span>, <span class="func">file!</span>(), <span class="func">line!</span>())
+    }
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">let</span> error = CustomError {
+        message: String::from(<span class="string">"Something went wrong"</span>),
+    };
+    <span class="func">println!</span>(<span class="string">"{}"</span>, error);    <span class="comment">// Uses Display</span>
+    <span class="func">println!</span>(<span class="string">"{:?}"</span>, error);  <span class="comment">// Uses Debug</span>
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 5: حزمتا thiserror و anyhow -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>حزمتا thiserror و anyhow</h2>
+    </div>
+    <p>لكود الإنتاج، استخدم حزم Error Handling الشائعة. أولاً، أضفها إلى ملف <code>Cargo.toml</code>:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">TOML</span></div>
+      <pre><code>[<span class="param">dependencies</span>]
+thiserror = <span class="string">"1.0"</span>
+anyhow = <span class="string">"1.0"</span></code></pre>
+    </div>
+    <h3>استخدام thiserror</h3>
+    <p>تُسهّل حزمة <code>thiserror</code> تعريف أنواع أخطاء مخصصة:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> thiserror::Error;
+#[derive(Error, Debug)]
+<span class="keyword">pub</span> <span class="keyword">enum</span> DataError {
+    #[error(<span class="string">"IO error: {0}"</span>)]
+    Io(#[from] std::io::Error),
+    #[error(<span class="string">"Parse error: {0}"</span>)]
+    Parse(#[from] std::num::ParseIntError),
+    #[error(<span class="string">"Invalid data: {0}"</span>)]
+    Invalid(<span class="param">String</span>),
+<span class="keyword">fn</span> <span class="func">process_data</span>(s: &amp;<span class="param">str</span>) -&gt; <span class="param">Result</span>&lt;<span class="param">i32</span>, DataError&gt; {
+    s.parse()
+        .map_err(|_| DataError::Invalid(String::from(<span class="string">"Not a number"</span>)))
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">process_data</span>(<span class="string">"not_a_number"</span>) {
+        <span class="keyword">Ok</span>(num) =&gt; <span class="func">println!</span>(<span class="string">"Parsed: {}"</span>, num),
+        <span class="keyword">Err</span>(e) =&gt; <span class="func">eprintln!</span>(<span class="string">"Error: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <h3>استخدام anyhow</h3>
+    <p>توفر حزمة <code>anyhow</code> معالجة أخطاء مرنة للتطوير السريع:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> anyhow::{Result, Context};
+<span class="keyword">use</span> std::fs;
+<span class="keyword">fn</span> <span class="func">read_config</span>(path: &amp;<span class="param">str</span>) -&gt; <span class="param">Result</span>&lt;<span class="param">String</span>&gt; {
+    <span class="keyword">let</span> contents = fs::read_to_string(path)
+        .context(<span class="string">"Failed to read config file"</span>)?;
+    <span class="keyword">Ok</span>(contents)
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">read_config</span>(<span class="string">"config.txt"</span>) {
+        <span class="keyword">Ok</span>(config) =&gt; <span class="func">println!</span>(<span class="string">"Config: {}"</span>, config),
+        <span class="keyword">Err</span>(e) =&gt; <span class="func">eprintln!</span>(<span class="string">"Error: {}"</span>, e),
+    }
+}</code></pre>
+    </div>
+    <div class="tip">
+      <div class="tip-icon">💡</div>
+      <div><h4>نصيحة</h4><p>استخدم <code>thiserror</code> للمكتبات (أخطاء مُهيكلة ومُنمَّطة) و <code>anyhow</code> للتطبيقات (معالجة أخطاء مرنة وسريعة). تُكمّلان بعضهما جيداً.</p></div>
+    </div>
+  </div>
+  <!-- Section 6: نمط عملي لError Handling -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>نمط عملي لError Handling</h2>
+    </div>
+    <p>إليك مثالاً عملياً يجمع عدة مفاهيم:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Rust</span></div>
+      <pre><code><span class="keyword">use</span> std::fs::File;
+<span class="keyword">use</span> std::io::{<span class="keyword">self</span>, Read};
+<span class="keyword">fn</span> <span class="func">read_and_parse_file</span>(path: &amp;<span class="param">str</span>) -&gt; <span class="param">Result</span>&lt;<span class="param">i32</span>, Box&lt;<span class="keyword">dyn</span> std::error::Error&gt;&gt; {
+    <span class="comment">// Open file, propagating IO errors</span>
+    <span class="keyword">let</span> <span class="keyword">mut</span> file = File::open(path)?;
+    <span class="comment">// Read contents, propagating IO errors</span>
+    <span class="keyword">let</span> <span class="keyword">mut</span> contents = String::new();
+    file.read_to_string(&amp;<span class="keyword">mut</span> contents)?;
+    <span class="comment">// Parse to integer, propagating parse errors</span>
+    <span class="keyword">let</span> number = contents.trim().parse::&lt;<span class="param">i32</span>&gt;()?;
+    <span class="keyword">Ok</span>(number)
+<span class="keyword">fn</span> <span class="func">main</span>() {
+    <span class="keyword">match</span> <span class="func">read_and_parse_file</span>(<span class="string">"number.txt"</span>) {
+        <span class="keyword">Ok</span>(num) =&gt; <span class="func">println!</span>(<span class="string">"Number: {}"</span>, num),
+        <span class="keyword">Err</span>(e) =&gt; {
+            <span class="func">eprintln!</span>(<span class="string">"An error occurred: {}"</span>, e);
+            std::process::exit(<span class="number">1</span>);
+        }
+    }
+}</code></pre>
+    </div>
+  </div>
+  <!-- Section 7: أفضل ممارسات Error Handling -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>أفضل ممارسات Error Handling</h2>
+    </div>
+    <p>عند تصميم Error Handling لتطبيقك:</p>
+    <ul>
+      <li><strong>استخدم Result افتراضياً:</strong> Functions التي قد تفشل يجب أن تُرجع <code>Result</code>.</li>
+      <li><strong>مرّر الأخطاء للأعلى:</strong> استخدم عامل <code>?</code> لتترك المُستدعي يقرر كيفية التعامل مع الأخطاء.</li>
+      <li><strong>وفّر السياق:</strong> أضف معلومات حول ما فشل ولماذا.</li>
+      <li><strong>استخدم أخطاء مخصصة للمكتبات:</strong> يجب أن تُعرّف المكتبات أنواع أخطائها الخاصة.</li>
+      <li><strong>استخدم anyhow للتطبيقات:</strong> يمكن للتطبيقات استخدام معالجة أخطاء مرنة مع anyhow.</li>
+      <li><strong>تجنب unwrap في الإنتاج:</strong> استخدم <code>unwrap()</code> فقط عندما تكون متأكداً تماماً من وجود القيمة.</li>
+      <li><strong>سجّل الأخطاء:</strong> استخدم حزمة <code>log</code> أو ما شابهها لتسجيل الأخطاء لأغراض التصحيح.</li>
+    </ul>
+    <div class="insight">
+      <div class="insight-icon">✨</div>
+      <div><h4>ملاحظة مهمة</h4><p>فلسفة Error Handling في Rust هي "اجعل الحالات غير الصالحة غير قابلة للتمثيل." بترميز الفشل في Type System باستخدام <code>Result</code> و <code>Option</code>، يكتشف المُترجم Error Handling المفقودة في Compile-time, وليس في Runtime.</p></div>
+    </div>
+  </div>
+</div>
+<div class="bottom-nav">
+  <a href="ch-04-structs-enums.html" class="nav-btn">السابق →</a>
+  <span class="nav-info">الفصل 5 من 17</span>
+  <a href="ch-06-collections.html" class="nav-btn primary">← التالي</a>
+</div>
+<script src="../slides.js"></script>
+</body>
+</html>
